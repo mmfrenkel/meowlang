@@ -1,0 +1,9 @@
+# files/executables/intermediates from compilation steps
+*.cmi
+*.cmo
+parser.ml
+parser.mli
+scanner.ml
+
+# files from IDEs, etc.
+.DS_Store
