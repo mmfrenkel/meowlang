@@ -4,6 +4,8 @@
 parser.ml
 parser.mli
 scanner.ml
+meowlang.native
 
 # files from IDEs, etc.
 .DS_Store
+_build/

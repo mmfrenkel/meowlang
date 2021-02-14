@@ -12,7 +12,7 @@ found https://dev.realworldocaml.org/parsing-with-ocamllex-and-menhir.html
 let digit = ['0' - '9']
 let digits = digit+
 let variable = ['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
-let whilespace = [' ' '\t' '\r' '\n']
+let whitespace = [' ' '\t' '\r' '\n']
 
 rule token = parse
   whitespace      { token lexbuf }             (* Whitespace *)
@@ -68,3 +68,6 @@ and read_string buf =
   | _ { raise (SyntaxError ("Illegal string character: " ^ Lexing.lexeme lexbuf)) }
   | eof { raise (SyntaxError ("String is not terminated")) }
 
+and comment = parse
+  "\n" { token lexbuf }
+| _    { comment lexbuf }
