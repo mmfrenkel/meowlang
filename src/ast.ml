@@ -50,7 +50,7 @@ let string_of_op = function
   | Or -> "||"
 
 let string_of_modules = function
-  Module(l) -> "include \"" ^ "\""
+  Module(l) -> "include \"" ^ l ^ "\""
 
 let string_of_uop = function
   Not -> "!"

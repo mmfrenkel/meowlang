@@ -57,6 +57,26 @@ fdecl:
 	        body = List.rev $9
         }
       }
+  | LBRACE DEF typ FUNCTION ID RPAREN vdecl_list stmt_list return RBRACE
+      {
+        {
+          typ = $3;
+	        fname = $5;
+	        formals = [];
+	        locals = List.rev $7;
+	        body = List.rev ($9 :: $8);
+        }
+      }
+  | LBRACE DEF FUNCTION ID RPAREN vdecl_list stmt_list RBRACE
+      {
+        {
+          typ = Void;
+	        fname = $4;
+	        formals = [];
+	        locals = List.rev $6;
+	        body = List.rev $7;
+        }
+      }
 
 formals_opt:
     /* nothing */ { [] }
