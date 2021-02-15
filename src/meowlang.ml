@@ -2,6 +2,7 @@
     Mostly a place holder file if we wanted to test our scanner/parser
 *)
 open Ast
+open Pretty
 
 let _ =
     let lexbuf = Lexing.from_channel stdin in
