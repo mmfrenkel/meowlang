@@ -1,0 +1,18 @@
+GIMME hello?
+
+HAI ITZ ME YARN FUNC testing_variables,
+
+        PSST Creating some local variables
+        ITZ ME NUMBR count.
+        ITZ ME NUMBAR random.
+        ITZ ME BOO say_hello.
+        ITZ ME YARN msg.
+
+        PSST Assigning local varibles values
+        msg IZ "hello world".
+        say_hello IZ AYE.
+        count IZ 2.
+        random IZ 2.34.
+
+        GIVE msg.  PSST Returning Hello to user
+KBYE

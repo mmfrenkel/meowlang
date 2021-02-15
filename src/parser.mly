@@ -2,10 +2,10 @@
 open Ast
 %}
 
-%token MODULE IMPORT CALL FUNCTION DEF COMP
+%token RETURN MODULE IMPORT CALL FUNCTION DEF COMP
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN
 %token NOT EQ NEQ LT GT AND OR CONCAT
-%token RETURN INT BOOL FLOAT STRING
+%token INT BOOL FLOAT STRING
 %token <int> ILIT
 %token <bool> BLIT
 %token <string> ID FLIT SLIT
@@ -15,6 +15,7 @@ open Ast
 %type <Ast.program> program
 
 %right ASSIGN
+%left CONCAT
 %left OR
 %left AND
 %left EQ NEQ
@@ -36,35 +37,39 @@ decls:
 import:
   MODULE ID IMPORT { Module($2) }
 
+/*
+A function declaration can include return types or not. It can include a list
+of parameters or not; or any combination of the two.
+*/
 fdecl:
-    LBRACE DEF typ FUNCTION ID LPAREN formals_opt RPAREN vdecl_list stmt_list return RBRACE
+    LBRACE DEF typ FUNCTION ID formals_opt RPAREN vdecl_list stmt_list RBRACE
       {
         {
           typ = $3;
-	        fname = $5;
-	        formals = List.rev $7;
-	        locals = List.rev $9;
-	        body = List.rev ($11 :: $10)
+          fname = $5;
+          formals = List.rev $6;
+          locals = List.rev $8;
+          body = List.rev $9;
         }
       }
-  | LBRACE DEF FUNCTION ID LPAREN formals_opt RPAREN vdecl_list stmt_list RBRACE
+  | LBRACE DEF FUNCTION ID formals_opt RPAREN vdecl_list stmt_list RBRACE
       {
         {
           typ = Void;
 	        fname = $4;
-	        formals = List.rev $6;
-	        locals = List.rev $8;
-	        body = List.rev $9
+	        formals = List.rev $5;
+	        locals = List.rev $7;
+	        body = List.rev $8;
         }
       }
-  | LBRACE DEF typ FUNCTION ID RPAREN vdecl_list stmt_list return RBRACE
+  | LBRACE DEF typ FUNCTION ID RPAREN vdecl_list stmt_list RBRACE
       {
         {
           typ = $3;
-	        fname = $5;
-	        formals = [];
-	        locals = List.rev $7;
-	        body = List.rev ($9 :: $8);
+          fname = $5;
+          formals = [];
+          locals = List.rev $7;
+          body = List.rev $8;
         }
       }
   | LBRACE DEF FUNCTION ID RPAREN vdecl_list stmt_list RBRACE
@@ -79,37 +84,36 @@ fdecl:
       }
 
 formals_opt:
-    /* nothing */ { [] }
-  | formal_list   { $1 }
+    /* nothing */        { [] }
+  | LPAREN formal_list   { $2 }
 
 formal_list:
     typ ID                   { [($1,$2)]     }
   | formal_list COMMA typ ID { ($3,$4) :: $1 }
 
 typ:
-    INT   { Int   }
-  | BOOL  { Bool  }
-  | FLOAT { Float }
+    INT     { Int    }
+  | BOOL    { Bool   }
+  | FLOAT   { Float  }
+  | STRING  { String }
 
 vdecl_list:
-    /* nothing */    { [] }
-  | vdecl_list vdecl { $2 :: $1 }
+    /* nothing */             { []                     }
+  | vdecl_list vdecl          { $2 :: $1               }
 
 vdecl:
-   DEF typ ID SEMI { ($2, $3) }
+   DEF typ ID SEMI            { ($2, $3)               }
 
 stmt_list:
-    /* nothing */  { [] }
-  | stmt_list stmt { $2 :: $1 }
-
-return:
-  | RETURN expr_opt SEMI                    { Return $2             }
+    /* nothing */             { []                     }
+  | stmt_list stmt            { $2 :: $1               }
 
 stmt:
-    expr SEMI                               { Expr $1               }
+    expr SEMI                 { Expr($1)               }
+  | RETURN expr SEMI          { Return($2)             }
 
 expr_opt:
-  | expr          { $1 }
+  | expr                      { $1                     }
 
 expr:
     ILIT                      { ILiteral($1)           }
@@ -129,13 +133,15 @@ expr:
   | OR expr COMMA expr        { Binop($2, Or,    $4)   }
   | NOT expr                  { Unop(Not, $2)          }
   | ID ASSIGN expr            { Assign($1, $3)         }
+  | CALL ID                   { Call($2, [])           }
   | CALL ID LPAREN args_opt   { Call($2, $4)           }
   | LPAREN expr RPAREN        { $2                     }
+  | expr CONCAT expr          { Binop($1, Concat, $3)  }
 
 args_opt:
-    /* nothing */ { [] }
-  | args_list  { List.rev $1 }
+    /* nothing */             { []                     }
+  | args_list                 { List.rev $1            }
 
 args_list:
-    expr                    { [$1] }
-  | args_list COMMA expr { $3 :: $1 }
+    expr                      { [$1]                   }
+  | args_list COMMA expr      { $3 :: $1               }

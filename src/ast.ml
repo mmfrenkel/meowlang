@@ -1,6 +1,6 @@
 (* Abstract Syntax Tree and functions for printing it *)
 
-type op = Add | Sub | Mult | Div | Equal | Neq | Less | Greater | And | Or
+type op = Add | Sub | Mult | Div | Equal | Neq | Less | Greater | And | Or | Concat
 
 type uop = Not
 
@@ -48,6 +48,7 @@ let string_of_op = function
   | Greater -> ">"
   | And -> "&&"
   | Or -> "||"
+  | Concat -> "+"
 
 let string_of_modules = function
   Module(l) -> "include \"" ^ l ^ "\""
@@ -57,7 +58,7 @@ let string_of_uop = function
 
 let rec string_of_expr = function
     ILiteral(l) -> string_of_int l
-  | StringLit(l) -> l
+  | StringLit(l) -> "\"" ^ l ^ "\""
   | Fliteral(l) -> l
   | BoolLit(true) -> "true"
   | BoolLit(false) -> "false"
@@ -70,26 +71,35 @@ let rec string_of_expr = function
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
 
 let rec string_of_stmt = function
-    Expr(expr) -> string_of_expr expr ^ ";\n";
-  | Return(expr) -> "return " ^ string_of_expr expr ^ ";\n"
+    Expr(expr) -> "\t" ^ string_of_expr expr ^ ";\n";
+  | Return(expr) -> "\treturn " ^ string_of_expr expr ^ ";\n"
 
 let string_of_typ = function
     Int -> "int"
   | Bool -> "bool"
   | Float -> "float"
-  | String -> "string"
+  | String -> "char *"
   | Void -> ""
 
-let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
+let string_of_vdecl (t, id) = "\t" ^ string_of_typ t ^ " " ^ id ^ ";\n"
+
+let string_of_formals (t, id) = string_of_typ t ^ " " ^ id
+
+let format_params fdecl =
+  "(" ^ String.concat ", " (List.map string_of_formals fdecl.formals) ^ ")\n"
 
 let string_of_fdecl fdecl =
-  string_of_typ fdecl.typ ^ " " ^
-  fdecl.fname ^ "(" ^ String.concat ", " (List.map snd fdecl.formals) ^
-  ")\n{\n" ^
-  String.concat "" (List.map string_of_vdecl fdecl.locals) ^
-  String.concat "" (List.map string_of_stmt fdecl.body) ^
+  let return_string = (
+    match fdecl.typ with
+        Void -> ""
+      | _ -> string_of_typ fdecl.typ ^ " ") in
+
+  return_string ^ fdecl.fname ^ format_params fdecl ^
+  "{\n" ^
+    String.concat "" (List.map string_of_vdecl fdecl.locals) ^
+    String.concat "" (List.map string_of_stmt fdecl.body) ^
   "}\n"
 
 let string_of_program (imports, funcs) =
-  String.concat "" (List.map string_of_modules imports) ^ "\n" ^
+  String.concat "" (List.map string_of_modules imports) ^ "\n\n" ^
   String.concat "\n" (List.map string_of_fdecl funcs)

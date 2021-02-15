@@ -1,0 +1,22 @@
+GIMME hello?
+
+HAI ITZ ME YARN FUNC create_message WIT YARN name,
+
+        ITZ ME YARN msg.
+
+        msg IZ "hello, ".
+        msg IZ msg CAT name.
+
+        GIVE msg.
+
+KBYE
+
+HAI ITZ ME NUMBR FUNC main,
+        PSST Attempt to call a helper function
+
+        ITZ ME YARN my_name.
+        my_name IZ "Meg".
+
+        PURR create_message WIT my_name.
+        GIVE 0.
+KBYE

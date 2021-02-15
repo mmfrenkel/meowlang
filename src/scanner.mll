@@ -13,6 +13,7 @@ let digit = ['0' - '9']
 let digits = digit+
 let variable = ['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
 let whitespace = [' ' '\t' '\r' '\n']
+let float = digits '.'  ((digit+ | ( ['e' 'E'] ['+' '-']? digits)) | (digit* ( ['e' 'E'] ['+' '-']? digits )))
 
 rule token = parse
   whitespace      { token lexbuf }             (* Whitespace *)
@@ -23,7 +24,6 @@ rule token = parse
 | "KBYE"          { RBRACE }
 | "PURR"          { CALL }
 | "FUNC"          { FUNCTION }
-| "."             { SEMI }
 | "WIT"           { LPAREN }
 | ","             { RPAREN }
 | "AN"            { COMMA }
@@ -50,9 +50,10 @@ rule token = parse
 | "CAT"           { CONCAT }
 | "THAN"          { COMP }
 | digits as lxm   { ILIT(int_of_string lxm) }
-| digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )? as lxm { FLIT(lxm) }
+| float as lxm    { FLIT(lxm) }
 | variable as lxm { ID(lxm) }
 | '"'             { read_string (Buffer.create 17) lexbuf }
+| "."             { SEMI }
 | eof { EOF }
 | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
 
