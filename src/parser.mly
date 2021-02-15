@@ -29,6 +29,9 @@ open Ast
 program:
   decls EOF                     { $1                       }
 
+/*
+  A program is a list of import statements and a set of function declarations.
+ */
 decls:
   /* nothing */                 { ([], [])                 }
   | decls import                { (($2 :: fst $1), snd $1) }
@@ -38,9 +41,10 @@ import:
   MODULE ID IMPORT              { Module($2)               }
 
 /*
-A function declaration can include return types or not. It can include a list
-of parameters or not; or any combination of the two.
-*/
+ A function declaration can include return types or not. It can include a list
+ of parameters or not; or any combination of the two. Because we do not require
+ users to use 'void', we have four possibilities for function declarations.
+ */
 fdecl:
     LBRACE DEF typ FUNCTION ID formals_opt RPAREN vdecl_list stmt_list RBRACE
       {

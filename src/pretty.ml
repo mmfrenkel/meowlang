@@ -1,4 +1,8 @@
-(* Pretty-printing functions *)
+(*
+   Pretty-printing functions that allow you to print a meowlang program in the
+   near-equivalent C program. Note that a large amount of this code was derived
+   and adjusted from the MicroC Compiler provided by S. Edwards (Spring 2021).
+*)
 open Ast
 
 let string_of_op = function
