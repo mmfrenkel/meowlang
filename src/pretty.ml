@@ -1,0 +1,69 @@
+(* Pretty-printing functions *)
+open Ast
+
+let string_of_op = function
+    Add -> "+"
+  | Sub -> "-"
+  | Mult -> "*"
+  | Div -> "/"
+  | Equal -> "=="
+  | Neq -> "!="
+  | Less -> "<"
+  | Greater -> ">"
+  | And -> "&&"
+  | Or -> "||"
+  | Concat -> "+"
+
+let string_of_modules = function
+  Module(l) -> "include \"" ^ l ^ "\""
+
+let string_of_uop = function
+  Not -> "!"
+
+let rec string_of_expr = function
+    ILiteral(l) -> string_of_int l
+  | StringLit(l) -> "\"" ^ l ^ "\""
+  | Fliteral(l) -> l
+  | BoolLit(true) -> "true"
+  | BoolLit(false) -> "false"
+  | Id(s) -> s
+  | Binop(e1, o, e2) ->
+      string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
+  | Unop(o, e) -> string_of_uop o ^ string_of_expr e
+  | Assign(v, e) -> v ^ " = " ^ string_of_expr e
+  | Call(f, el) ->
+      f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+
+let rec string_of_stmt = function
+    Expr(expr) -> "\t" ^ string_of_expr expr ^ ";\n";
+  | Return(expr) -> "\treturn " ^ string_of_expr expr ^ ";\n"
+
+let string_of_typ = function
+    Int -> "int"
+  | Bool -> "bool"
+  | Float -> "float"
+  | String -> "char *"
+  | Void -> ""
+
+let string_of_vdecl (t, id) = "\t" ^ string_of_typ t ^ " " ^ id ^ ";\n"
+
+let string_of_formals (t, id) = string_of_typ t ^ " " ^ id
+
+let format_params fdecl =
+  "(" ^ String.concat ", " (List.map string_of_formals fdecl.formals) ^ ")\n"
+
+let string_of_fdecl fdecl =
+  let return_string = (
+    match fdecl.typ with
+        Void -> ""
+      | _ -> string_of_typ fdecl.typ ^ " ") in
+
+  return_string ^ fdecl.fname ^ format_params fdecl ^
+  "{\n" ^
+    String.concat "" (List.map string_of_vdecl fdecl.locals) ^
+    String.concat "" (List.map string_of_stmt fdecl.body) ^
+  "}\n"
+
+let string_of_program (imports, funcs) =
+  String.concat "" (List.map string_of_modules imports) ^ "\n\n" ^
+  String.concat "\n" (List.map string_of_fdecl funcs)
