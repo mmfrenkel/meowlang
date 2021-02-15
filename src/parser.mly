@@ -27,15 +27,15 @@ open Ast
 %%
 
 program:
-  decls EOF { $1}
+  decls EOF                     { $1                       }
 
 decls:
-  /* nothing */ { ([], [])               }
-  | decls import { (($2 :: fst $1), snd $1) }
-  | decls fdecl { (fst $1, ($2 :: snd $1)) }
+  /* nothing */                 { ([], [])                 }
+  | decls import                { (($2 :: fst $1), snd $1) }
+  | decls fdecl                 { (fst $1, ($2 :: snd $1)) }
 
 import:
-  MODULE ID IMPORT { Module($2) }
+  MODULE ID IMPORT              { Module($2)               }
 
 /*
 A function declaration can include return types or not. It can include a list
@@ -84,12 +84,12 @@ fdecl:
       }
 
 formals_opt:
-    /* nothing */        { [] }
-  | LPAREN formal_list   { $2 }
+    /* nothing */            { []                     }
+  | LPAREN formal_list       { $2                     }
 
 formal_list:
-    typ ID                   { [($1,$2)]     }
-  | formal_list COMMA typ ID { ($3,$4) :: $1 }
+    typ ID                   { [($1,$2)]               }
+  | formal_list COMMA typ ID { ($3,$4) :: $1           }
 
 typ:
     INT     { Int    }
