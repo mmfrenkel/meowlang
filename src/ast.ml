@@ -10,6 +10,10 @@ type bind = typ * string
 
 type import = Module of string
 
+type array_size =
+    ILiteralArraySize of int
+  | VariableArraySize of string
+
 type expr =
     ILiteral of int
   | Fliteral of string
@@ -20,6 +24,7 @@ type expr =
   | Unop of uop * expr
   | Assign of string * expr
   | Call of string * expr list
+  | NewArray of string * typ * array_size * expr list
 
 type stmt =
     Expr of expr

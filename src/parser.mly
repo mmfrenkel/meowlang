@@ -2,10 +2,10 @@
 open Ast
 %}
 
-%token RETURN MODULE IMPORT CALL FUNCTION DEF COMP
+%token RETURN MODULE IMPORT CALL FUNCTION DEF COMP CLASS NEW FREE MAKE
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN
-%token NOT EQ NEQ LT GT AND OR CONCAT
-%token INT BOOL FLOAT STRING
+%token NOT EQ NEQ LT GT AND OR CONCAT CONTAINS
+%token INT BOOL FLOAT STRING ARRAY
 %token <int> ILIT
 %token <bool> BLIT
 %token <string> ID FLIT SLIT
@@ -39,11 +39,6 @@ decls:
 import:
   MODULE ID IMPORT              { Module($2)               }
 
-/*
- A function declaration can include return types or not. It can include a list
- of parameters or not; or any combination of the two. Because we do not require
- users to use 'void', we have four possibilities for function declarations.
- */
 fdecl:
     LBRACE DEF return_type FUNCTION ID formals_opt RPAREN vdecl_list stmt_list RBRACE
       {
@@ -79,7 +74,7 @@ vdecl_list:
   | vdecl_list vdecl          { $2 :: $1               }
 
 vdecl:
-   DEF typ ID SEMI            { ($2, $3)               }
+  DEF typ ID SEMI            { ($2, $3)               }
 
 stmt_list:
     /* nothing */             { []                     }
@@ -90,6 +85,8 @@ stmt:
   | RETURN expr SEMI          { Return($2)             }
   | CALL ID SEMI              { Expr(Call($2, []))     }
   | CALL ID LPAREN args_opt SEMI { Expr(Call($2, $4))  }
+  | ID ASSIGN expr SEMI       { Expr(Assign($1, $3))   }
+  | array_decl SEMI           { Expr($1)               }
 
 expr:
     ILIT                      { ILiteral($1)           }
@@ -108,7 +105,6 @@ expr:
   | AND expr COMMA expr       { Binop($2, And,   $4)   }
   | OR expr COMMA expr        { Binop($2, Or,    $4)   }
   | NOT expr                  { Unop(Not, $2)          }
-  | ID ASSIGN expr            { Assign($1, $3)         }
   | LPAREN expr RPAREN        { $2                     }
   | CONCAT expr COMMA expr    { Binop($2, Concat, $4)  }
 
@@ -118,3 +114,14 @@ args_opt:
 args_list:
     expr                      { [$1]                   }
   | args_list COMMA expr      { $3 :: $1               }
+
+/* Array Specification */
+
+array_decl:
+    MAKE ID NEW typ ARRAY CONTAINS array_size_typ RPAREN LPAREN args_opt { NewArray($2, $4, $7, $10) }
+  | MAKE ID NEW typ ARRAY CONTAINS array_size_typ  { NewArray($2, $4, $7, []) }
+  | MAKE ID NEW typ ARRAY { NewArray($2, $4, ILiteralArraySize(0), []) }
+
+array_size_typ:
+    ILIT                      { ILiteralArraySize($1)   }
+  | ID                        { VariableArraySize($1)   }

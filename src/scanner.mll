@@ -38,6 +38,12 @@ rule token = parse
 | "GIMME"         { MODULE }
 | "?"             { IMPORT }
 
+(* Objects/Classes *)
+| "MAEK"          { MAKE }
+| "NEW"           { NEW }
+| "BLEEP"         { FREE }
+| "CLASS"         { CLASS }
+
 (* Functions *)
 | "PURR"          { CALL }
 | "FUNC"          { FUNCTION }
@@ -59,6 +65,7 @@ rule token = parse
 | "NOT"           { NOT }
 | "CAT"           { CONCAT }
 | "THAN"          { COMP }
+| "OF"            { CONTAINS }
 
 (* Data Types *)
 | "YARN"          { STRING }
@@ -68,6 +75,7 @@ rule token = parse
 | "AYE"           { BLIT(true)  }
 | "NAY"           { BLIT(false) }
 
+| "BUCKET"        { ARRAY }
 | digits as lxm   { ILIT(int_of_string lxm) }
 | float as lxm    { FLIT(lxm) }
 | identifier as lxm { ID(lxm) }

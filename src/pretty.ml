@@ -23,6 +23,16 @@ let string_of_modules = function
 
 let string_of_uop = function
   Not -> "!"
+let string_of_typ = function
+  Int -> "int"
+| Bool -> "bool"
+| Float -> "float"
+| String -> "char *"
+| Void -> ""
+
+let string_of_array_size = function
+  ILiteralArraySize(l) -> string_of_int l
+| VariableArraySize(s) -> s
 
 let rec string_of_expr = function
     ILiteral(l) -> string_of_int l
@@ -37,17 +47,12 @@ let rec string_of_expr = function
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | NewArray(i, typ, s, contents) ->
+      string_of_typ typ ^ " [" ^ string_of_array_size s ^ "] " ^ i ^ " = [ " ^ String.concat ", " (List.map string_of_expr contents) ^ " ]"
 
 let rec string_of_stmt = function
     Expr(expr) -> "\t" ^ string_of_expr expr ^ ";\n";
   | Return(expr) -> "\treturn " ^ string_of_expr expr ^ ";\n"
-
-let string_of_typ = function
-    Int -> "int"
-  | Bool -> "bool"
-  | Float -> "float"
-  | String -> "char *"
-  | Void -> ""
 
 let string_of_vdecl (t, id) = "\t" ^ string_of_typ t ^ " " ^ id ^ ";\n"
 
