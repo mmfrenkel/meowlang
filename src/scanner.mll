@@ -11,7 +11,7 @@ found https://dev.realworldocaml.org/parsing-with-ocamllex-and-menhir.html
 
 let digit = ['0' - '9']
 let digits = digit+
-let variable = ['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
+let identifier = ['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
 let whitespace = [' ' '\t' '\r' '\n']
 let float = digits '.'  ((digit+ | ( ['e' 'E'] ['+' '-']? digits)) | (digit* ( ['e' 'E'] ['+' '-']? digits )))
 
@@ -51,11 +51,11 @@ rule token = parse
 | "THAN"          { COMP }
 | digits as lxm   { ILIT(int_of_string lxm) }
 | float as lxm    { FLIT(lxm) }
-| variable as lxm { ID(lxm) }
+| identifier as lxm { ID(lxm) }
 | '"'             { read_string (Buffer.create 17) lexbuf }
 | "."             { SEMI }
 | eof { EOF }
-| _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
+| _ as char { raise (SyntaxError("Illegal character " ^ Char.escaped char)) }
 
 
 and read_string buf =
@@ -66,7 +66,6 @@ and read_string buf =
         Buffer.add_string buf (Lexing.lexeme lexbuf);
         read_string buf lexbuf
     }
-  | _ { raise (SyntaxError ("Illegal string character: " ^ Lexing.lexeme lexbuf)) }
   | eof { raise (SyntaxError ("String is not terminated")) }
 
 and comment = parse

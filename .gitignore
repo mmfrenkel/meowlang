@@ -3,6 +3,7 @@
 *.cmo
 parser.ml
 parser.mli
+parser.output
 scanner.ml
 meowlang.native
 

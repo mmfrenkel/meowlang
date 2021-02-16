@@ -94,6 +94,8 @@ stmt_list:
 stmt:
     expr SEMI                 { Expr($1)               }
   | RETURN expr SEMI          { Return($2)             }
+  | CALL ID SEMI              { Expr(Call($2, []))     }
+  | CALL ID LPAREN args_opt SEMI { Expr(Call($2, $4))  }
 
 expr:
     ILIT                      { ILiteral($1)           }
@@ -113,8 +115,6 @@ expr:
   | OR expr COMMA expr        { Binop($2, Or,    $4)   }
   | NOT expr                  { Unop(Not, $2)          }
   | ID ASSIGN expr            { Assign($1, $3)         }
-  | CALL ID SEMI SEMI         { Call($2, [])           }
-  | CALL ID LPAREN args_opt SEMI SEMI  { Call($2, $4)  }
   | LPAREN expr RPAREN        { $2                     }
   | CONCAT expr COMMA expr    { Binop($2, Concat, $4)  }
 
