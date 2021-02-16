@@ -45,7 +45,7 @@ import:
  users to use 'void', we have four possibilities for function declarations.
  */
 fdecl:
-    LBRACE DEF typ FUNCTION ID formals_opt RPAREN vdecl_list stmt_list RBRACE
+    LBRACE DEF return_type FUNCTION ID formals_opt RPAREN vdecl_list stmt_list RBRACE
       {
         {
           typ = $3;
@@ -55,16 +55,10 @@ fdecl:
           body = List.rev $9;
         }
       }
-  | LBRACE DEF FUNCTION ID formals_opt RPAREN vdecl_list stmt_list RBRACE
-      {
-        {
-          typ = Void;
-	        fname = $4;
-	        formals = List.rev $5;
-	        locals = List.rev $7;
-	        body = List.rev $8;
-        }
-      }
+
+return_type:
+    /* nothing */            { Void                   }
+  | typ                      { $1                     }
 
 formals_opt:
     /* nothing */            { []                     }

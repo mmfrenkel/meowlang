@@ -13,20 +13,37 @@ let digit = ['0' - '9']
 let digits = digit+
 let identifier = ['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
 let whitespace = [' ' '\t' '\r' '\n']
+
+(*
+  Special rule for float; note that because periods are used as a semicolon
+  in this langauge, we have to treat the input "2." differently than usual. In
+  this language, "2." is interpreted as an integer and "2.0" is a float.
+*)
 let float = digits '.'  ((digit+ | ( ['e' 'E'] ['+' '-']? digits)) | (digit* ( ['e' 'E'] ['+' '-']? digits )))
 
 rule token = parse
-  whitespace      { token lexbuf }             (* Whitespace *)
-| "PSST"          { comment lexbuf }           (* Comments *)
-| "GIMME"         { MODULE }
-| "?"             { IMPORT }
+(* Whitespace/Comments *)
+  whitespace      { token lexbuf }
+| "PSST"          { comment lexbuf }
+
+(* Structural *)
 | "HAI"           { LBRACE }
 | "KBYE"          { RBRACE }
-| "PURR"          { CALL }
-| "FUNC"          { FUNCTION }
 | "WIT"           { LPAREN }
 | ","             { RPAREN }
 | "AN"            { COMMA }
+| "."             { SEMI }
+
+(* Module/Imports *)
+| "GIMME"         { MODULE }
+| "?"             { IMPORT }
+
+(* Functions *)
+| "PURR"          { CALL }
+| "FUNC"          { FUNCTION }
+| "GIVE"          { RETURN }
+
+(* Operators *)
 | "SUM OF"        { PLUS }
 | "DIFF OF"       { MINUS }
 | "PRODUKT OF"    { TIMES }
@@ -40,20 +57,21 @@ rule token = parse
 | "BOTH OF"       { AND }
 | "EITHER OF"     { OR }
 | "NOT"           { NOT }
+| "CAT"           { CONCAT }
+| "THAN"          { COMP }
+
+(* Data Types *)
 | "YARN"          { STRING }
-| "GIVE"          { RETURN }
 | "NUMBR"         { INT }
 | "BOO"           { BOOL }
 | "NUMBAR"        { FLOAT }
 | "AYE"           { BLIT(true)  }
 | "NAY"           { BLIT(false) }
-| "CAT"           { CONCAT }
-| "THAN"          { COMP }
+
 | digits as lxm   { ILIT(int_of_string lxm) }
 | float as lxm    { FLIT(lxm) }
 | identifier as lxm { ID(lxm) }
-| '"'             { read_string (Buffer.create 17) lexbuf }
-| "."             { SEMI }
+| '"'             { read_string (Buffer.create 17) lexbuf }  (* String *)
 | eof { EOF }
 | _ as char { raise (SyntaxError("Illegal character " ^ Char.escaped char)) }
 
