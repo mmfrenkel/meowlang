@@ -5,7 +5,7 @@ HAI ITZ ME YARN FUNC create_message WIT YARN name,
         ITZ ME YARN msg.
 
         msg IZ "hello, ".
-        msg IZ msg CAT name.
+        msg IZ CAT msg AN name.
 
         GIVE msg.
 
@@ -17,6 +17,6 @@ HAI ITZ ME NUMBR FUNC main,
         ITZ ME YARN my_name.
         my_name IZ "Meg".
 
-        PURR create_message WIT my_name.
+        PURR create_message WIT my_name...
         GIVE 0.
 KBYE

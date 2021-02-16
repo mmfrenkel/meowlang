@@ -15,13 +15,12 @@ open Ast
 %type <Ast.program> program
 
 %right ASSIGN
-%left CONCAT
-%left OR
-%left AND
-%left EQ NEQ
-%left LT GT
-%left PLUS MINUS
-%left TIMES DIVIDE
+%right CONCAT
+%right OR AND
+%right EQ NEQ
+%right LT GT
+%right PLUS MINUS
+%right TIMES DIVIDE
 %right NOT
 
 %%
@@ -66,26 +65,6 @@ fdecl:
 	        body = List.rev $8;
         }
       }
-  | LBRACE DEF typ FUNCTION ID RPAREN vdecl_list stmt_list RBRACE
-      {
-        {
-          typ = $3;
-          fname = $5;
-          formals = [];
-          locals = List.rev $7;
-          body = List.rev $8;
-        }
-      }
-  | LBRACE DEF FUNCTION ID RPAREN vdecl_list stmt_list RBRACE
-      {
-        {
-          typ = Void;
-	        fname = $4;
-	        formals = [];
-	        locals = List.rev $6;
-	        body = List.rev $7;
-        }
-      }
 
 formals_opt:
     /* nothing */            { []                     }
@@ -116,9 +95,6 @@ stmt:
     expr SEMI                 { Expr($1)               }
   | RETURN expr SEMI          { Return($2)             }
 
-expr_opt:
-  | expr                      { $1                     }
-
 expr:
     ILIT                      { ILiteral($1)           }
   | FLIT	                    { Fliteral($1)           }
@@ -137,13 +113,12 @@ expr:
   | OR expr COMMA expr        { Binop($2, Or,    $4)   }
   | NOT expr                  { Unop(Not, $2)          }
   | ID ASSIGN expr            { Assign($1, $3)         }
-  | CALL ID                   { Call($2, [])           }
-  | CALL ID LPAREN args_opt   { Call($2, $4)           }
+  | CALL ID SEMI SEMI         { Call($2, [])           }
+  | CALL ID LPAREN args_opt SEMI SEMI  { Call($2, $4)  }
   | LPAREN expr RPAREN        { $2                     }
-  | expr CONCAT expr          { Binop($1, Concat, $3)  }
+  | CONCAT expr COMMA expr    { Binop($2, Concat, $4)  }
 
 args_opt:
-    /* nothing */             { []                     }
   | args_list                 { List.rev $1            }
 
 args_list:
