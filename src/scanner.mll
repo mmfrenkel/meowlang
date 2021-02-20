@@ -66,6 +66,8 @@ rule token = parse
 | "CAT"           { CONCAT }
 | "THAN"          { COMP }
 | "OF"            { CONTAINS }
+| "UPPIN YR"      { INCREMENT }
+| "NERFIN YR"     { DECREMENT }
 
 (* Data Types *)
 | "YARN"          { STRING }

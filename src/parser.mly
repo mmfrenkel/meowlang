@@ -16,6 +16,7 @@ open Ast
 
 %nonassoc NOELSE
 %nonassoc ELSE
+%nonassoc UNTIL
 %right ASSIGN
 %right CONCAT
 %right OR AND
@@ -92,7 +93,8 @@ stmt:
   | array_decl SEMI           { Expr($1)               }
   | expr IF stmt %prec NOELSE { If($1, $3, Block([]))  }
   | expr IF stmt ELSE stmt    { If($1, $3, $5)         }
-  | FOR expr stmt             { For($2, $3)            }
+  | FOR INCREMENT expr expr stmt { For(Increment, $3, $4, $5) }
+  | FOR DECREMENT expr expr stmt { For(Decrement, $3, $4, $5) }
 
 expr:
     ILIT                      { ILiteral($1)           }

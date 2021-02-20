@@ -1,6 +1,6 @@
 (* Abstract Syntax Tree *)
 
-type op = Add | Sub | Mult | Div | Equal | Neq | Less | Greater | And | Or | Concat
+type op = Add | Sub | Mult | Div | Equal | Neq | Less | Greater | And | Or | Concat | Increment | Decrement
 
 type uop = Not
 
@@ -31,7 +31,7 @@ type stmt =
   | Expr of expr
   | Return of expr
   | If of expr * stmt * stmt
-  | For of expr * stmt
+  | For of op * expr * expr * stmt
 
 type func_decl = {
     typ : typ;
