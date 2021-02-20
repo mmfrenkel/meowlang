@@ -56,6 +56,8 @@ let rec string_of_stmt = function
   | Block(stmts) ->
     "{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "}\n"
   | If(e, s, Block([])) -> "\tif (" ^ string_of_expr e ^ ")\n\t" ^ string_of_stmt s
+  | If(e, s1, s2) ->  "if (" ^ string_of_expr e ^ ")\n" ^
+    string_of_stmt s1 ^ "else\n" ^ string_of_stmt s2
 
 let string_of_vdecl (t, id) = "\t" ^ string_of_typ t ^ " " ^ id ^ ";\n"
 
