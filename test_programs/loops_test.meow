@@ -5,11 +5,12 @@ HAI ITZ ME FUNC loops_test,
         ITZ ME NUMBR count.
         count IZ 0.
         
-        IM IN YR LOOP UPPIN YR count SAEM count AN 10
-            GIVE count.
+        IM IN YR LOOP UPPIN YR count SMALLR count THAN 10
+            count IZ SUM OF count AN 1.
 
-        IM IN YR LOOP NERFIN YR count SAEM count AN 10
-            GIVE count.
+        count IZ 20.
+        IM IN YR LOOP NERFIN YR count BIGGR count THAN 10
+            count IZ DIFF OF count AN 1.
         
         GIVE count.
 KBYE

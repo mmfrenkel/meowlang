@@ -60,7 +60,7 @@ let rec string_of_stmt = function
   | If(e, s1, s2) ->  "\tif (" ^ string_of_expr e ^ ") {\n\t" ^
     string_of_stmt s1 ^ "\t}\n\telse {\n\t" ^ string_of_stmt s2 ^ "\t}\n"
   | For(o, e1, e2, s) ->
-      "for (" ^ string_of_expr e1 ^ "; " ^ string_of_op o ^ "; " ^ string_of_expr e2 ^ ") " ^ string_of_stmt s
+      "\tfor (" ^ string_of_expr e1 ^ string_of_op o ^ "; " ^ string_of_expr e2 ^ ") {\n\t\t" ^ string_of_stmt s ^ "\t}\n"
 
 let string_of_vdecl (t, id) = "\t" ^ string_of_typ t ^ " " ^ id ^ ";\n"
 
