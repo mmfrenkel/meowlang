@@ -5,38 +5,8 @@ HAI ITZ ME FUNC conditional_test1,
         PSST Test if-then/else
 
         ITZ ME YARN condition.
-        SAEM 4 AN 4.
-        O RLY?  PSST if
-            YA RLY,     PSST then
-                condition IZ "4 is same as 4".
-            NO WAI,     PSST else
-                condition IZ "4 is not same as 4",
-        OIC     PSST endif
-
-        GIVE condition.
-KBYE
-
-HAI ITZ ME FUNC conditional_test2,
-
-        PSST Test if-then/elseif/else
-
-        ITZ ME YARN condition.
-        ITZ ME YARN kitten.
-        ITZ ME YARN baby_cat.
-        ITZ ME YARN puppy.
-        kitten IZ "cute".
-        baby_cat IZ "cute".
-        puppy is "boop".
-
-        SAEM kitten AN baby_cat.
-        O RLY?  PSST if
-            YA RLY,     PSST then
-                condition IZ "kute".
-            MEBBE SAEM kitten AN puppy,
-                condition IZ "babies".
-            NO WAI,     PSST else
-                condition IZ "not kute",
-        OIC     PSST endif
-
-        GIVE condition.
+        
+        SAEM 4 AN 4
+        O RLY? 
+            condition IZ "same same".
 KBYE

@@ -27,8 +27,10 @@ type expr =
   | NewArray of string * typ * array_size * expr list
 
 type stmt =
-    Expr of expr
+    Block of stmt list
+  | Expr of expr
   | Return of expr
+  | If of expr * stmt * stmt
 
 type func_decl = {
     typ : typ;

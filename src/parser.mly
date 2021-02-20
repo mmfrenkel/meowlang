@@ -5,7 +5,7 @@ open Ast
 %token RETURN MODULE IMPORT CALL FUNCTION DEF COMP CLASS NEW FREE MAKE
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN
 %token NOT EQ NEQ LT GT AND OR CONCAT CONTAINS
-%token INT BOOL FLOAT STRING ARRAY
+%token IF INT BOOL FLOAT STRING ARRAY
 %token <int> ILIT
 %token <bool> BLIT
 %token <string> ID FLIT SLIT
@@ -83,10 +83,12 @@ stmt_list:
 stmt:
     expr SEMI                 { Expr($1)               }
   | RETURN expr SEMI          { Return($2)             }
+  | LBRACE stmt_list RBRACE   { Block(List.rev $2)     }
   | CALL ID SEMI              { Expr(Call($2, []))     }
   | CALL ID LPAREN args_opt SEMI { Expr(Call($2, $4))  }
   | ID ASSIGN expr SEMI       { Expr(Assign($1, $3))   }
   | array_decl SEMI           { Expr($1)               }
+  | expr IF stmt { If($1, $3, Block([])) }
 
 expr:
     ILIT                      { ILiteral($1)           }

@@ -53,6 +53,9 @@ let rec string_of_expr = function
 let rec string_of_stmt = function
     Expr(expr) -> "\t" ^ string_of_expr expr ^ ";\n";
   | Return(expr) -> "\treturn " ^ string_of_expr expr ^ ";\n"
+  | Block(stmts) ->
+    "{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "}\n"
+  | If(e, s, Block([])) -> "\tif (" ^ string_of_expr e ^ ")\n\t" ^ string_of_stmt s
 
 let string_of_vdecl (t, id) = "\t" ^ string_of_typ t ^ " " ^ id ^ ";\n"
 

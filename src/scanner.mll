@@ -83,6 +83,8 @@ rule token = parse
 | eof { EOF }
 | _ as char { raise (SyntaxError("Illegal character " ^ Char.escaped char)) }
 
+(* Flow Control *)
+| "O RLY?"               { IF       }
 
 and read_string buf =
   parse
