@@ -11,4 +11,8 @@ HAI ITZ ME FUNC conditional_test1,
             condition IZ "same same".
         NO WAI
             condition IZ "not same same".
+        
+        SAEM "hello" AN "goodbye"
+        O RLY? 
+            condition IZ "you say goodbye I say hello".
 KBYE
