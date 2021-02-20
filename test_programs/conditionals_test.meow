@@ -18,18 +18,22 @@ KBYE
 
 HAI ITZ ME FUNC conditional_test2,
 
-        PSST Test if-then/else
+        PSST Test if-then/elseif/else
 
         ITZ ME YARN condition.
         ITZ ME YARN kitten.
         ITZ ME YARN baby_cat.
+        ITZ ME YARN puppy.
         kitten IZ "cute".
         baby_cat IZ "cute".
+        puppy is "boop".
 
         SAEM kitten AN baby_cat.
         O RLY?  PSST if
             YA RLY,     PSST then
                 condition IZ "kute".
+            MEBBE SAEM kitten AN puppy,
+                condition IZ "babies".
             NO WAI,     PSST else
                 condition IZ "not kute",
         OIC     PSST endif
