@@ -14,6 +14,8 @@ open Ast
 %start program
 %type <Ast.program> program
 
+%nonassoc NOELSE
+%nonassoc ELSE
 %right ASSIGN
 %right CONCAT
 %right OR AND
@@ -88,7 +90,7 @@ stmt:
   | CALL ID LPAREN args_opt SEMI { Expr(Call($2, $4))  }
   | ID ASSIGN expr SEMI       { Expr(Assign($1, $3))   }
   | array_decl SEMI           { Expr($1)               }
-  | expr IF stmt              { If($1, $3, Block([])) }
+  | expr IF stmt %prec NOELSE { If($1, $3, Block([])) }
   | expr IF stmt ELSE stmt    { If($1, $3, $5)}
 
 expr:
