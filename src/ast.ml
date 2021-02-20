@@ -31,6 +31,7 @@ type stmt =
   | Expr of expr
   | Return of expr
   | If of expr * stmt * stmt
+  | For of expr * stmt
 
 type func_decl = {
     typ : typ;

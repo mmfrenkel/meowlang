@@ -86,6 +86,7 @@ rule token = parse
 (* Flow Control *)
 | "O RLY?"               { IF       }
 | "NO WAI"               { ELSE     }
+| "IM IN YR LOOP"        { FOR      }
 
 and read_string buf =
   parse
