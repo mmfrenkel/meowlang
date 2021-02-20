@@ -1,0 +1,13 @@
+GIMME hello?
+
+HAI ITZ ME FUNC loops_test,
+
+        ITZ ME NUMBR count.
+        count IZ 0.
+        
+        IM IN YR LOOP UPPIN YR count TIL SAEM count AN 10
+            count IZ count+1
+        IM OUTTA YR LOOP
+        
+        GIVE count.
+KBYE
