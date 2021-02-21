@@ -87,6 +87,7 @@ rule token = parse
 
 (* Flow Control *)
 | "O RLY?"               { IF       }
+| "YA RLY"               { THEN     }
 | "NO WAI"               { ELSE     }
 | "IM IN YR LOOP"        { FOR      }
 

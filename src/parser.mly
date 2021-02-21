@@ -5,7 +5,7 @@ open Ast
 %token RETURN MODULE IMPORT CALL FUNCTION DEF COMP CLASS NEW FREE MAKE
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN
 %token NOT EQ NEQ LT GT AND OR CONCAT CONTAINS
-%token IF ELSE FOR INCREMENT DECREMENT UNTIL INT BOOL FLOAT STRING ARRAY
+%token IF THEN ELSE FOR INCREMENT DECREMENT INT BOOL FLOAT STRING ARRAY
 %token <int> ILIT
 %token <bool> BLIT
 %token <string> ID FLIT SLIT
@@ -16,7 +16,6 @@ open Ast
 
 %nonassoc NOELSE
 %nonassoc ELSE
-%nonassoc UNTIL
 %right ASSIGN
 %right CONCAT
 %right OR AND
@@ -91,8 +90,8 @@ stmt:
   | CALL ID LPAREN args_opt SEMI { Expr(Call($2, $4))  }
   | ID ASSIGN expr SEMI       { Expr(Assign($1, $3))   }
   | array_decl SEMI           { Expr($1)               }
-  | expr IF stmt %prec NOELSE { If($1, $3, Block([]))  }
-  | expr IF stmt ELSE stmt    { If($1, $3, $5)         }
+  | expr IF THEN stmt %prec NOELSE { If($1, $4, Block([]))  }
+  | expr IF THEN stmt ELSE stmt    { If($1, $4, $6)         }
   | FOR INCREMENT expr expr stmt { For(Increment, $3, $4, $5) }
   | FOR DECREMENT expr expr stmt { For(Decrement, $3, $4, $5) }
 
