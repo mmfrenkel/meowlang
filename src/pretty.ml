@@ -55,10 +55,10 @@ let rec string_of_stmt = function
     Expr(expr) -> "\t" ^ string_of_expr expr ^ ";\n";
   | Return(expr) -> "\treturn " ^ string_of_expr expr ^ ";\n"
   | Block(stmts) ->
-    "{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "}\n"
-  | If(e, s, Block([])) -> "\tif (" ^ string_of_expr e ^ ") {\n\t" ^ string_of_stmt s ^ "\t}\n"
-  | If(e, s1, s2) ->  "\tif (" ^ string_of_expr e ^ ") {\n\t" ^
-    string_of_stmt s1 ^ "\t}\n\telse {\n\t" ^ string_of_stmt s2 ^ "\t}\n"
+    "\t{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "\t}\n"
+  | If(e, s, Block([])) -> "\tif (" ^ string_of_expr e ^ ")\n" ^ string_of_stmt s
+  | If(e, s1, s2) ->  "\tif (" ^ string_of_expr e ^ ")" ^
+    string_of_stmt s1 ^ "\telse\t" ^ string_of_stmt s2
   | For(o, e1, e2, s) ->
       "\tfor (" ^ string_of_expr e1 ^ string_of_op o ^ "; " ^ string_of_expr e2 ^ ") {\n\t\t" ^ string_of_stmt s ^ "\t}\n"
 
