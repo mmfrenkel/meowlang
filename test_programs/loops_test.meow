@@ -1,0 +1,21 @@
+HAI ITZ ME FUNC loops_test,
+
+        ITZ ME NUMBR count.
+        count IZ 0.
+
+        PSST Incrementing with already instantiated index        
+        IM IN YR LOOP UPPIN YR count SMALLR count THAN 10
+            count IZ SUM OF count AN 1.
+
+        PSST Decrementing with already instantiated index
+        count IZ 20.
+        IM IN YR LOOP NERFIN YR count BIGGR count THAN 10
+        HAI
+            count IZ DIFF OF count AN 1.
+            count IZ count.
+        KBYE
+        
+        PSST Instantiating index and incrementing
+        IM IN YR LOOP index NERFIN YR index IZ 15 BIGGR index THAN 10
+            index IZ DIFF OF index AN 1.
+KBYE

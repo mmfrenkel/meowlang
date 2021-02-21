@@ -1,0 +1,12 @@
+# files/executables/intermediates from compilation steps
+*.cmi
+*.cmo
+parser.ml
+parser.mli
+parser.output
+scanner.ml
+meowlang.native
+
+# files from IDEs, etc.
+.DS_Store
+_build/
