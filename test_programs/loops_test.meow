@@ -10,7 +10,10 @@ HAI ITZ ME FUNC loops_test,
         PSST Decrementing with already instantiated index
         count IZ 20.
         IM IN YR LOOP NERFIN YR count BIGGR count THAN 10
+        HAI
             count IZ DIFF OF count AN 1.
+            count IZ count.
+        KBYE
         
         PSST Instantiating index and incrementing
         IM IN YR LOOP index NERFIN YR index IZ 15 BIGGR index THAN 10
