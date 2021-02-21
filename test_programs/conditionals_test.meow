@@ -1,9 +1,16 @@
-HAI ITZ ME FUNC conditional_test1,
+HAI ITZ ME FUNC conditional_test,
 
-        PSST Test if-then/else
+        PSST Test if-then-else
 
         ITZ ME YARN condition.
+
+        PSST IF THEN
+        SMALLR 4 THAN 10
+        O RLY? 
+        YA RLY
+            condition IZ "math is the only Truth".
         
+        PSST IF THEN ELSE with single statement blocks
         SAEM 4 AN 4
         O RLY? 
         YA RLY
@@ -11,14 +18,15 @@ HAI ITZ ME FUNC conditional_test1,
         NO WAI
             condition IZ "not same same".
         
-        SAEM "hello" AN "goodbye"
+        PSST IF THEN ELSE with code blocks
+        SAEM "kittens" AN "puppies"
         O RLY? 
         YA RLY HAI
-            condition IZ "you say goodbye I say hello".
-            condition IZ "did the block work".
+            condition IZ "this is not the correct answer".
+            condition IZ "you have to pick a team".
         KBYE
         NO WAI HAI
-            condition IZ "you say hello I say goodbye".
-            condition IZ "the block did work".
+            condition IZ "clearly kittens are cuter".
+            condition IZ "or are they?".
         KBYE
 KBYE
