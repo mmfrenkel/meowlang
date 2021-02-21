@@ -3,8 +3,8 @@ open Ast
 %}
 
 %token RETURN MODULE IMPORT CALL FUNCTION DEF COMP CLASS NEW FREE MAKE
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN
-%token NOT EQ NEQ LT GT AND OR CONCAT CONTAINS
+%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN 
+%token NOT EQ NEQ LT GT AND OR CONCAT CONTAINS IN 
 %token IF ELSE FOR INCREMENT DECREMENT UNTIL INT BOOL FLOAT STRING ARRAY
 %token <int> ILIT
 %token <bool> BLIT
@@ -43,14 +43,13 @@ import:
   MODULE ID IMPORT              { Module($2)               }
 
 fdecl:
-    LBRACE DEF return_type FUNCTION ID formals_opt RPAREN vdecl_list stmt_list RBRACE
+    LBRACE DEF return_type FUNCTION ID formals_opt RPAREN stmt_list RBRACE
       {
         {
           typ = $3;
           fname = $5;
           formals = List.rev $6;
-          locals = List.rev $8;
-          body = List.rev $9;
+          body = List.rev $8;
         }
       }
 
@@ -71,13 +70,10 @@ typ:
   | BOOL    { Bool   }
   | FLOAT   { Float  }
   | STRING  { String }
-
-vdecl_list:
-    /* nothing */             { []                     }
-  | vdecl_list vdecl          { $2 :: $1               }
+  | ID      { Obtyp($1)}
 
 vdecl:
-  DEF typ ID SEMI            { ($2, $3)               }
+    DEF typ ID                { ($2, $3)               }
 
 stmt_list:
     /* nothing */             { []                     }
@@ -85,16 +81,20 @@ stmt_list:
 
 stmt:
     expr SEMI                 { Expr($1)               }
+  | vdecl SEMI                { Bind($1)               }
+  | vdecl ASSIGN expr SEMI    { BindAssign($1, $3)     }
   | RETURN expr SEMI          { Return($2)             }
   | LBRACE stmt_list RBRACE   { Block(List.rev $2)     }
   | CALL ID SEMI              { Expr(Call($2, []))     }
   | CALL ID LPAREN args_opt SEMI { Expr(Call($2, $4))  }
-  | ID ASSIGN expr SEMI       { Expr(Assign($1, $3))   }
   | array_decl SEMI           { Expr($1)               }
   | expr IF stmt %prec NOELSE { If($1, $3, Block([]))  }
   | expr IF stmt ELSE stmt    { If($1, $3, $5)         }
   | FOR INCREMENT expr expr stmt { For(Increment, $3, $4, $5) }
   | FOR DECREMENT expr expr stmt { For(Decrement, $3, $4, $5) }
+  | ID IN ID ASSIGN expr SEMI { ClassAssign($1, $3, $5)}
+  | FREE expr                   { Dealloc($2)}
+  
 
 expr:
     ILIT                      { ILiteral($1)           }
@@ -102,6 +102,7 @@ expr:
   | BLIT                      { BoolLit($1)            }
   | SLIT                      { StringLit($1)          }
   | ID                        { Id($1)                 }
+  | ID ASSIGN expr            { Assign($1, $3)         }
   | PLUS expr COMMA expr      { Binop($2, Add,   $4)   }
   | MINUS expr COMMA expr     { Binop($2, Sub,   $4)   }
   | TIMES expr COMMA expr     { Binop($2, Mult,  $4)   }
@@ -115,6 +116,8 @@ expr:
   | NOT expr                  { Unop(Not, $2)          }
   | LPAREN expr RPAREN        { $2                     }
   | CONCAT expr COMMA expr    { Binop($2, Concat, $4)  }
+  | NEW ID                    { NewInstance($2)}
+  | ID IN ID                  { ClassAccess($1, $3)}
 
 args_opt:
   | args_list                 { List.rev $1            }
@@ -133,3 +136,38 @@ array_decl:
 array_size_typ:
     ILIT                      { ILiteralArraySize($1)   }
   | ID                        { VariableArraySize($1)   }
+
+/* Classes */
+
+class_decl:
+    LBRACE DEF CLASS ID RPAREN class_properties RBRACE
+    {
+      {
+        cname = $4;
+        cvars = $6.cvars;
+        cfuncs = $6.cfuncs;
+      }
+    }
+
+class_properties:
+    /* nothing */             { cname = ""; cvars = []; cfuncs = []; }
+  | class_func_decl class_properties { cname = ""; cvars = []; cfuncs = $1::$2.cfuncs; }
+  | class_var_decl class_properties { cname = ""; cvars = $1::$2.cvars; cfuncs = []; }
+
+
+class_func_decl:
+{
+    LBRACE DEF return_type FUNCTION ID formals_opt RPAREN stmt_list RBRACE
+      {
+        {
+          typ = $3;
+          fname = $5;
+          formals = List.rev $6;
+          body = List.rev $8;
+        }
+      }
+}
+class_var_decl:
+{
+  DEF typ ID            { ($2, $3)               }
+}

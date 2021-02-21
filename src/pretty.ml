@@ -30,6 +30,7 @@ let string_of_typ = function
 | Float -> "float"
 | String -> "char *"
 | Void -> ""
+| Obtyp(s) -> s 
 
 let string_of_array_size = function
   ILiteralArraySize(l) -> string_of_int l
@@ -52,7 +53,7 @@ let rec string_of_expr = function
       string_of_typ typ ^ " [" ^ string_of_array_size s ^ "] " ^ i ^ " = [ " ^ String.concat ", " (List.map string_of_expr contents) ^ " ]"
 
 let rec string_of_stmt = function
-    Expr(expr) -> "\t" ^ string_of_expr expr ^ ";\n";
+    Expr(expr) -> "\t" ^ string_of_expr expr ^ ";\n"
   | Return(expr) -> "\treturn " ^ string_of_expr expr ^ ";\n"
   | Block(stmts) ->
     "{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "}\n"
@@ -77,7 +78,6 @@ let string_of_fdecl fdecl =
 
   return_string ^ fdecl.fname ^ format_params fdecl ^
   "{\n" ^
-    String.concat "" (List.map string_of_vdecl fdecl.locals) ^
     String.concat "" (List.map string_of_stmt fdecl.body) ^
   "}\n"
 
