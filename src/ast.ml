@@ -25,6 +25,7 @@ type expr =
   | Assign of string * expr
   | Call of string * expr list
   | NewArray of string * typ * array_size * expr list
+  | Noexpr
 
 type stmt =
     Block of stmt list

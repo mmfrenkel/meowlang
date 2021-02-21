@@ -115,6 +115,10 @@ expr:
   | LPAREN expr RPAREN        { $2                     }
   | CONCAT expr COMMA expr    { Binop($2, Concat, $4)  }
 
+expr_opt:
+    /* nothing */ { Noexpr }
+  | expr          { $1 }
+
 args_opt:
   | args_list                 { List.rev $1            }
 
