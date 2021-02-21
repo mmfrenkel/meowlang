@@ -88,7 +88,6 @@ stmt:
   | LBRACE stmt_list RBRACE   { Block(List.rev $2)     }
   | CALL ID SEMI              { Expr(Call($2, []))     }
   | CALL ID LPAREN args_opt SEMI { Expr(Call($2, $4))  }
-  | ID ASSIGN expr SEMI       { Expr(Assign($1, $3))   }
   | array_decl SEMI           { Expr($1)               }
   | expr IF THEN stmt %prec NOELSE { If($1, $4, Block([]))  }
   | expr IF THEN stmt ELSE stmt    { If($1, $4, $6)         }
@@ -101,6 +100,7 @@ expr:
   | BLIT                      { BoolLit($1)            }
   | SLIT                      { StringLit($1)          }
   | ID                        { Id($1)                 }
+  | ID ASSIGN expr            { Assign($1, $3)         }
   | PLUS expr COMMA expr      { Binop($2, Add,   $4)   }
   | MINUS expr COMMA expr     { Binop($2, Sub,   $4)   }
   | TIMES expr COMMA expr     { Binop($2, Mult,  $4)   }
