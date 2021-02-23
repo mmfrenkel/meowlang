@@ -30,7 +30,11 @@ let string_of_typ = function
 | Float -> "float"
 | String -> "char *"
 | Void -> ""
-| Obtyp(s) -> s 
+
+
+let string_of_bind = function
+  typ -> string_of_typ typ
+
 
 let string_of_array_size = function
   ILiteralArraySize(l) -> string_of_int l
@@ -46,11 +50,15 @@ let rec string_of_expr = function
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Unop(o, e) -> string_of_uop o ^ string_of_expr e
+  | Bind(t, s) -> string_of_typ t ^ " " ^ s 
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
+  | BindAssign(t, s, e) -> string_of_typ t ^ " " ^ s ^ " = " ^ string_of_expr e 
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | NewArray(i, typ, s, contents) ->
       string_of_typ typ ^ " [" ^ string_of_array_size s ^ "] " ^ i ^ " = [ " ^ String.concat ", " (List.map string_of_expr contents) ^ " ]"
+  | NewInstance(s) -> "struct " ^ s 
+  | ClassAccess(s1, s2) -> s1 ^ "." ^ s2
 
 let rec string_of_stmt = function
     Expr(expr) -> "\t" ^ string_of_expr expr ^ ";\n"
@@ -62,6 +70,8 @@ let rec string_of_stmt = function
     string_of_stmt s1 ^ "\t}\n\telse {\n\t" ^ string_of_stmt s2 ^ "\t}\n"
   | For(o, e1, e2, s) ->
       "\tfor (" ^ string_of_expr e1 ^ string_of_op o ^ "; " ^ string_of_expr e2 ^ ") {\n\t\t" ^ string_of_stmt s ^ "\t}\n"
+  | Dealloc(e) -> "free(" ^ string_of_expr e ^ ")"
+  | ClassAssign(s1, s2, e) -> s1 ^ "." ^ s2 ^ " = " ^ string_of_expr e 
 
 let string_of_vdecl (t, id) = "\t" ^ string_of_typ t ^ " " ^ id ^ ";\n"
 
@@ -81,6 +91,9 @@ let string_of_fdecl fdecl =
     String.concat "" (List.map string_of_stmt fdecl.body) ^
   "}\n"
 
-let string_of_program (imports, funcs) =
+let string_of_cdecl classes = 
+  "Class " ^ cdecl.cname ^ "{\n" ^ 
+
+let string_of_program (imports, funcs, classes) =
   String.concat "" (List.map string_of_modules imports) ^ "\n\n" ^
   String.concat "\n" (List.map string_of_fdecl funcs)

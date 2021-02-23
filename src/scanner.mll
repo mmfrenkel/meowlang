@@ -43,7 +43,8 @@ rule token = parse
 | "NEW"           { NEW }
 | "BLEEP"         { FREE }
 | "CLASS"         { CLASS }
-| "IN"            { IN }
+
+(* "IN"            { IN }*)
 
 (* Functions *)
 | "PURR"          { CALL }

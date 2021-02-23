@@ -1,5 +1,6 @@
 %{
 open Ast
+open Helpers
 %}
 
 %token RETURN MODULE IMPORT CALL FUNCTION DEF COMP CLASS NEW FREE MAKE
@@ -35,9 +36,10 @@ program:
   A program is a list of import statements and a set of function declarations.
  */
 decls:
-  /* nothing */                 { ([], [])                 }
-  | decls import                { (($2 :: fst $1), snd $1) }
-  | decls fdecl                 { (fst $1, ($2 :: snd $1)) }
+  /* nothing */                 { ([], [], [])             }
+  | decls import                { ($2 :: fst $1), snd $1, get_third $1 }
+  | decls fdecl                 { fst $1, ($2 :: snd $1), get_third $1 }
+  | decls cdecl                 {  fst $1, snd $1, ($2 :: get_third $1)  }                       }
 
 import:
   MODULE ID IMPORT              { Module($2)               }
@@ -70,7 +72,7 @@ typ:
   | BOOL    { Bool   }
   | FLOAT   { Float  }
   | STRING  { String }
-  | ID      { Obtyp($1)}
+ /*  |       { Obtyp($1)} */
 
 vdecl:
     DEF typ ID                { ($2, $3)               }
@@ -83,6 +85,8 @@ stmt:
     expr SEMI                 { Expr($1)               }
   | vdecl SEMI                { Bind($1)               }
   | vdecl ASSIGN expr SEMI    { BindAssign($1, $3)     }
+  | cvar_decl SEMI            { Bind($1)               }
+  | cvar_decl ASSIGN expr SEMI{ BindAssign($1, $3)     }
   | RETURN expr SEMI          { Return($2)             }
   | LBRACE stmt_list RBRACE   { Block(List.rev $2)     }
   | CALL ID SEMI              { Expr(Call($2, []))     }
@@ -92,7 +96,7 @@ stmt:
   | expr IF stmt ELSE stmt    { If($1, $3, $5)         }
   | FOR INCREMENT expr expr stmt { For(Increment, $3, $4, $5) }
   | FOR DECREMENT expr expr stmt { For(Decrement, $3, $4, $5) }
-  | ID IN ID ASSIGN expr SEMI { ClassAssign($1, $3, $5)}
+  | ID IN ID ASSIGN expr SEMI { ClassAssign($1, $3, $5)} 
   | FREE expr                   { Dealloc($2)}
   
 
@@ -117,7 +121,7 @@ expr:
   | LPAREN expr RPAREN        { $2                     }
   | CONCAT expr COMMA expr    { Binop($2, Concat, $4)  }
   | NEW ID                    { NewInstance($2)}
-  | ID IN ID                  { ClassAccess($1, $3)}
+  | ID IN ID                  { ClassAccess($1, $3)} 
 
 args_opt:
   | args_list                 { List.rev $1            }
@@ -139,7 +143,7 @@ array_size_typ:
 
 /* Classes */
 
-class_decl:
+cdecl:
     LBRACE DEF CLASS ID RPAREN class_properties RBRACE
     {
       {
@@ -151,12 +155,12 @@ class_decl:
 
 class_properties:
     /* nothing */             { cname = ""; cvars = []; cfuncs = []; }
-  | class_func_decl class_properties { cname = ""; cvars = []; cfuncs = $1::$2.cfuncs; }
-  | class_var_decl class_properties { cname = ""; cvars = $1::$2.cvars; cfuncs = []; }
+  | cfunc_decl class_properties { cname = ""; cvars = []; cfuncs = $1::$2.cfuncs; }
+  | cvar_decl class_properties { cname = ""; cvars = $1::$2.cvars; cfuncs = []; }
 
 
-class_func_decl:
-{
+cfunc_decl:
+
     LBRACE DEF return_type FUNCTION ID formals_opt RPAREN stmt_list RBRACE
       {
         {
@@ -166,8 +170,24 @@ class_func_decl:
           body = List.rev $8;
         }
       }
-}
-class_var_decl:
-{
+
+cvar_decl:
+
   DEF typ ID            { ($2, $3)               }
-}
+
+ /* Class Instantiation */
+c_instance:
+
+  MAKE ID NEW obtyp CLASS { NewInstance()}
+| MAKE ID NEW obtyp CLASS RPAREN LPAREN class_opt { NewInstance()}
+
+class_opt:
+  /* nothing */         { []                      } 
+| LPAREN copt_list      { $2                      }
+
+copt_list:
+  expr                  { $1                      }
+| copt_list COMMA expr  { $3 :: $1                }
+
+
+
