@@ -30,6 +30,7 @@ let string_of_typ = function
 | Float -> "float"
 | String -> "char *"
 | Void -> ""
+| Obtype(s) -> "Class " ^s
 
 let string_of_array_size = function
   ILiteralArraySize(l) -> string_of_int l
@@ -51,9 +52,11 @@ let rec string_of_expr = function
   | NewArray(i, typ, s, contents) ->
       string_of_typ typ ^ " [" ^ string_of_array_size s ^ "] " ^ i ^ " = [ " ^ String.concat ", " (List.map string_of_expr contents) ^ " ]"
   | Noexpr -> ""
+  | NewInstance(var, c) -> c ^ " " ^ var
+  | ClassAccess(el, ob) -> ob ^ "." ^ el
 
 let rec string_of_stmt = function
-    Expr(expr) -> "\t" ^ string_of_expr expr ^ ";\n";
+    Expr(expr) -> "\t" ^ string_of_expr expr ^ ";\n"
   | Return(expr) -> "\treturn " ^ string_of_expr expr ^ ";\n"
   | Block(stmts) ->
     "\t{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "\t}\n"
@@ -62,8 +65,13 @@ let rec string_of_stmt = function
     string_of_stmt s1 ^ "\telse\t" ^ string_of_stmt s2
   | For(o, e1, e_opt, e2, s) ->
       "\tfor (" ^string_of_expr e_opt ^ " " ^ string_of_expr e1 ^ string_of_op o ^ " " ^ string_of_expr e2 ^ ") {\n\t\t" ^ string_of_stmt s ^ "\t}\n"
+  | Dealloc(e) -> "\tfree(" ^ e ^ ");\n"
+  | ClassAssign(s1, s2, e) -> "\t" ^ s1 ^ "." ^ s2 ^ " = " ^ string_of_expr e ^ ";\n"
 
-let string_of_vdecl (t, id) = "\t" ^ string_of_typ t ^ " " ^ id ^ ";\n"
+let string_of_vdecl (t, id, expr) =
+    match expr with
+    | Noexpr -> "\t" ^ string_of_typ t ^ " " ^ id ^ ";\n"
+    | _ -> "\t" ^ string_of_typ t ^ " " ^ id ^ " = " ^ string_of_expr expr ^ ";\n"
 
 let string_of_formals (t, id) = string_of_typ t ^ " " ^ id
 
@@ -82,6 +90,14 @@ let string_of_fdecl fdecl =
     String.concat "" (List.map string_of_stmt fdecl.body) ^
   "}\n"
 
-let string_of_program (imports, funcs) =
+let string_of_cdecl cdecl =
+    "Class " ^ cdecl.cname ^ " {\n\n" ^
+    String.concat "" (List.map string_of_vdecl cdecl.cvars) ^ "\n" ^
+    String.concat "" (List.map string_of_fdecl cdecl.cfuncs) ^ "\n" ^
+    "}\n"
+
+
+let string_of_program (imports, funcs, classes) =
   String.concat "" (List.map string_of_modules imports) ^ "\n\n" ^
-  String.concat "\n" (List.map string_of_fdecl funcs)
+  String.concat "\n" (List.map string_of_fdecl funcs) ^ "\n" ^
+  String.concat "\n" (List.map string_of_cdecl classes)

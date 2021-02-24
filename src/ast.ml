@@ -4,9 +4,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Greater | And | Or | Con
 
 type uop = Not
 
-type typ = Int | Bool | Float | String | Void
-
-type bind = typ * string
+type typ = Int | Bool | Float | String | Void | Obtype of string
 
 type import = Module of string
 
@@ -26,6 +24,11 @@ type expr =
   | Call of string * expr list
   | NewArray of string * typ * array_size * expr list
   | Noexpr
+  | NewInstance of string * string
+  | ClassAccess of string * string
+
+type bind_var = typ * string * expr
+type bind_formals = typ * string
 
 type stmt =
     Block of stmt list
@@ -33,13 +36,21 @@ type stmt =
   | Return of expr
   | If of expr * stmt * stmt
   | For of op * expr * expr * expr * stmt
+  | Dealloc of string
+  | ClassAssign of string * string * expr
 
 type func_decl = {
     typ : typ;
     fname : string;
-    formals : bind list;
-    locals : bind list;
+    formals : bind_formals list;
+    locals : bind_var list;
     body : stmt list;
   }
 
-type program = import list * func_decl list
+type class_decl = {
+    cname : string;
+    cvars : bind_var list;
+    cfuncs : func_decl list;
+}
+
+type program = import list * func_decl list * class_decl list
