@@ -39,7 +39,7 @@ decls:
   /* nothing */                 { ([], [], [])             }
   | decls import                { ($2 :: fst $1), snd $1, get_third $1 }
   | decls fdecl                 { fst $1, ($2 :: snd $1), get_third $1 }
-  | decls cdecl                 {  fst $1, snd $1, ($2 :: get_third $1)  }                       }
+  | decls cdecl                 { fst $1, snd $1, ($2 :: get_third $1) }                       
 
 import:
   MODULE ID IMPORT              { Module($2)               }
@@ -72,7 +72,7 @@ typ:
   | BOOL    { Bool   }
   | FLOAT   { Float  }
   | STRING  { String }
- /*  |       { Obtyp($1)} */
+  | ID      { Obtyp($1)} 
 
 vdecl:
     DEF typ ID                { ($2, $3)               }
@@ -85,13 +85,12 @@ stmt:
     expr SEMI                 { Expr($1)               }
   | vdecl SEMI                { Bind($1)               }
   | vdecl ASSIGN expr SEMI    { BindAssign($1, $3)     }
-  | cvar_decl SEMI            { Bind($1)               }
-  | cvar_decl ASSIGN expr SEMI{ BindAssign($1, $3)     }
   | RETURN expr SEMI          { Return($2)             }
   | LBRACE stmt_list RBRACE   { Block(List.rev $2)     }
   | CALL ID SEMI              { Expr(Call($2, []))     }
   | CALL ID LPAREN args_opt SEMI { Expr(Call($2, $4))  }
   | array_decl SEMI           { Expr($1)               }
+  | c_instance SEMI           { Expr($1)               }
   | expr IF stmt %prec NOELSE { If($1, $3, Block([]))  }
   | expr IF stmt ELSE stmt    { If($1, $3, $5)         }
   | FOR INCREMENT expr expr stmt { For(Increment, $3, $4, $5) }
@@ -173,13 +172,13 @@ cfunc_decl:
 
 cvar_decl:
 
-  DEF typ ID            { ($2, $3)               }
+  vdecl          { []              }
 
  /* Class Instantiation */
 c_instance:
 
-  MAKE ID NEW obtyp CLASS { NewInstance()}
-| MAKE ID NEW obtyp CLASS RPAREN LPAREN class_opt { NewInstance()}
+  MAKE ID NEW ID { NewInstance($4)}
+| MAKE ID NEW ID RPAREN LPAREN class_opt { NewInstance($4)}
 
 class_opt:
   /* nothing */         { []                      } 

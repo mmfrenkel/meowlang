@@ -4,8 +4,7 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Greater | And | Or | Con
 
 type uop = Not
 
-type typ = Int | Bool | Float | String | Void 
-(*| Obtyp of string*)
+type typ = Int | Bool | Float | String | Void | Obtyp of string
 
 type bind = typ * string
 
