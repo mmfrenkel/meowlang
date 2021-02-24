@@ -76,7 +76,7 @@ vdecl_list:
   | vdecl_list vdecl          { $2 :: $1               }
 
 vdecl:
-  DEF typ ID SEMI            { ($2, $3)               }
+  DEF typ ID SEMI             { ($2, $3)               }
 
 stmt_list:
     /* nothing */             { []                     }
@@ -90,9 +90,7 @@ stmt:
   | CALL ID LPAREN args_opt SEMI { Expr(Call($2, $4))  }
   | array_decl SEMI           { Expr($1)               }
   | expr IF THEN stmt %prec NOELSE { If($1, $4, Block([]))  }
-  | expr IF THEN stmt ELSE stmt    { If($1, $4, $6)         }
-  // | FOR expr_opt INCREMENT expr expr stmt { For($2, Increment, $4, $5, $6) }
-  // | FOR expr_opt DECREMENT expr expr stmt { For($2, Decrement, $4, $5, $6) }
+  | expr IF THEN stmt ELSE stmt { If($1, $4, $6)            }
   | FOR expr INCREMENT expr_opt COMMA expr stmt { For(Increment, $2, $4, $6, $7) }
   | FOR expr DECREMENT expr_opt COMMA expr stmt { For(Decrement, $2, $4, $6, $7) }
 
