@@ -10,7 +10,7 @@ HAI ITZ ME FUNC conditional_test,
         YA RLY
             condition IZ "math is the only Truth".
         
-        PSST IF THEN ELSE with single statement blocks
+        PSST IF THEN ELSE
         SAEM 4 AN 4
         O RLY? 
         YA RLY
@@ -23,10 +23,12 @@ HAI ITZ ME FUNC conditional_test,
         O RLY? 
         YA RLY HAI
             condition IZ "this is not the correct answer".
-            condition IZ "you have to pick a team".
+            condition IZ CAT condition AN "you have to pick a team".
         KBYE
         NO WAI HAI
             condition IZ "clearly kittens are cuter".
-            condition IZ "or are they?".
+            condition IZ CAT condition AN "or are they?".
         KBYE
+
+        GIVE condition.
 KBYE
