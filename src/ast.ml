@@ -25,13 +25,14 @@ type expr =
   | Assign of string * expr
   | Call of string * expr list
   | NewArray of string * typ * array_size * expr list
+  | Noexpr
 
 type stmt =
     Block of stmt list
   | Expr of expr
   | Return of expr
   | If of expr * stmt * stmt
-  | For of op * expr * expr * stmt
+  | For of op * expr * expr * expr * stmt
 
 type func_decl = {
     typ : typ;
