@@ -91,8 +91,10 @@ stmt:
   | array_decl SEMI           { Expr($1)               }
   | expr IF THEN stmt %prec NOELSE { If($1, $4, Block([]))  }
   | expr IF THEN stmt ELSE stmt    { If($1, $4, $6)         }
-  | FOR expr_opt INCREMENT expr expr stmt { For($2, Increment, $4, $5, $6) }
-  | FOR expr_opt DECREMENT expr expr stmt { For($2, Decrement, $4, $5, $6) }
+  // | FOR expr_opt INCREMENT expr expr stmt { For($2, Increment, $4, $5, $6) }
+  // | FOR expr_opt DECREMENT expr expr stmt { For($2, Decrement, $4, $5, $6) }
+  | FOR INCREMENT expr expr stmt { For(Increment, $3, $4, $5) }
+  | FOR DECREMENT expr expr stmt { For(Decrement, $3, $4, $5) }
 
 expr:
     ILIT                      { ILiteral($1)           }
@@ -114,10 +116,6 @@ expr:
   | NOT expr                  { Unop(Not, $2)          }
   | LPAREN expr RPAREN        { $2                     }
   | CONCAT expr COMMA expr    { Binop($2, Concat, $4)  }
-
-expr_opt:
-    /* nothing */ { Noexpr }
-  | expr          { $1 }
 
 args_opt:
   | args_list                 { List.rev $1            }
