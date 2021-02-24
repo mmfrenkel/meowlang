@@ -22,7 +22,7 @@ HAI ITZ ME FUNC conditional_test,
         SAEM "kittens" AN "puppies"
         O RLY? 
         YA RLY HAI
-            condition IZ "this is not the correct answer".
+            condition IZ "this is not the correct answer. ".
             condition IZ CAT condition AN "you have to pick a team".
         KBYE
         NO WAI HAI
