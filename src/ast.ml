@@ -24,7 +24,7 @@ type expr =
   | Call of string * expr list
   | NewArray of string * typ * array_size * expr list
   | Noexpr
-  | NewInstance of string
+  | NewInstance of string * string
   | ClassAccess of string * string
 
 type bind_var = typ * string * expr
@@ -36,7 +36,7 @@ type stmt =
   | Return of expr
   | If of expr * stmt * stmt
   | For of op * expr * expr * expr * stmt
-  | Dealloc of expr
+  | Dealloc of string
   | ClassAssign of string * string * expr
 
 type func_decl = {

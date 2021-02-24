@@ -102,7 +102,7 @@ stmt:
   | FOR expr INCREMENT expr_opt COMMA expr stmt { For(Increment, $2, $4, $6, $7) }
   | FOR expr DECREMENT expr_opt COMMA expr stmt { For(Decrement, $2, $4, $6, $7) }
   | ID IN ID ASSIGN expr SEMI { ClassAssign($1, $3, $5)}
-  | FREE expr                 { Dealloc($2)            }
+  | FREE ID SEMI              { Dealloc($2)            }
 
 expr:
     ILIT                      { ILiteral($1)           }
@@ -171,8 +171,8 @@ methods:
  /* Class Instantiation */
 
 c_instance:
-    MAKE ID NEW ID                           { NewInstance($4) }
-  | MAKE ID NEW ID RPAREN LPAREN class_opt   { NewInstance($4) }
+    MAKE ID NEW ID                           { NewInstance($2, $4) }
+  | MAKE ID NEW ID RPAREN LPAREN class_opt   { NewInstance($2, $4) }
 
 class_opt:
     /* nothing */             { []                      }

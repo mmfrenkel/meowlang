@@ -52,8 +52,8 @@ let rec string_of_expr = function
   | NewArray(i, typ, s, contents) ->
       string_of_typ typ ^ " [" ^ string_of_array_size s ^ "] " ^ i ^ " = [ " ^ String.concat ", " (List.map string_of_expr contents) ^ " ]"
   | Noexpr -> ""
-  | NewInstance(s) -> "Class " ^ s
-  | ClassAccess(ob, el) -> ob ^ "." ^ el
+  | NewInstance(var, c) -> c ^ " " ^ var
+  | ClassAccess(el, ob) -> ob ^ "." ^ el
 
 let rec string_of_stmt = function
     Expr(expr) -> "\t" ^ string_of_expr expr ^ ";\n"
@@ -65,8 +65,8 @@ let rec string_of_stmt = function
     string_of_stmt s1 ^ "\telse\t" ^ string_of_stmt s2
   | For(o, e1, e_opt, e2, s) ->
       "\tfor (" ^string_of_expr e_opt ^ " " ^ string_of_expr e1 ^ string_of_op o ^ " " ^ string_of_expr e2 ^ ") {\n\t\t" ^ string_of_stmt s ^ "\t}\n"
-  | Dealloc(e) -> "free(" ^ string_of_expr e ^ ")"
-  | ClassAssign(s1, s2, e) -> s1 ^ "." ^ s2 ^ " = " ^ string_of_expr e
+  | Dealloc(e) -> "\tfree(" ^ e ^ ");\n"
+  | ClassAssign(s1, s2, e) -> "\t" ^ s1 ^ "." ^ s2 ^ " = " ^ string_of_expr e ^ ";\n"
 
 let string_of_vdecl (t, id, expr) =
     match expr with
@@ -91,9 +91,9 @@ let string_of_fdecl fdecl =
   "}\n"
 
 let string_of_cdecl cdecl =
-    "Class " ^ cdecl.cname ^ " {\n" ^
-    String.concat "" (List.map string_of_vdecl cdecl.cvars) ^
-    String.concat "" (List.map string_of_fdecl cdecl.cfuncs) ^
+    "Class " ^ cdecl.cname ^ " {\n\n" ^
+    String.concat "" (List.map string_of_vdecl cdecl.cvars) ^ "\n" ^
+    String.concat "" (List.map string_of_fdecl cdecl.cfuncs) ^ "\n" ^
     "}\n"
 
 
