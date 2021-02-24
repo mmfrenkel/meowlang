@@ -93,8 +93,8 @@ stmt:
   | expr IF THEN stmt ELSE stmt    { If($1, $4, $6)         }
   // | FOR expr_opt INCREMENT expr expr stmt { For($2, Increment, $4, $5, $6) }
   // | FOR expr_opt DECREMENT expr expr stmt { For($2, Decrement, $4, $5, $6) }
-  | FOR INCREMENT expr expr stmt { For(Increment, $3, $4, $5) }
-  | FOR DECREMENT expr expr stmt { For(Decrement, $3, $4, $5) }
+  | FOR INCREMENT expr COMMA expr stmt { For(Increment, $3, $5, $6) }
+  | FOR DECREMENT expr COMMA expr stmt { For(Decrement, $3, $5, $6) }
 
 expr:
     ILIT                      { ILiteral($1)           }
