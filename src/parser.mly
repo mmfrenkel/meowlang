@@ -33,7 +33,7 @@ program:
   decls EOF                     { $1                       }
 
 /*
-  A program is a list of import statements and a set of function declarations.
+  A program is a list of import statements, a set of function declarations and a set of class declarations.
  */
 decls:
   /* nothing */                 { ([], [], [])             }

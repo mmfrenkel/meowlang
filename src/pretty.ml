@@ -30,11 +30,7 @@ let string_of_typ = function
 | Float -> "float"
 | String -> "char *"
 | Void -> ""
-
-
-let string_of_bind = function
-  typ -> string_of_typ typ
-
+| Obtyp(s) -> "Class " ^ s 
 
 let string_of_array_size = function
   ILiteralArraySize(l) -> string_of_int l
@@ -52,13 +48,13 @@ let rec string_of_expr = function
   | Unop(o, e) -> string_of_uop o ^ string_of_expr e
   | Bind(t, s) -> string_of_typ t ^ " " ^ s 
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
-  | BindAssign(t, s, e) -> string_of_typ t ^ " " ^ s ^ " = " ^ string_of_expr e 
+  | BindAssign((t, s), e) -> string_of_typ t ^ s ^ " = " ^ string_of_expr e 
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | NewArray(i, typ, s, contents) ->
       string_of_typ typ ^ " [" ^ string_of_array_size s ^ "] " ^ i ^ " = [ " ^ String.concat ", " (List.map string_of_expr contents) ^ " ]"
-  | NewInstance(s) -> "struct " ^ s 
-  | ClassAccess(s1, s2) -> s1 ^ "." ^ s2
+  | NewInstance(s) -> "Class " ^ s 
+  | ClassAccess(ob, el) -> ob ^ "." ^ el
 
 let rec string_of_stmt = function
     Expr(expr) -> "\t" ^ string_of_expr expr ^ ";\n"
@@ -91,9 +87,16 @@ let string_of_fdecl fdecl =
     String.concat "" (List.map string_of_stmt fdecl.body) ^
   "}\n"
 
-let string_of_cdecl classes = 
+
+let string_of_cdecl cdecl = 
   "Class " ^ cdecl.cname ^ "{\n" ^ 
+  String.concat "" (List.map string_of_stmt cdecl.cvars) ^
+  String.concat "" (List.map string_of_fdecl cdecl.cfuncs) ^ 
+  "}\n"
+
+
 
 let string_of_program (imports, funcs, classes) =
   String.concat "" (List.map string_of_modules imports) ^ "\n\n" ^
-  String.concat "\n" (List.map string_of_fdecl funcs)
+  String.concat "\n" (List.map string_of_fdecl funcs) ^ "\n" ^
+String.concat "\n" (List.map string_of_cdecl classes) 

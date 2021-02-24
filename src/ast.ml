@@ -49,7 +49,7 @@ type func_decl = {
 
 type class_decl = {
     cname : string;
-    cvars : bind list;
+    cvars : stmt list;
     cfuncs : func_decl list; 
 }
 
