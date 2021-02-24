@@ -1,21 +1,14 @@
-GIMME hello?
-
-PSST Create a custom MOUSE class
 HAI ITZ ME CLASS MOUSE,
 
-    PSST This is an instance variable
     ITZ ME NUMBR cookies IZ 0.
-
-    PSST This is a class method
-    HAI ITZ ME FUNC squeek,
-        MEOW "Eeeeeeek!".
-    KBYE    
 
     HAI ITZ ME NUMBR FUNC count_cookies,
         GIVE cookies.
-    KBYE 
+    KBYE
 
     HAI ITZ ME FUNC give_cookie WIT NUMBR count_cookies,
-        cookies IZ SUM OF cookies AN count_cookies. 
+        PSST This uses the SUM prefix operator
+        cookies IZ SUM OF cookies AN count_cookies.
     KBYE
+
 KBYE

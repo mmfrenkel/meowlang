@@ -43,6 +43,7 @@ rule token = parse
 | "NEW"           { NEW }
 | "BLEEP"         { FREE }
 | "CLASS"         { CLASS }
+| "IN"            { IN }
 
 (* Functions *)
 | "PURR"          { CALL }
@@ -69,6 +70,12 @@ rule token = parse
 | "UPPIN"         { INCREMENT }
 | "NERFIN"        { DECREMENT }
 
+(* Flow Control *)
+| "O RLY?"               { IF       }
+| "YA RLY"               { THEN     }
+| "NO WAI"               { ELSE     }
+| "IM IN YR LOOP"        { FOR      }
+
 (* Data Types *)
 | "YARN"          { STRING }
 | "NUMBR"         { INT }
@@ -76,7 +83,6 @@ rule token = parse
 | "NUMBAR"        { FLOAT }
 | "AYE"           { BLIT(true)  }
 | "NAY"           { BLIT(false) }
-
 | "BUCKET"        { ARRAY }
 | digits as lxm   { ILIT(int_of_string lxm) }
 | float as lxm    { FLIT(lxm) }
@@ -84,12 +90,6 @@ rule token = parse
 | '"'             { read_string (Buffer.create 17) lexbuf }  (* String *)
 | eof { EOF }
 | _ as char { raise (SyntaxError("Illegal character " ^ Char.escaped char)) }
-
-(* Flow Control *)
-| "O RLY?"               { IF       }
-| "YA RLY"               { THEN     }
-| "NO WAI"               { ELSE     }
-| "IM IN YR LOOP"        { FOR      }
 
 and read_string buf =
   parse
