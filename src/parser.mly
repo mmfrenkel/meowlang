@@ -91,10 +91,9 @@ stmt_list:
 
 stmt:
     expr SEMI                 { Expr($1)               }
+  | function_call SEMI        { Expr($1)               }
   | RETURN expr SEMI          { Return($2)             }
   | LBRACE stmt_list RBRACE   { Block(List.rev $2)     }
-  | CALL ID SEMI              { Expr(Call($2, []))     }
-  | CALL ID LPAREN args_opt SEMI { Expr(Call($2, $4))  }
   | array_decl SEMI           { Expr($1)               }
   | c_instance SEMI           { Expr($1)               }
   | expr IF THEN stmt %prec NOELSE { If($1, $4, Block([]))  }
@@ -103,6 +102,7 @@ stmt:
   | FOR expr DECREMENT expr_opt COMMA expr stmt { For(Decrement, $2, $4, $6, $7) }
   | ID IN ID ASSIGN expr SEMI { ClassAssign($1, $3, $5)}
   | FREE ID SEMI              { Dealloc($2)            }
+  | ID ASSIGN function_call SEMI  { Expr(Assign($1, $3)) }
 
 expr:
     ILIT                      { ILiteral($1)           }
@@ -125,6 +125,12 @@ expr:
   | LPAREN expr RPAREN        { $2                     }
   | CONCAT expr COMMA expr    { Binop($2, Concat, $4)  }
   | ID IN ID                  { ClassAccess($1, $3)    }
+
+function_call:
+    CALL ID                   { FunctionCall($2, [])   }
+  | CALL ID IN ID             { MethodCall($2, $4, []) }
+  | CALL ID LPAREN args_opt   { FunctionCall($2, $4)   }
+  | CALL ID IN ID LPAREN args_opt { MethodCall($2, $4, $6) }
 
 expr_opt:
   /* nothing */               { Noexpr                 }

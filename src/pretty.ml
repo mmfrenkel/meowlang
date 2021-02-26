@@ -47,8 +47,10 @@ let rec string_of_expr = function
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Unop(o, e) -> string_of_uop o ^ string_of_expr e
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
-  | Call(f, el) ->
+  | FunctionCall(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | MethodCall(f, ob, el) ->
+      ob ^ "." ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | NewArray(i, typ, s, contents) ->
       string_of_typ typ ^ " [" ^ string_of_array_size s ^ "] " ^ i ^ " = [ " ^ String.concat ", " (List.map string_of_expr contents) ^ " ]"
   | Noexpr -> ""
