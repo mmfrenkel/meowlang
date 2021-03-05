@@ -14,5 +14,7 @@ printf "\n\nCONDITIONALS TEST ------------------------------>\n"
 ./src/meowlang.native < test_programs/conditionals.meow
 printf "\n\nLOOPS TEST ------------------------------------->\n"
 ./src/meowlang.native < test_programs/loops.meow
-printf "\n\nCLASS TEST --------------->"
+printf "\n\nCLASS TEST #1 ---------------------------------->\n"
 ./src/meowlang.native < test_programs/mouse_class.meow
+printf "\n\nCLASS TEST #2 ---------------------------------->\n"
+./src/meowlang.native < test_programs/mouse_class_two.meow
