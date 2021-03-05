@@ -27,13 +27,12 @@ open Ast
 
 %%
 
-
 program:
-    imports fdecls cdecls EOF { (List.rev $1, List.rev $2, List.rev $3) }
-  | fdecls cdecls EOF         { ([], List.rev $1, List.rev $2) }
-  | imports fdecls EOF        { (List.rev $1, List.rev $2, []) }
-  | fdecls EOF                { ([], List.rev $1, []) }
-  | cdecls EOF                { ([], [], List.rev $1) }
+  decls EOF                   { $1 }
+
+decls:
+    imports udf_udcs          { (List.rev $1, fst $2, snd $2) }
+  | udf_udcs                  { ([], fst $1, snd $1) }
 
 imports:
     import                   { [$1]                    }
@@ -41,6 +40,11 @@ imports:
 
 import:
   MODULE ID IMPORT           { Module($2)              }
+
+udf_udcs:
+   /* nothing */             { ([], [])                }
+| udf_udcs fdecl             { (($2 :: fst $1), snd $1) }
+| udf_udcs cdecl             { (fst $1, ($2 :: snd $1)) }
 
 fdecls:
     fdecl                    { [$1]                    }
@@ -155,10 +159,6 @@ array_size_typ:
   | ID                        { VariableArraySize($1)   }
 
 /* Classes */
-
-cdecls:
-    cdecl                     { [$1]                    }
-  | cdecls cdecl              { $2 :: $1                }
 
 cdecl:
     LBRACE DEF CLASS ID RPAREN vdecls methods RBRACE

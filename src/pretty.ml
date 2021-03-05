@@ -80,7 +80,7 @@ let string_of_formals (t, id) = string_of_typ t ^ " " ^ id
 let format_params fdecl =
   "(" ^ String.concat ", " (List.map string_of_formals fdecl.formals) ^ ")\n"
 
-let string_of_fdecl fdecl =
+let string_of_fdecl fdecl  =
   let return_string = (
     match fdecl.typ with
         Void -> ""
@@ -92,12 +92,25 @@ let string_of_fdecl fdecl =
     String.concat "" (List.map string_of_stmt fdecl.body) ^
   "}\n"
 
+let string_of_mdecl fdecl =
+  let indent = "\t" in
+
+  let return_string = (
+    match fdecl.typ with
+        Void -> ""
+      | _ -> string_of_typ fdecl.typ ^ " ") in
+
+  indent ^ return_string ^ fdecl.fname ^ format_params fdecl ^
+  indent ^ "{\n" ^
+    String.concat indent (List.map string_of_vdecl fdecl.locals) ^
+    String.concat indent (List.map string_of_stmt fdecl.body) ^
+  indent ^ "}\n"
+
 let string_of_cdecl cdecl =
     "Class " ^ cdecl.cname ^ " {\n\n" ^
     String.concat "" (List.map string_of_vdecl cdecl.cvars) ^ "\n" ^
-    String.concat "" (List.map string_of_fdecl cdecl.cfuncs) ^ "\n" ^
+    String.concat "" (List.map string_of_mdecl cdecl.cfuncs) ^ "\n" ^
     "}\n"
-
 
 let string_of_program (imports, funcs, classes) =
   String.concat "" (List.map string_of_modules imports) ^ "\n\n" ^
