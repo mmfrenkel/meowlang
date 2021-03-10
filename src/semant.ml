@@ -51,11 +51,6 @@ let find_class_method cname mname =
   try StringMap.find mname cls_methods
   with Not_found -> raise (ClassMethodNotFound(class_method_unknown))
 
-(* All programs must have a main function *)
-let check_program_has_main =
-  if Hashtbl.mem function_tbl "Main" then () else raise (Exceptions.MissingMainFunction (missing_main_func_msg))
-
-
 let rec semant_expr expr symbol_tbl =
   let check_arg_type formal_param arg_expr =
     let (actual_type, arg_expr') = semant_expr arg_expr symbol_tbl
@@ -214,5 +209,4 @@ let check (imports, functions, classes) =
   List.iter (fun func -> Hashtbl.add function_tbl func.fname func) functions;
   List.iter (fun cls-> Hashtbl.add class_tbl cls.cname cls) classes;
 
-  check_program_has_main;
-  true;
+  if Hashtbl.mem function_tbl "Main" then true else raise (Exceptions.MissingMainFunction (missing_main_func_msg))

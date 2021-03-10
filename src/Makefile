@@ -9,4 +9,4 @@ meowlang.native : parser.mly scanner.mll ast.ml
 .PHONY : clean
 clean :
 	ocamlbuild -clean
-	rm -rf ocamlllvm *.diff
+	rm -rf ocamlllvm *.diff parser.output
