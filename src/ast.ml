@@ -4,13 +4,13 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Greater | And | Or | Con
 
 type uop = Not
 
-type typ = Int | Bool | Float | String | Void | Obtype of string
-
-type import = Module of string
-
 type array_size =
     ILiteralArraySize of int
   | VariableArraySize of string
+
+type typ = Int | Bool | Float | String | Void | Obtype of string | Arrtype of array_size * typ
+
+type import = Module of string
 
 type expr =
     ILiteral of int
@@ -25,7 +25,7 @@ type expr =
   | MethodCall of string * string * expr list
   | NewArray of string * typ * array_size * expr list
   | Noexpr
-  | NewInstance of string * string
+  | NewInstance of string * typ * expr list
   | ClassAccess of string * string
 
 type bind_var = typ * string * expr

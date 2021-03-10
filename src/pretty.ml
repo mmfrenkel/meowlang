@@ -24,13 +24,20 @@ let string_of_modules = function
 
 let string_of_uop = function
   Not -> "!"
-let string_of_typ = function
+
+
+let string_of_array_size = function
+  ILiteralArraySize i -> string_of_int i
+| VariableArraySize s -> s
+
+let rec string_of_typ = function
   Int -> "int"
 | Bool -> "bool"
 | Float -> "float"
 | String -> "char *"
 | Void -> ""
-| Obtype(s) -> "Class " ^s
+| Obtype(s) -> "class " ^s
+| Arrtype(size, typ) -> string_of_typ typ ^ " [" ^ string_of_array_size size ^ "]"
 
 let string_of_array_size = function
   ILiteralArraySize(l) -> string_of_int l
@@ -54,7 +61,8 @@ let rec string_of_expr = function
   | NewArray(i, typ, s, contents) ->
       string_of_typ typ ^ " [" ^ string_of_array_size s ^ "] " ^ i ^ " = [ " ^ String.concat ", " (List.map string_of_expr contents) ^ " ]"
   | Noexpr -> ""
-  | NewInstance(var, c) -> c ^ " " ^ var
+  | NewInstance(var, c, []) -> string_of_typ c ^ " " ^ var
+  | NewInstance(var, c, exprs) -> string_of_typ c ^ " " ^ var ^ "(" ^ String.concat "" (List.map string_of_expr exprs) ^ ")"
   | ClassAccess(el, ob) -> ob ^ "." ^ el
 
 let rec string_of_stmt = function

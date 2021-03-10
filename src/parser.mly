@@ -177,8 +177,8 @@ methods:
  /* Class Instantiation */
 
 c_instance:
-    MAKE ID NEW ID                           { NewInstance($2, $4) }
-  | MAKE ID NEW ID RPAREN LPAREN class_opt   { NewInstance($2, $4) }
+    MAKE ID NEW typ                           { NewInstance($2, $4, []) }
+  | MAKE ID NEW typ RPAREN LPAREN class_opt   { NewInstance($2, $4, $7) }
 
 class_opt:
     /* nothing */             { []                      }
