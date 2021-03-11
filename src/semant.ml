@@ -130,12 +130,18 @@ let rec semant_expr expr symbol_tbl =
         let args' = List.map2 check_arg_type meth.formals args in
         (meth.typ, SMethodCall(vname, mname, args'))
 
-  | NewArray (arr_name, arr_typ, size, expr_list) as ex ->
+  | NewArray (arr_name, arr_typ, arr_size, expr_list) as ex ->
 
       (* 1. Check to make sure that size is integer *)
       let array_size_typ =
-        match size with
-          ILiteralArraySize i -> Int
+        match arr_size with
+          ILiteralArraySize i ->
+            (* 2. check integer literal against expr_list length *)
+            let num_items = List.length expr_list in
+              if num_items > i
+                then raise (ExcessArrayInput(excess_array_item ^ string_of_int num_items))
+              else ();
+            Int
         | VariableArraySize s -> find_type_of_id symbol_tbl s
       in
       if array_size_typ != Int
@@ -143,14 +149,14 @@ let rec semant_expr expr symbol_tbl =
       else
         let expr_list' = List.fold_left (fun acc e -> semant_expr e symbol_tbl :: acc) [] expr_list
         in
-        (* 2. if expr_list, check that the expressions match the content type of array *)
+        (* 3. if expr_list, check that the expressions match the content type of array *)
         List.iter (
           fun (expr_typ, expr) ->
             if expr_typ != arr_typ
               then raise (InvalidArrayItem(invalid_array_item_msg ^ string_of_expr ex))
             else ()
         ) expr_list';
-        (Arrtype(size, arr_typ), SNewArray(arr_name, arr_typ, size, expr_list'))
+        (Arrtype(arr_size, arr_typ), SNewArray(arr_name, arr_typ, arr_size, expr_list'))
 
   | NewInstance (obj_name, typ, expr_list) as ex ->
 
@@ -160,7 +166,7 @@ let rec semant_expr expr symbol_tbl =
         | _ -> raise (ObjectCreationInvalid(invalid_object_creation ^ string_of_expr ex))
       and expr_list' = List.fold_left (fun acc e -> semant_expr e symbol_tbl :: acc) [] expr_list
       in
-      (* 2. Check that the class of new instance actually exists *)
+      (* 2. Check that the class of new instance actually exists - valid*)
       let _ = find_class cname in
       (typ, SNewInstance(obj_name, typ, expr_list'))
 
