@@ -156,6 +156,9 @@ let rec semant_expr expr symbol_tbl =
               then raise (InvalidArrayItem(invalid_array_item_msg ^ string_of_expr ex))
             else ()
         ) expr_list';
+
+        (* make sure to add the allocated obj to symbol table so it can be referenced *)
+        Hashtbl.add symbol_tbl arr_name (Arrtype (arr_size, arr_typ));
         (Arrtype(arr_size, arr_typ), SNewArray(arr_name, arr_typ, arr_size, expr_list'))
 
   | NewInstance (obj_name, typ, expr_list) as ex ->
@@ -168,6 +171,9 @@ let rec semant_expr expr symbol_tbl =
       in
       (* 2. Check that the class of new instance actually exists - valid*)
       let _ = find_class cname in
+
+      (* make sure to add the allocated obj to symbol table so it can be referenced *)
+      Hashtbl.add symbol_tbl obj_name (Obtype (cname));
       (typ, SNewInstance(obj_name, typ, expr_list'))
 
   | ClassAccess (obj_name, class_var) as ex ->
@@ -182,17 +188,30 @@ let rec semant_expr expr symbol_tbl =
       (* 3. Check that the instance variable exists within the class *)
       (Obtype(cname), (SClassAccess(obj_name, class_var)))
 
+(*
+let rec semant_stmt stmt symbol_tbl =
+
+  (* THIS NEEDS TO BE FILLED OUT!!!! See microC for details removed *)
+  match stmt with
+    Expr e -> SExpr (semant_expr e symbol_tbl)
+  | Return e -> SReturn()
+  | If (e, stmt1, stmt2) -> SIf()
+  | For (op, e1, e2, e3, stmt) -> SFor()
+  | Dealloc id -> SDealloc(id)
+  | ClassAssign (id, meth_name, e) -> SClassAssign()
+  | Block b -> SBlock(semant_stmt b symbol_tbl)
+*)
+
 let check_function_body func =
 
-  (* Build local symbol table of variables for this function *)
+  (* Build local symbol table of variables for this scope *)
   let symbol_table:(string, Ast.typ) Hashtbl.t = Hashtbl.create 10
   in
   List.iter (fun (typ, name) -> Hashtbl.add symbol_table name typ) func.formals;
   List.iter (fun (typ, name, expr) -> Hashtbl.add symbol_table name typ) func.locals
 
-  (* TO DO: Symbol table also needs to include objects (Obtype) and arrays (ArrType) that are allocated *)
-
-  (* TO DO: Build up the SAST Tree for the Function Here *)
+  (* TO DO: Build up the SAST Tree for the Function Here -- NEED STATEMENTS FILLED OUT *)
+  (* semant_stmt func.body symbol_table *)
 
 let check_function func =
 
