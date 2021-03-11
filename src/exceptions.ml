@@ -16,6 +16,8 @@ exception InvalidMethodCall of string
 exception InvalidArraySizeSpecified of string
 exception ObjectCreationInvalid of string
 exception InstanceVariableAccessInvalid of string
+exception InvalidArrayItem of string
+exception ExcessArrayInput of string
 
 (* Message Templates for Exceptions *)
 let dup_func_msg = "duplicate function name: "
@@ -33,3 +35,5 @@ let invalid_method_call = "methods can only be called on objects: "
 let invalid_array_size_msg = "arrays sizes must be integer literals or variables only: "
 let invalid_object_creation = "you can only create objects from classes: "
 let invalid_instance_var_access = "instance variables only exist in classes: "
+let invalid_array_item_msg = "arrays can only be of the specified type: "
+let excess_array_item = "array contents exceeded specified array size: "
