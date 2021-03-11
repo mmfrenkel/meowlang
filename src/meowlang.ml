@@ -1,5 +1,5 @@
 (*
-    Mostly a place holder file if we wanted to test our scanner/parser
+    Main CLI for running the compiler. Command line arguments specify behavior.
 *)
 open Ast
 open Pretty
