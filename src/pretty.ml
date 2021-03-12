@@ -19,12 +19,12 @@ let string_of_op = function
   | Concat -> "+"
   | Increment -> "++"
   | Decrement -> "--"
+  
 let string_of_modules = function
   Module(l) -> "include \"" ^ l ^ "\""
 
 let string_of_uop = function
   Not -> "!"
-
 
 let string_of_array_size = function
   ILiteralArraySize i -> string_of_int i
@@ -107,12 +107,10 @@ let string_of_mdecl fdecl =
     match fdecl.typ with
         Void -> ""
       | _ -> string_of_typ fdecl.typ ^ " ") in
-
-  indent ^ return_string ^ fdecl.fname ^ format_params fdecl ^
-  indent ^ "{\n" ^
-    String.concat indent (List.map string_of_vdecl fdecl.locals) ^
-    String.concat indent (List.map string_of_stmt fdecl.body) ^
-  indent ^ "}\n"
+  
+  indent ^ return_string ^ fdecl.fname ^ format_params fdecl ^ indent ^ "{\n" ^
+  String.concat indent (List.map string_of_vdecl fdecl.locals) ^
+  String.concat indent (List.map string_of_stmt fdecl.body) ^ indent ^ "}\n"
 
 let string_of_cdecl cdecl =
     "Class " ^ cdecl.cname ^ " {\n\n" ^
@@ -120,6 +118,7 @@ let string_of_cdecl cdecl =
     String.concat "" (List.map string_of_mdecl cdecl.cfuncs) ^ "\n" ^
     "}\n"
 
+(* Main function that pretty-prints an AST *)
 let string_of_program (imports, funcs, classes) =
   String.concat "" (List.map string_of_modules imports) ^ "\n\n" ^
   String.concat "\n" (List.map string_of_fdecl funcs) ^ "\n" ^
