@@ -110,7 +110,7 @@ stmt:
 
 expr:
     ILIT                      { ILiteral($1)           }
-  | FLIT	                    { Fliteral($1)           }
+  | FLIT                      { Fliteral($1)           }
   | BLIT                      { BoolLit($1)            }
   | SLIT                      { StringLit($1)          }
   | ID                        { Id($1)                 }
