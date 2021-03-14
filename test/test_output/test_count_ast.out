@@ -1,0 +1,9 @@
+
+
+int count(int count1, int count2)
+{
+	int count3;
+	count3 = count1 + count2;
+	return count3;
+}
+

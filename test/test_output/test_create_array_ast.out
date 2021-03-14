@@ -1,0 +1,9 @@
+include "hello"
+
+Main()
+{
+	int [3] cool_array = [ 1, 2, 3 ];
+	char * [0] unknown_array = [  ];
+	bool [10] empty_array = [  ];
+}
+
