@@ -7,6 +7,9 @@ parser.output
 scanner.ml
 meowlang.native
 
+# test files
+global_log*
+
 # files from IDEs, etc.
 .DS_Store
 _build/
