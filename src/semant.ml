@@ -196,50 +196,54 @@ let rec semant_stmt stmt symbol_tbl =
   let check_bool_expr e = 
     let (t', e') = semant_expr e symbol_tbl in
       if t' == Bool then (t', e') 
-      else raise (ControlFlowIllegalArgument(expr_type_mismatch ^ "expected Boolean but got type " ^ t' ^ " in expression " ^ string_of_expr e))
-  in
+      else raise (ControlFlowIllegalArgument(expr_type_mismatch ^ "expected Boolean but got type " ^ string_of_typ t' ^ " in expression " ^ string_of_expr e))
+  and
 
   (* for looping: checks that op is Increment or Decrement *)
-  let check_control_op op =
+  check_control_op op =
     match op with 
       Increment -> op
     | Decrement -> op
-    | _ -> raise (ControlFlowIllegalArgument(op_type_mismatch ^ "expected Increment or Decrement but got type " ^ t' ^ " in expression " ^ string_of_expr e))
-  in
+    | _ -> raise (ControlFlowIllegalArgument(op_type_mismatch ^ "expected Increment or Decrement but got type " ^  string_of_op op))
+  and
 
   (* for looping: checks that index is an Integer *)
-  let check_control_index e =
+  check_control_index e =
     let (t', e') = semant_expr e symbol_tbl in
       if t' == Int then (t', e')
-      else raise (ControlFlowIllegalArgument(expr_type_mismatch ^ "expected Integer but got type " ^ t' ^ " in expression " ^ string_of_expr e)) 
-  in
+      else raise (ControlFlowIllegalArgument(expr_type_mismatch ^ "expected Integer but got type " ^ (string_of_typ t') ^ " in expression " ^ string_of_expr e)) 
+  and
 
   (* for looping: second expr is optional or must be index assignment *)
   (* if expr is index assignment, ID of index must be the ID being assigned *)
   (* 1. Not  sure how to get the ID from the Assign expr *)
   (* 2. Not sure if I can reference SAssign like this, i.e. without params *)
   (* 3. How to handle expr_opt? *)
-  let check_index_assignment e index =
+  check_index_assignment e index =
     let (t', e') = semant_expr e symbol_tbl in
     let (ti', ei') = semant_expr e symbol_tbl in
-    if e' != SAssign then raise (ControlFlowIllegalArgument("index assignment expected in expression: " ^ string_of_expr e))
-    else if t' = ti' then (t', e')
-    else raise (ControlFlowIllegalArgument("expected to assign index variable " ^ string_of_expr index ^ " in expression: " ^ string_of_expr e))
-  in
+    match e' with 
+        SNoexpr -> (t', e')
+      | SAssign(_, _) ->
+          if t' = ti' then (t', e')
+          else raise (ControlFlowIllegalArgument("expected to assign index variable " ^ string_of_expr index ^ " in expression: " ^ string_of_expr e))
+      | _ -> raise (ControlFlowIllegalArgument("index assignment expected in expression: " ^ string_of_expr e))
+  and
 
   (* for looping: checks that loop termination is a binary operation of < or > *)
-  let check_loop_termination e =
+  check_loop_termination e =
     let (t', e') = semant_expr e symbol_tbl in
-      match t' with
-        Less -> (t', e')
-      | Greater -> (t', e')
-      | _ -> raise (ControlFlowIllegalArgument(op_typ_mismatch ^ "expected binary operation of < or > in expression: " ^ string_of_expr e))
-  in
+      match e' with
+        SBinop(_, op, _) -> 
+          (match op with 
+              Less | Greater | Equal | Neq -> (t', e')
+            | _ -> raise (ControlFlowIllegalArgument(op_type_mismatch ^ "expected <, >, =, != as loop termination condition: " ^ string_of_expr e)))
+      | _ -> raise (ControlFlowIllegalArgument(expr_type_mismatch ^ "expected binary operation in loop: " ^ string_of_expr e))
+  in 
 
   (* THIS NEEDS TO BE FINISHED!!!! See microC for details removed *)
   match stmt with
-    Block b -> SBlock(semant_stmt b symbol_tbl)
-  | Expr e -> SExpr(semant_expr e symbol_tbl)
+    Expr e -> SExpr(semant_expr e symbol_tbl)
   | Return e -> SReturn(semant_expr e symbol_tbl)
   | If (e, stmt1, stmt2) ->
       SIf(check_bool_expr e,
@@ -251,6 +255,13 @@ let rec semant_stmt stmt symbol_tbl =
           check_index_assignment e2 e1, (* optional index assignment *)
           check_loop_termination e3, (* termination condition *)
           semant_stmt stmt symbol_tbl) (* loop body *)
+  | Block b ->
+    let rec check_stmt_list = function
+        [Return _ as s] -> [semant_stmt s symbol_tbl]
+      | Block sl :: ss  -> check_stmt_list (sl @ ss) (* Flatten blocks *)
+      | s :: ss         -> semant_stmt s symbol_tbl :: check_stmt_list ss
+      | []              -> []
+    in SBlock(check_stmt_list b)
   (* | Dealloc id -> SDealloc(id) *)
   (* | ClassAssign (id, meth_name, e) -> SClassAssign() *)
 

@@ -10,7 +10,7 @@ HAI ITZ ME YARN FUNC create_message WIT YARN name,
         GIVE msg.
 KBYE
 
-HAI ITZ ME NUMBR FUNC main,
+HAI ITZ ME NUMBR FUNC Main,
         PSST Attempt to call a helper function
 
         ITZ ME YARN my_name.
