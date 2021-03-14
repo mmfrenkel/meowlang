@@ -43,7 +43,7 @@ Check() {
                 exit 1
         fi
 
-        # remove the old files
+        # report result and remove the old files
         echo "TEST PASSED" | tee -a $global_log
         rm -f $actual_output
 }
@@ -66,7 +66,7 @@ then
         global_log="./test/global_log.out"
 
         # remove old global log, if it still exists
-        rm -f global_log
+        rm -f $global_log
 else
         echo -e "Command line arg $1 is not yet a supported test type \n"
         Usage
@@ -86,16 +86,12 @@ for file in $files
 do
         case $file in
 	        *test*)
-	                Check $file $true
-	                ;;
+	                Check $file $true ;;
                 *fail*)
-	                Check $file $false
-	                ;;
+	                Check $file $false ;;
 	        *)
-	                echo "Unknown file type $file, skipping..."
-	                ;;
+	                echo "Unknown file type $file, skipping..." ;;
         esac
-
         let n_tests_completed++
 done
 
