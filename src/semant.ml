@@ -188,19 +188,71 @@ let rec semant_expr expr symbol_tbl =
       (* 3. Check that the instance variable exists within the class *)
       (Obtype(cname), (SClassAccess(obj_name, class_var)))
 
-(*
+
+(* Return a semantically-checked statement i.e. containing sexprs *)      
 let rec semant_stmt stmt symbol_tbl =
 
-  (* THIS NEEDS TO BE FILLED OUT!!!! See microC for details removed *)
+  (* if/else branching: checks that termination expr is a Boolean *)
+  let check_bool_expr e = 
+    let (t', e') = semant_expr e symbol_tbl in
+      if t' == Bool then (t', e') 
+      else raise (ControlFlowIllegalArgument(expr_type_mismatch ^ "expected Boolean but got type " ^ t' ^ " in expression " ^ string_of_expr e))
+  in
+
+  (* for looping: checks that op is Increment or Decrement *)
+  let check_control_op op =
+    match op with 
+      Increment -> op
+    | Decrement -> op
+    | _ -> raise (ControlFlowIllegalArgument(op_type_mismatch ^ "expected Increment or Decrement but got type " ^ t' ^ " in expression " ^ string_of_expr e))
+  in
+
+  (* for looping: checks that index is an Integer *)
+  let check_control_index e =
+    let (t', e') = semant_expr e symbol_tbl in
+      if t' == Int then (t', e')
+      else raise (ControlFlowIllegalArgument(expr_type_mismatch ^ "expected Integer but got type " ^ t' ^ " in expression " ^ string_of_expr e)) 
+  in
+
+  (* for looping: second expr is optional or must be index assignment *)
+  (* if expr is index assignment, ID of index must be the ID being assigned *)
+  (* 1. Not  sure how to get the ID from the Assign expr *)
+  (* 2. Not sure if I can reference SAssign like this, i.e. without params *)
+  (* 3. How to handle expr_opt? *)
+  let check_index_assignment e index =
+    let (t', e') = semant_expr e symbol_tbl in
+    let (ti', ei') = semant_expr e symbol_tbl in
+    if e' != SAssign then raise (ControlFlowIllegalArgument("index assignment expected in expression: " ^ string_of_expr e))
+    else if t' = ti' then (t', e')
+    else raise (ControlFlowIllegalArgument("expected to assign index variable " ^ string_of_expr index ^ " in expression: " ^ string_of_expr e))
+  in
+
+  (* for looping: checks that loop termination is a binary operation of < or > *)
+  let check_loop_termination e =
+    let (t', e') = semant_expr e symbol_tbl in
+      match t' with
+        Less -> (t', e')
+      | Greater -> (t', e')
+      | _ -> raise (ControlFlowIllegalArgument(op_typ_mismatch ^ "expected binary operation of < or > in expression: " ^ string_of_expr e))
+  in
+
+  (* THIS NEEDS TO BE FINISHED!!!! See microC for details removed *)
   match stmt with
-    Expr e -> SExpr (semant_expr e symbol_tbl)
-  | Return e -> SReturn()
-  | If (e, stmt1, stmt2) -> SIf()
-  | For (op, e1, e2, e3, stmt) -> SFor()
-  | Dealloc id -> SDealloc(id)
-  | ClassAssign (id, meth_name, e) -> SClassAssign()
-  | Block b -> SBlock(semant_stmt b symbol_tbl)
-*)
+    Block b -> SBlock(semant_stmt b symbol_tbl)
+  | Expr e -> SExpr(semant_expr e symbol_tbl)
+  | Return e -> SReturn(semant_expr e symbol_tbl)
+  | If (e, stmt1, stmt2) ->
+      SIf(check_bool_expr e,
+      semant_stmt stmt1 symbol_tbl,
+      semant_stmt stmt2 symbol_tbl)
+  | For (op, e1, e2, e3, stmt) ->
+      SFor(check_control_op op, (* increment or decrement *)
+          check_control_index e1, (* index *)
+          check_index_assignment e2 e1, (* optional index assignment *)
+          check_loop_termination e3, (* termination condition *)
+          semant_stmt stmt symbol_tbl) (* loop body *)
+  (* | Dealloc id -> SDealloc(id) *)
+  (* | ClassAssign (id, meth_name, e) -> SClassAssign() *)
 
 let check_function_body func =
 
