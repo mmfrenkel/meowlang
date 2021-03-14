@@ -11,12 +11,11 @@ Usage() {
 }
 
 # checks to make sure that a source file that should pass still passes
-# and compares old result with the new result
+# and compares old result with the new result. must call only after
+# the test_type_dir and the run_type global variables are set by the script
 Check() {
         test_file=$1      # name of the test file to run
-        run_type=$2       # run type (e.g., -a)
-        test_type_dir=$3  # directory containing results for differe test types. e.g., ast)
-        should_pass=$4    # do we expect the test to pass?
+        should_pass=$2    # do we expect the test to pass?
 
         base_name=$(basename $file .meow)                                        # e.g., "test_conditionals"
         actual_output="$base_name.out"                                           # e.g., "test_conditionals.out"
@@ -87,14 +86,13 @@ for file in $files
 do
         case $file in
 	        *test*)
-	                Check $file $run_type $test_type_dir $true
+	                Check $file $true
 	                ;;
                 *fail*)
-	                Check $file $run_type $suffix $false
+	                Check $file $false
 	                ;;
 	        *)
-	                echo "Unknown file type $file"
-	                Usage
+	                echo "Unknown file type $file, skipping..."
 	                ;;
         esac
 
