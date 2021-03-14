@@ -264,7 +264,8 @@ let rec semant_stmt stmt symbol_tbl =
     in SBlock(check_stmt_list b)
   (* | Dealloc id -> SDealloc(id) *)
   (* | ClassAssign (id, meth_name, e) -> SClassAssign() *)
-
+  (* | ArrayAccess (id, e) -> SArrayAccess() *)  
+ 
 let check_function_body func =
 
   (* Build local symbol table of variables for this scope *)
