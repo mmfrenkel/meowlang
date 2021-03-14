@@ -10,6 +10,7 @@ exception IllegalUnaryOp of string
 exception FunctionArgumentLengthMismatch of string
 exception VariableAssignmentError of string
 exception FunctionArgumentTypeMismatch of string
+exception ControlFlowIllegalArgument of string
 exception ClassMethodNotFound of string
 exception MethodArgumentLengthMismatch of string
 exception InvalidMethodCall of string
@@ -30,6 +31,10 @@ let undeclared_msg = "undeclared identifier: "
 let missing_main_func_msg = "all programs must have a 'Main' function"
 let func_arg_num_mismatch =  "expected different number of arguments for function: "
 let meth_arg_num_mismatch =  "expected different number of arguments for method: "
+
+let expr_type_mismatch = "expression type mismatch: " (* expected _ but got _ in expression _ *)
+
+let op_type_mismatch = "operation type mismatch: " (* expected _ but got _ in expression _ *)
 let class_method_unknown = "method does not exist for this class: "
 let invalid_method_call = "methods can only be called on objects: "
 let invalid_array_size_msg = "arrays sizes must be integer literals or variables only: "
