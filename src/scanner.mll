@@ -50,7 +50,12 @@ rule token = parse
 | "FUNC"          { FUNCTION }
 | "GIVE"          { RETURN }
 
+(* Array Indexing *)
+| "["             { LBRACKET }
+| "]"             { RBRACKET }
+
 (* Operators *)
+
 | "SUM OF"        { PLUS }
 | "DIFF OF"       { MINUS }
 | "PRODUKT OF"    { TIMES }

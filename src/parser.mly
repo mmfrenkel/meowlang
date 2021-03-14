@@ -3,7 +3,7 @@ open Ast
 %}
 
 %token RETURN MODULE IMPORT CALL FUNCTION DEF COMP CLASS NEW FREE MAKE
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN
+%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN LBRACKET RBRACKET
 %token NOT EQ NEQ LT GT AND OR CONCAT CONTAINS IN
 %token IF THEN ELSE FOR INCREMENT DECREMENT INT BOOL FLOAT STRING ARRAY
 %token <int> ILIT
@@ -158,6 +158,8 @@ array_size_typ:
     ILIT                      { ILiteralArraySize($1) }
   | ID                        { VariableArraySize($1) }
 
+array_index:
+  ID LBRACKET expr RBRACKET   { ArrayAccess($1, $3)   }
 
 /* Classes */
 
