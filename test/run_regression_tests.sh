@@ -22,7 +22,7 @@ Check() {
         actual_output="$base_name.out"                                           # e.g., "test_conditionals.out"
         expected_output="./test/test_output/$test_type_dir/$base_name.out"       # e.g., ./test/test_output/ast/test_conditions.out
 
-        echo -e "\n*** Running $base_name *** "
+        echo -e "\n*** Running $base_name *** " | tee -a $global_log
 
         # run the test
         ./src/meowlang.native $run_type < $test_file &> $actual_output
@@ -30,19 +30,22 @@ Check() {
         # see if the result is what we expected
         if [[ $should_pass && $? -ne 0 ]];
         then
-                echo "TEST FAILED: Expected test to succeed, but failed before diff"
+                echo "TEST FAILED: Test unexpectedly failed" | tee -a $global_log
                 exit 1
         else [[ !$should_pass && $? -eq 0 ]];
         fi
 
+        # run this twice to be sure to easily capture output in global log
+        diff -b $actual_output $expected_output >> $global_log
         diff -b $actual_output $expected_output
-        if [ $? -ne 0 ]; then
-                echo "TEST FAILED: Result did not match expected output"
+        if [ $? -ne 0 ];
+        then
+                echo "TEST FAILED: Result did not match expected output" | tee -a $global_log
                 exit 1
         fi
 
         # remove the old files
-        echo "TEST PASSED"
+        echo "TEST PASSED" | tee -a $global_log
         rm -f $actual_output
 }
 
@@ -84,10 +87,10 @@ for file in $files
 do
         case $file in
 	        *test*)
-	                Check $file $run_type $test_type_dir $true 2>> $global_log
+	                Check $file $run_type $test_type_dir $true
 	                ;;
                 *fail*)
-	                Check $file $run_type $suffix $false 2>> $global_log
+	                Check $file $run_type $suffix $false
 	                ;;
 	        *)
 	                echo "Unknown file type $file"
@@ -98,4 +101,4 @@ do
         let n_tests_completed++
 done
 
-echo -e "\n*** $n_tests_completed successful tests completed! Good to go! ***"
+echo -e "\n*** $n_tests_completed successful tests completed! Good to go! ***" 2>&1 | tee -a $global_log
