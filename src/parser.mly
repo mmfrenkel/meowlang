@@ -158,6 +158,7 @@ array_size_typ:
     ILIT                      { ILiteralArraySize($1) }
   | ID                        { VariableArraySize($1) }
 
+
 /* Classes */
 
 cdecl:
