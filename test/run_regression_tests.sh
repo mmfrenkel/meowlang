@@ -1,4 +1,6 @@
-
+# Use this file to perform regression tests on the meowlang compiler.
+# This file is designed to be used from the project root directory and run as:
+# ./test/run_regression_tests.sh [run_type]
 
 # helper function to print usage if incorrect args are passed
 Usage() {
@@ -7,7 +9,6 @@ Usage() {
         echo "[files]      : optional; list of .meow files, default uses all files"
         exit 1
 }
-
 
 # checks to make sure that a source file that should pass still passes
 # and compares old result with the new result
@@ -85,7 +86,6 @@ do
 	        *test*)
 	                Check $file $run_type $test_type_dir $true 2>> $global_log
 	                ;;
-
                 *fail*)
 	                Check $file $run_type $suffix $false 2>> $global_log
 	                ;;
