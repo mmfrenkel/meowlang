@@ -8,7 +8,7 @@ scanner.ml
 meowlang.native
 
 # test files
-global_log*
+./test/global_log.out
 
 # files from IDEs, etc.
 .DS_Store

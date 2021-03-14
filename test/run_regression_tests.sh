@@ -60,7 +60,7 @@ if [ $1 == "-a" ]
 then
         run_type=$1
         test_type_dir="ast"
-        global_log="./test/global_log$suffix.out"
+        global_log="./test/global_log.out"
 
         # remove old global log, if it still exists
         rm -f global_log

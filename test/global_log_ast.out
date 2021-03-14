@@ -1,5 +1,0 @@
-Fatal error: exception Scanner.SyntaxError("Illegal character: '('")
-diff: ./test/test_output/fail_syntax_comment_ast.out: No such file or directory
-Fatal error: exception Scanner.SyntaxError("Illegal character: '('")
-Fatal error: exception Scanner.SyntaxError("Illegal character: '('")
-Fatal error: exception Scanner.SyntaxError("Illegal character: '('")
