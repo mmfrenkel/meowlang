@@ -1,0 +1,17 @@
+GIMME hello?
+
+HAI ITZ ME FUNC Main,
+		
+		ITZ ME NUMBR idx IZ 0.
+
+        MAEK cool_array NEW NUMBR BUCKET OF 3,
+            WIT 1 AN 2 AN 3.
+
+		PSST test array access with integer literal
+		cool_array[1].
+
+		PSST test_array access with variable
+		idx IZ 1.
+		cool_array[idx].
+KBYE
+

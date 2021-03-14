@@ -1,0 +1,11 @@
+include "hello"
+
+Main()
+{
+	int idx = 0;
+	int [3] cool_array = [ 1, 2, 3 ];
+	cool_array[1];
+	idx = 1;
+	cool_array[idx];
+}
+

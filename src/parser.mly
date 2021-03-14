@@ -129,8 +129,9 @@ expr:
   | LPAREN expr RPAREN        { $2                     }
   | CONCAT expr COMMA expr    { Binop($2, Concat, $4)  }
   | ID IN ID                  { ClassAccess($1, $3)    }
+  | ID LBRACKET expr RBRACKET { ArrayAccess($1, $3)    }
 
-function_call:
+ function_call:
     CALL ID                       { FunctionCall($2, [])   }
   | CALL ID IN ID                 { MethodCall($2, $4, []) }
   | CALL ID LPAREN args_opt       { FunctionCall($2, $4)   }
@@ -157,9 +158,6 @@ array_decl:
 array_size_typ:
     ILIT                      { ILiteralArraySize($1) }
   | ID                        { VariableArraySize($1) }
-
-array_index:
-  ID LBRACKET expr RBRACKET   { ArrayAccess($1, $3)   }
 
 /* Classes */
 
