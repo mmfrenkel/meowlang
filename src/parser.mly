@@ -3,7 +3,7 @@ open Ast
 %}
 
 %token RETURN MODULE IMPORT CALL FUNCTION DEF COMP CLASS NEW FREE MAKE
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN
+%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN LBRACKET RBRACKET
 %token NOT EQ NEQ LT GT AND OR CONCAT CONTAINS IN
 %token IF THEN ELSE FOR INCREMENT DECREMENT INT BOOL FLOAT STRING ARRAY
 %token <int> ILIT
@@ -129,8 +129,9 @@ expr:
   | LPAREN expr RPAREN        { $2                     }
   | CONCAT expr COMMA expr    { Binop($2, Concat, $4)  }
   | ID IN ID                  { ClassAccess($1, $3)    }
+  | ID LBRACKET expr RBRACKET { ArrayAccess($1, $3)    }
 
-function_call:
+ function_call:
     CALL ID                       { FunctionCall($2, [])   }
   | CALL ID IN ID                 { MethodCall($2, $4, []) }
   | CALL ID LPAREN args_opt       { FunctionCall($2, $4)   }

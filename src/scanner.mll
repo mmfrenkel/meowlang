@@ -50,7 +50,12 @@ rule token = parse
 | "FUNC"          { FUNCTION }
 | "GIVE"          { RETURN }
 
+(* Array Indexing *)
+| "["             { LBRACKET }
+| "]"             { RBRACKET }
+
 (* Operators *)
+
 | "SUM OF"        { PLUS }
 | "DIFF OF"       { MINUS }
 | "PRODUKT OF"    { TIMES }
@@ -89,7 +94,7 @@ rule token = parse
 | identifier as lxm { ID(lxm) }
 | '"'             { read_string (Buffer.create 17) lexbuf }  (* String *)
 | eof { EOF }
-| _ as char { raise (SyntaxError("Illegal character " ^ Char.escaped char)) }
+| _ as char { raise (SyntaxError("Illegal character: '" ^ Char.escaped char ^ "'")) }
 
 and read_string buf =
   parse

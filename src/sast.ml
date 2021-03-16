@@ -25,7 +25,8 @@ type sstmt =
   | SIf of sexpr * sstmt * sstmt
   | SFor of op * sexpr * sexpr * sexpr * sstmt
   | SDealloc of string
-  | SClassAssign of string * string * expr
+  | SClassAssign of string * string * sexpr
+  | SArrayAssign of string * sexpr
 
 type sfunc_decl = {
     styp : typ;

@@ -27,6 +27,7 @@ type expr =
   | Noexpr
   | NewInstance of string * typ * expr list
   | ClassAccess of string * string
+  | ArrayAccess of string * expr
 
 type bind_var = typ * string * expr
 type bind_formals = typ * string
