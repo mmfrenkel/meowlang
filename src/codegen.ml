@@ -1,15 +1,8 @@
-(* Code generation: translate takes a semantically checked AST and
-produces LLVM IR
+(*
+  Code generation: translate takes a semantically checked AST and produces LLVM IR
 
-LLVM tutorial: Make sure to read the OCaml version of the tutorial
-
-http://llvm.org/docs/tutorial/index.html
-
-Detailed documentation on the OCaml LLVM library:
-
-http://llvm.moe/
-http://llvm.moe/ocaml/
-
+  Note: This code significantly inspired by codegen.ml of the MicroC Compiler by S Edwards
+  (Programming Languages and Translators, Spring 2021)
 *)
 
 module L = Llvm
@@ -19,50 +12,53 @@ open Sast
 
 module StringMap = Map.Make(String)
 
-(* translate : Sast.program -> Llvm.module *)
+let context    = L.global_context ()
+let the_module = L.create_module context "Meowlang"
+
+(* Easier to not have to rewrite these types*)
+let i32_t     = L.i32_type    context
+let i1_t      = L.i1_type     context
+let float_t   = L.double_type context
+let void_t    = L.void_type   context
+let str_t     = L.pointer_type  (L.i8_type  context)
+
+(* Finds the LLVM type corresponding to the Meowlang type *)
+let rec ltype_of_typ = function
+    A.Int   -> i32_t
+  | A.Bool  -> i1_t
+  | A.Float -> float_t
+  | A.Void  -> void_t
+  | A.String -> str_t
+  | _ -> raise (NotYetSupported("complex types not yet supported"))
+  (* | A.Arrtype(sz, typ) -> L.array_type (ltype_of_typ typ) sz *)
+
+(* Creates a function prototype *)
+let create_func_prototype fdecl =
+    let name =  fdecl.sfname
+    and return_typ = ltype_of_typ fdecl.styp
+    and formal_types = Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.sformals)
+    in
+    let ftype = L.function_type return_typ formal_types in
+    L.define_function name ftype the_module, fdecl
+
+
+(****************************************************************
+  Translate : Takes a Sast.program and produces an Llvm.module
+*****************************************************************)
 let translate (_, functions, _) =
 
-  let context    = L.global_context () in
-
-  (* Create LLVM compilation module which will hold generated code *)
-  let the_module = L.create_module context "Meowlang" in
-
-  (* Get types from the context *)
-  let i32_t     = L.i32_type    context
-  and i1_t      = L.i1_type     context
-  and float_t   = L.double_type context
-  and void_t    = L.void_type   context
-  and str_t     = L.pointer_type  (L.i8_type  context)
-  in
-
-  (* Return the LLVM type for a Meowlang type *)
-  let rec ltype_of_typ = function
-      A.Int   -> i32_t
-    | A.Bool  -> i1_t
-    | A.Float -> float_t
-    | A.Void  -> void_t
-    | A.String -> str_t
-    | _ -> raise (NotYetSupported("complex types not yet supported"))
-    (* | A.Arrtype(sz, typ) -> L.array_type (ltype_of_typ typ) sz *)
-  in
-
-  (* Create the prototype for printf built-in function *)
+  (* Create the prototype for printf/Meow, a built-in function *)
   let printf_t : L.lltype =
       L.var_arg_function_type i32_t [| str_t |] in
   let printf_func : L.llvalue =
       L.declare_function "printf" printf_t the_module in
 
-  (* Define each function as prototype (arguments and return type) so we can
-     call it even before we've created its body. This function builds up a
-     map of function_name: prototype *)
+  (* Create each function's prototype so we can call it even before we've
+     created its body. This function builds up a map of function_name: prototype *)
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
-      let function_decl m fdecl =
-        let name =  fdecl.sfname
-        and formal_types = Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.sformals)
-        in
-        let ftype = L.function_type (ltype_of_typ fdecl.styp) formal_types in
-        StringMap.add name (L.define_function name ftype the_module, fdecl) m in
-    List.fold_left function_decl StringMap.empty functions in
+      let add_function_to_map m fdecl =
+        StringMap.add fdecl.sfname (create_func_prototype fdecl) m in
+    List.fold_left add_function_to_map StringMap.empty functions in
 
   (* Fill in the body of the each function *)
   let build_function fdecl =
@@ -81,7 +77,7 @@ let translate (_, functions, _) =
     in
 
     (* LLVM insists each basic block end with exactly one "terminator"
-       instruction that transfers control.  This function runs "instr builder"
+       instruction that transfers control. This function runs "instr builder"
        if the current block does not already have a terminator.  Used,
        e.g., to handle the "fall off the end of the function" case. *)
     let add_terminal builder instr =
@@ -112,7 +108,8 @@ let translate (_, functions, _) =
       match fdecl.styp with
         A.Void -> L.build_ret_void
       | A.Float -> L.build_ret (L.const_float float_t 0.0)
-      | t -> L.build_ret (L.const_int (ltype_of_typ t) 0))
+      | t -> L.build_ret (L.const_int (ltype_of_typ t) 0)
+    )
   in
 
   List.iter build_function functions;

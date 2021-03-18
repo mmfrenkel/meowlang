@@ -1,11 +1,13 @@
 # meowlang
 
-From root directory:
+## Compile:
 
-Compile:
+From root or src directories:
 ```
 $ make
 ```
+
+## Test
 
 To run an individual test:
 ```
@@ -30,7 +32,7 @@ will be run as a test.
 ## Hello World
 
 The meowlang compiler currently only supports the hello world program. This can
-be run via:
+be run via the following, after compiling the compiler:
 ```
 $ test/test_single_program.sh test_hello_world.meow
 ```
