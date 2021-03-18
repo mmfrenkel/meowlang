@@ -1,18 +1,8 @@
-include "hello"
+
 
 int Main()
 {
-	char * my_name;
-	my_name = "Cherry";
-	create_message(my_name);
+	printf("%s\n", "hello, world");
 	return 0;
-}
-
-char * create_message(char * name)
-{
-	char * msg;
-	msg = "hello, ";
-	msg = "*" + msg + name;
-	return msg;
 }
 

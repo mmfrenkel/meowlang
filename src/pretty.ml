@@ -19,7 +19,7 @@ let string_of_op = function
   | Concat -> "+"
   | Increment -> "++"
   | Decrement -> "--"
-  
+
 let string_of_modules = function
   Module(l) -> "include \"" ^ l ^ "\""
 
@@ -55,7 +55,9 @@ let rec string_of_expr = function
   | Unop(o, e) -> string_of_uop o ^ string_of_expr e
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
   | FunctionCall(f, el) ->
-      f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+      (match f with
+          "Meow" -> "printf" ^ "(\"%s\\n\", " ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+        | _      -> f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")")
   | MethodCall(f, ob, el) ->
       ob ^ "." ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | NewArray(i, typ, s, contents) ->
@@ -64,7 +66,7 @@ let rec string_of_expr = function
   | NewInstance(var, c, []) -> string_of_typ c ^ " " ^ var
   | NewInstance(var, c, exprs) -> string_of_typ c ^ " " ^ var ^ "(" ^ String.concat "" (List.map string_of_expr exprs) ^ ")"
   | ClassAccess(el, ob) -> ob ^ "." ^ el
-  | ArrayAccess(var, e) -> var ^ "[" ^ string_of_expr e ^ "]" 
+  | ArrayAccess(var, e) -> var ^ "[" ^ string_of_expr e ^ "]"
 
 let rec string_of_stmt = function
     Expr(expr) -> "\t" ^ string_of_expr expr ^ ";\n"
@@ -108,7 +110,7 @@ let string_of_mdecl fdecl =
     match fdecl.typ with
         Void -> ""
       | _ -> string_of_typ fdecl.typ ^ " ") in
-  
+
   indent ^ return_string ^ fdecl.fname ^ format_params fdecl ^ indent ^ "{\n" ^
   String.concat indent (List.map string_of_vdecl fdecl.locals) ^
   String.concat indent (List.map string_of_stmt fdecl.body) ^ indent ^ "}\n"
