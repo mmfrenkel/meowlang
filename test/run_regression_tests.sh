@@ -54,7 +54,7 @@ n_tests_completed=0
 
 if [[ $# -le 0 ]]
 then
-        echo -e "Test-type must be specified as a command line argument \n"
+        echo "Test-type must be specified as a command line argument"
         Usage
 fi
 
@@ -68,7 +68,7 @@ then
         # remove old global log, if it still exists
         rm -f $global_log
 else
-        echo -e "Command line arg $1 is not yet a supported test type \n"
+        echo "Command line arg $1 is not yet a supported test type"
         Usage
 fi
 

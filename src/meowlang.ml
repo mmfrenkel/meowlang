@@ -4,7 +4,7 @@
 open Ast
 open Pretty
 
-type action = Ast | Sast
+type action = Ast | Sast | LLVM_IR | Compile
 
 let _ =
     (* Figure out the action to take *)
@@ -12,9 +12,11 @@ let _ =
     let set_action a () = action := a in
     let speclist = [
         ("-a", Arg.Unit (set_action Ast), "Print the AST");
-        ("-s", Arg.Unit (set_action Sast), "Check Semantics");
+        ("-s", Arg.Unit (set_action Sast), "Perform Semantic Checks on the SAST");
+        ("-l", Arg.Unit (set_action LLVM_IR), "Print the generated LLVM IR");
+        ("-c", Arg.Unit (set_action Compile), "Check and print the generated LLVM IR");
     ] in
-    let usage_msg = "usage: ./meowlang.native [-a|-s] [file.meow]" in
+    let usage_msg = "usage: ./meowlang.native [-a|-s|-l|-c] [file.meow]" in
     let channel = ref stdin in
     Arg.parse speclist (fun filename -> channel := open_in filename) usage_msg;
 
@@ -23,8 +25,13 @@ let _ =
     let ast = Parser.program Scanner.token lexbuf in
 
     match !action with
-        Ast -> print_string (string_of_program ast)
-      | Sast -> let sast = Semant.check ast in
-        match sast with
-              ([],  func_decl, []) -> print_string "Semantic check (functions only) succeeded!\n"
-            | _ -> print_string "Semantic check failed!\n"
+          Ast -> print_string (string_of_program ast)
+        | _   -> let sast = Semant.check ast in
+
+            match !action with
+              Ast     -> ()
+            | Sast    -> print_string "Semantic check succeded!\n"
+            | LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate sast))
+            | Compile -> let m = Codegen.translate sast in
+                Llvm_analysis.assert_valid_module m;
+                print_string (Llvm.string_of_llmodule m)

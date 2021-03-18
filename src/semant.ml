@@ -293,10 +293,14 @@ let check_function func =
   (* 3. Check for duplicates in formals and locals together *)
   find_duplicate (list_formal_names @ list_locals_names) dup_form_local_msg;
 
+  let adjusted_function_name f =
+    if f.fname = "Main" then "main" else f.fname
+  in
+
   (* 4. Check contents of function body *)
   let checked_func = {
     styp = func.typ;
-    sfname = func.fname;
+    sfname = adjusted_function_name func;
     sformals = func.formals;
     slocals  = func.locals;
     sbody = match check_function_body func with
