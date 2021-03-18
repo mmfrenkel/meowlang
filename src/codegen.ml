@@ -29,7 +29,6 @@ let translate (_, functions, _) =
 
   (* Get types from the context *)
   let i32_t     = L.i32_type    context
-  and i8_t      = L.i8_type     context
   and i1_t      = L.i1_type     context
   and float_t   = L.double_type context
   and void_t    = L.void_type   context
@@ -49,12 +48,13 @@ let translate (_, functions, _) =
 
   (* Create the prototype for printf built-in function *)
   let printf_t : L.lltype =
-      L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
+      L.var_arg_function_type i32_t [| str_t |] in
   let printf_func : L.llvalue =
       L.declare_function "printf" printf_t the_module in
 
   (* Define each function as prototype (arguments and return type) so we can
-     call it even before we've created its body *)
+     call it even before we've created its body. This function builds up a
+     map of function_name: prototype *)
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
       let function_decl m fdecl =
         let name =  fdecl.sfname
@@ -65,7 +65,7 @@ let translate (_, functions, _) =
     List.fold_left function_decl StringMap.empty functions in
 
   (* Fill in the body of the each function *)
-  let build_function_body fdecl =
+  let build_function fdecl =
     let (the_function, _) = StringMap.find fdecl.sfname function_decls in
     let builder = L.builder_at_end context (L.entry_block the_function) in
 
@@ -115,5 +115,5 @@ let translate (_, functions, _) =
       | t -> L.build_ret (L.const_int (ltype_of_typ t) 0))
   in
 
-  List.iter build_function_body functions;
+  List.iter build_function functions;
   the_module
