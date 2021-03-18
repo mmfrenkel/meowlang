@@ -24,4 +24,7 @@ let _ =
 
     match !action with
         Ast -> print_string (string_of_program ast)
-      | Sast -> let result = Semant.check ast in if result then print_string "Semantic check succeeded!\n"
+      | Sast -> let sast = Semant.check ast in
+        match sast with
+              ([],  func_decl, []) -> print_string "Semantic check (functions only) succeeded!\n"
+            | _ -> print_string "Semantic check failed!\n"

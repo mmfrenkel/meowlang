@@ -9,7 +9,7 @@ $ make
 
 To run an individual test:
 ```
-$ ./src/meowlang.native < test_programs/<test_program_name>.meow
+$ ./src/meowlang.native < test/test_programs/<test_program_name>.meow
 ```
 Currently the following options are supported as a (mutually exclusive) command line `FLAG`:
 * `-a`: Print out abstract syntax tree

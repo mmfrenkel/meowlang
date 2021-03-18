@@ -34,7 +34,7 @@ let check_matching_types typ1 typ2 err =
 (* Helper function to check for duplicates of anything *)
 let find_duplicate items exception_msg =
   let rec helper = function
-      n1 :: n2 :: _ when n1 = n2 -> raise (DuplicateIdentifier (exception_msg ^ n1 ^ "n"))
+      n1 :: n2 :: _ when n1 = n2 -> raise (DuplicateIdentifier (exception_msg ^ n1))
     | _ :: t -> helper t
     | [] -> ()
   in helper (List.sort compare items)
@@ -187,21 +187,22 @@ let rec semant_expr expr symbol_tbl =
       in
       (* 3. Check that the instance variable exists within the class *)
       (Obtype(cname), (SClassAccess(obj_name, class_var)))
+  | _ as ex -> raise (NotYetSupported("compiler doesn't support this expression type yet: " ^ string_of_expr ex))
+  (* | ArrayAccess *)
 
-
-(* Return a semantically-checked statement i.e. containing sexprs *)      
+(* Return a semantically-checked statement i.e. containing sexprs *)
 let rec semant_stmt stmt symbol_tbl =
 
   (* if/else branching: checks that termination expr is a Boolean *)
-  let check_bool_expr e = 
+  let check_bool_expr e =
     let (t', e') = semant_expr e symbol_tbl in
-      if t' == Bool then (t', e') 
+      if t' == Bool then (t', e')
       else raise (ControlFlowIllegalArgument(expr_type_mismatch ^ "expected Boolean but got type " ^ string_of_typ t' ^ " in expression " ^ string_of_expr e))
   and
 
   (* for looping: checks that op is Increment or Decrement *)
   check_control_op op =
-    match op with 
+    match op with
       Increment -> op
     | Decrement -> op
     | _ -> raise (ControlFlowIllegalArgument(op_type_mismatch ^ "expected Increment or Decrement but got type " ^  string_of_op op))
@@ -211,7 +212,7 @@ let rec semant_stmt stmt symbol_tbl =
   check_control_index e =
     let (t', e') = semant_expr e symbol_tbl in
       if t' == Int then (t', e')
-      else raise (ControlFlowIllegalArgument(expr_type_mismatch ^ "expected Integer but got type " ^ (string_of_typ t') ^ " in expression " ^ string_of_expr e)) 
+      else raise (ControlFlowIllegalArgument(expr_type_mismatch ^ "expected Integer but got type " ^ (string_of_typ t') ^ " in expression " ^ string_of_expr e))
   and
 
   (* for looping: second expr is optional or must be index assignment *)
@@ -222,7 +223,7 @@ let rec semant_stmt stmt symbol_tbl =
   check_index_assignment e index =
     let (t', e') = semant_expr e symbol_tbl in
     let (ti', ei') = semant_expr e symbol_tbl in
-    match e' with 
+    match e' with
         SNoexpr -> (t', e')
       | SAssign(_, _) ->
           if t' = ti' then (t', e')
@@ -234,14 +235,14 @@ let rec semant_stmt stmt symbol_tbl =
   check_loop_termination e =
     let (t', e') = semant_expr e symbol_tbl in
       match e' with
-        SBinop(_, op, _) -> 
-          (match op with 
+        SBinop(_, op, _) ->
+          (match op with
               Less | Greater | Equal | Neq -> (t', e')
             | _ -> raise (ControlFlowIllegalArgument(op_type_mismatch ^ "expected <, >, =, != as loop termination condition: " ^ string_of_expr e)))
       | _ -> raise (ControlFlowIllegalArgument(expr_type_mismatch ^ "expected binary operation in loop: " ^ string_of_expr e))
-  in 
+  in
 
-  (* THIS NEEDS TO BE FINISHED!!!! See microC for details removed *)
+  (* Incomplete *)
   match stmt with
     Expr e -> SExpr(semant_expr e symbol_tbl)
   | Return e -> SReturn(semant_expr e symbol_tbl)
@@ -262,49 +263,87 @@ let rec semant_stmt stmt symbol_tbl =
       | s :: ss         -> semant_stmt s symbol_tbl :: check_stmt_list ss
       | []              -> []
     in SBlock(check_stmt_list b)
+  | _ as s -> raise (NotYetSupported("compiler doesn't support this statement type yet: " ^ string_of_stmt s))
   (* | Dealloc id -> SDealloc(id) *)
   (* | ClassAssign (id, meth_name, e) -> SClassAssign() *)
-  (* | ArrayAccess (id, e) -> SArrayAccess() *)  
- 
+
 let check_function_body func =
 
   (* Build local symbol table of variables for this scope *)
   let symbol_table:(string, Ast.typ) Hashtbl.t = Hashtbl.create 10
   in
   List.iter (fun (typ, name) -> Hashtbl.add symbol_table name typ) func.formals;
-  List.iter (fun (typ, name, expr) -> Hashtbl.add symbol_table name typ) func.locals
+  List.iter (fun (typ, name, expr) -> Hashtbl.add symbol_table name typ) func.locals;
 
   (* TO DO: Build up the SAST Tree for the Function Here -- NEED STATEMENTS FILLED OUT *)
-  (* semant_stmt func.body symbol_table *)
+  semant_stmt (Block func.body) symbol_table
 
+(* Checks to ensure that a function is semantically valid, producing a SAST equivalent *)
 let check_function func =
 
+  (* 1. Get a list of formal names and local variable names *)
   let list_formal_names = List.fold_left (fun acc form -> snd form :: acc) [] func.formals
   and list_locals_names = List.fold_left (fun acc (typ, name, expr) -> name  :: acc) [] func.locals
   in
-  (* Check for duplicate formal and duplicate local variable names on their own *)
+
+  (* 2. Check for duplicate formal and duplicate local variable names on their own *)
   find_duplicate (list_formal_names) dup_formal_msg;
   find_duplicate (list_locals_names) dup_local_var_msg;
-  (* Check for duplicates together *)
+
+  (* 3. Check for duplicates in formals and locals together *)
   find_duplicate (list_formal_names @ list_locals_names) dup_form_local_msg;
 
-  (* Check contents of function body *)
-  check_function_body func
+  (* 4. Check contents of function body *)
+  let checked_func = {
+    styp = func.typ;
+    sfname = func.fname;
+    sformals = func.formals;
+    slocals  = func.locals;
+    sbody = match check_function_body func with
+        SBlock(stmt_list) -> stmt_list
+      | _ -> raise (InternalError ("unexpected_error: no block in function body"))
+  } in
+  checked_func
 
-(* Checks for duplicates in class, functions and method names  *)
+(* Checks for duplicates *)
 let check_duplicates functions classes =
+  (* duplicates in function names *)
   find_duplicate (List.map (fun f -> f.fname) functions) dup_func_msg;
+
+  (* duplicates in class names*)
   find_duplicate (List.map (fun c -> c.cname) classes) dup_class_msg;
+
+  (* duplicates in methods within a class*)
   List.iter (fun cls -> find_duplicate (List.map (fun m -> m.fname) cls.cfuncs) dup_method_msg) classes;
   ()
 
-let check (imports, functions, classes) =
+(* Add built in functions to the list of functions *)
+let add_built_ins existing_funcs =
+  (*  printf function, corresponding to Meow in Meowlang *)
+  let printf = {
+    typ = Void;
+    fname = "Meow";
+    formals = [(String, "x")];
+    locals = [];
+    body = []
+  } in
+  printf :: existing_funcs
 
-  (* Check for duplicate function, method and class names *)
-  check_duplicates functions classes;
+let check (_, functions, classes) =
 
-  (* Create a maps of functions, classes *)
-  List.iter (fun func -> Hashtbl.add function_tbl func.fname func) functions;
+  (* 1. add built in functions to list of functions *)
+  let functions' = add_built_ins functions in
+
+  (* 2. Check for any duplicate function, method and class names *)
+  check_duplicates functions' classes;
+
+  (* 3. Since functions/classes are global, create maps of functions, classes *)
+  List.iter (fun func -> Hashtbl.add function_tbl func.fname func) functions';
   List.iter (fun cls-> Hashtbl.add class_tbl cls.cname cls) classes;
 
-  if Hashtbl.mem function_tbl "Main" then true else raise (MissingMainFunction (missing_main_func_msg))
+  (* 4. Make sure that a main function exists*)
+  if Hashtbl.mem function_tbl "Main"
+
+    (* Create the SAST, with just functions for now *)
+    then ([], List.map check_function functions, [])
+    else raise (MissingMainFunction (missing_main_func_msg))
