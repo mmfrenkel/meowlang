@@ -88,7 +88,7 @@ let rec semant_expr expr symbol_tbl =
     in (end_typ, SBinop((typ1, e1'), op, (typ2, e2')))
 
   | Unop (op, e) as ex ->
-    (* Only one type of Uop supported *)
+    (* Only one type of Unop supported *)
       let (vtype, e') = semant_expr e symbol_tbl in
       if vtype == Bool then (vtype, SUnop(op, (vtype, e')))
       else raise (IllegalUnaryOp (string_of_expr ex))

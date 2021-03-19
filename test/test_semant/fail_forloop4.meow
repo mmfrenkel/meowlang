@@ -1,0 +1,9 @@
+HAI ITZ ME FUNC Main,
+    PSST loop termination is not a binary operation of <, >, =, or !=
+    ITZ ME NUMBR count.
+    ITZ ME YARN condition.
+    count IZ 0.
+       
+    IM IN YR LOOP count mistake AN count
+        condition IZ "count is still not 10".
+KBYE
