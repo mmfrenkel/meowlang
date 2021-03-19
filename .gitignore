@@ -9,6 +9,7 @@ meowlang.native
 
 # test files
 test/global_log.out
+*.exe
 
 # files from IDEs, etc.
 .DS_Store

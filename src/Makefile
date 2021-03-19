@@ -1,10 +1,11 @@
+# Run 'make' to build meowlang.native
 
 .PHONY : all
 all : meowlang.native
 
-meowlang.native : parser.mly scanner.mll ast.ml
+meowlang.native : parser.mly scanner.mll ast.ml semant.ml codegen.ml
 	opam config exec -- \
-	ocamlbuild -use-ocamlfind meowlang.native
+	ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis meowlang.native
 
 .PHONY : clean
 clean :
