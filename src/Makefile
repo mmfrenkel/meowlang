@@ -5,7 +5,7 @@ all : meowlang.native
 
 meowlang.native : parser.mly scanner.mll ast.ml semant.ml codegen.ml
 	opam config exec -- \
-	ocamlbuild -use-ocamlfind -pkgs llvm,llvm.analysis meowlang.native
+	ocamlbuild -use-ocamlfind meowlang.native
 
 .PHONY : clean
 clean :
