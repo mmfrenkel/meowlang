@@ -215,19 +215,12 @@ let rec semant_stmt stmt symbol_tbl =
       else raise (ControlFlowIllegalArgument(expr_type_mismatch ^ "expected Integer but got type " ^ (string_of_typ t') ^ " in expression " ^ string_of_expr e))
   and
 
-  (* for looping: second expr is optional or must be index assignment *)
-  (* if expr is index assignment, ID of index must be the ID being assigned *)
-  (* 1. Not  sure how to get the ID from the Assign expr *)
-  (* 2. Not sure if I can reference SAssign like this, i.e. without params *)
-  (* 3. How to handle expr_opt? *)
-  check_index_assignment e index =
+  (* for looping: second expr is optional or index assignment *)
+  check_index_assignment e =
     let (t', e') = semant_expr e symbol_tbl in
-    let (ti', ei') = semant_expr e symbol_tbl in
     match e' with
         SNoexpr -> (t', e')
-      | SAssign(_, _) ->
-          if t' = ti' then (t', e')
-          else raise (ControlFlowIllegalArgument("expected to assign index variable " ^ string_of_expr index ^ " in expression: " ^ string_of_expr e))
+      | SAssign(_, _) -> (t', e')
       | _ -> raise (ControlFlowIllegalArgument("index assignment expected in expression: " ^ string_of_expr e))
   and
 
@@ -253,7 +246,7 @@ let rec semant_stmt stmt symbol_tbl =
   | For (op, e1, e2, e3, stmt) ->
       SFor(check_control_op op, (* increment or decrement *)
           check_control_index e1, (* index *)
-          check_index_assignment e2 e1, (* optional index assignment *)
+          check_index_assignment e2, (* optional index assignment *)
           check_loop_termination e3, (* termination condition *)
           semant_stmt stmt symbol_tbl) (* loop body *)
   | Block b ->
