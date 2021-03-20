@@ -97,7 +97,7 @@ let rec semant_expr expr symbol_tbl =
     (* Check that the expr produces the same type as the variable it is assigned to *)
       let var_typ = find_type_of_id symbol_tbl var
       and (ret_type, e') = semant_expr e symbol_tbl in
-      let err = VariableAssignmentError(string_of_expr ex)
+      let err = VariableAssignmentError(assignment_typ_mismatch ^ string_of_expr ex)
       in (check_matching_types var_typ ret_type err, SAssign(var, (ret_type, e')))
 
   | FunctionCall (fname, args) ->
@@ -151,7 +151,7 @@ let rec semant_expr expr symbol_tbl =
         in
         (* 3. if expr_list, check that the expressions match the content type of array *)
         List.iter (
-          fun (expr_typ, expr) ->
+          fun (expr_typ, _) ->
             if expr_typ != arr_typ
               then raise (InvalidArrayItem(invalid_array_item_msg ^ string_of_expr ex))
             else ()
@@ -244,11 +244,11 @@ let rec semant_stmt stmt symbol_tbl =
       semant_stmt stmt1 symbol_tbl,
       semant_stmt stmt2 symbol_tbl)
   | For (op, e1, e2, e3, stmt) ->
-      SFor(check_control_op op, (* increment or decrement *)
-          check_control_index e1, (* index *)
-          check_index_assignment e2, (* optional index assignment *)
-          check_loop_termination e3, (* termination condition *)
-          semant_stmt stmt symbol_tbl) (* loop body *)
+      SFor(check_control_op op,         (* increment or decrement *)
+          check_control_index e1,       (* index *)
+          check_index_assignment e2,    (* optional index assignment *)
+          check_loop_termination e3,    (* termination condition *)
+          semant_stmt stmt symbol_tbl)  (* loop body *)
   | Block b ->
     let rec check_stmt_list = function
         [Return _ as s] -> [semant_stmt s symbol_tbl]
@@ -266,17 +266,29 @@ let check_function_body func =
   let symbol_table:(string, Ast.typ) Hashtbl.t = Hashtbl.create 10
   in
   List.iter (fun (typ, name) -> Hashtbl.add symbol_table name typ) func.formals;
-  List.iter (fun (typ, name, expr) -> Hashtbl.add symbol_table name typ) func.locals;
+  List.iter (fun (typ, name, _) -> Hashtbl.add symbol_table name typ) func.locals;
 
-  (* TO DO: Build up the SAST Tree for the Function Here -- NEED STATEMENTS FILLED OUT *)
-  semant_stmt (Block func.body) symbol_table
+  (* Refactoring step: moves real assignments in func.locals into function body beginning *)
+  let create_assignment_stmt build local_var_bind =
+    (match local_var_bind with
+      (_, _, Noexpr) -> build
+    | (_, name, expr)   -> Expr(Assign(name, expr)) :: build)
+  in
+  let new_assignments =
+    List.fold_left create_assignment_stmt [] func.locals
+  in
+  let adjusted_body = List.rev new_assignments @ func.body in
+
+  (* Build up the SAST Tree for the Function Here *)
+  (* List.iter (fun stmt -> print_string (string_of_stmt stmt)) adjusted_body; *)
+  semant_stmt (Block adjusted_body) symbol_table
 
 (* Checks to ensure that a function is semantically valid, producing a SAST equivalent *)
 let check_function func =
 
   (* 1. Get a list of formal names and local variable names *)
-  let list_formal_names = List.fold_left (fun acc form -> snd form :: acc) [] func.formals
-  and list_locals_names = List.fold_left (fun acc (typ, name, expr) -> name  :: acc) [] func.locals
+  let list_formal_names = List.fold_left (fun acc (_, name) -> name :: acc) [] func.formals
+  and list_locals_names = List.fold_left (fun acc (_, name, _) -> name  :: acc) [] func.locals
   in
 
   (* 2. Check for duplicate formal and duplicate local variable names on their own *)
@@ -286,11 +298,12 @@ let check_function func =
   (* 3. Check for duplicates in formals and locals together *)
   find_duplicate (list_formal_names @ list_locals_names) dup_form_local_msg;
 
+  (* 4. Step to make LLVM code happy; main function must be 'main' not 'Main' *)
   let adjusted_function_name f =
     if f.fname = "Main" then "main" else f.fname
   in
 
-  (* 4. Check contents of function body *)
+  (* 5. Check contents of function body *)
   let checked_func = {
     styp = func.typ;
     sfname = adjusted_function_name func;
