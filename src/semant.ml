@@ -109,8 +109,16 @@ let rec semant_expr expr symbol_tbl =
         then raise (FunctionArgumentLengthMismatch (func_arg_num_mismatch ^ fname))
       else
       (* 3. Check that the arguments passed are of the expected type *)
-        let args' = List.map2 check_arg_type func.formals args
-        in (func.typ, SFunctionCall(fname, args'))
+        let args' =
+          (match fname with
+          (* this is a work around for handling the built in print function, which can accept multiple types *)
+            | "Meow" ->
+                ( match args with
+                | arg :: []  -> [semant_expr arg symbol_tbl]
+                | _ -> raise (FunctionArgumentLengthMismatch("built in string function takes 1 argument only\n")))
+            | _ -> List.map2 check_arg_type func.formals args)
+        in
+        (func.typ, SFunctionCall(fname, args'))
 
   | MethodCall (vname, mname, args) as ex ->
       (* 1. Check that the object exists in the symbol table  *)

@@ -1,0 +1,10 @@
+
+
+int Main()
+{
+	char * msg;
+	msg = "nice to meet you!";
+	printf("%X\n", msg);
+	return 0;
+}
+

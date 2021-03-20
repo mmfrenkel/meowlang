@@ -56,7 +56,7 @@ let rec string_of_expr = function
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
   | FunctionCall(f, el) ->
       (match f with
-          "Meow" -> "printf" ^ "(\"%s\\n\", " ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+          "Meow" -> "printf" ^ "(\"%X\\n\", " ^ String.concat ", " (List.map string_of_expr el) ^ ")"
         | _      -> f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")")
   | MethodCall(f, ob, el) ->
       ob ^ "." ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"

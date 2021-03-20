@@ -1,14 +1,17 @@
-GIMME hello?
 
 HAI ITZ ME NUMBR FUNC Main,
 
         PSST Creating some local variables
-        ITZ ME NUMBR count.
+        ITZ ME NUMBR count IZ 2.
+        ITZ ME NUMBAR random.
+        ITZ ME BOO say_hello.
+        ITZ ME YARN msg.
 
         PSST Assigning local varibles values
+        msg IZ "hello world".
+        say_hello IZ AYE.
         count IZ 2.
-
-        PURR Meow WIT count.
+        random IZ 2.34.
 
         GIVE 0.
 KBYE
