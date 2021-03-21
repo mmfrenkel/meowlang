@@ -1,0 +1,11 @@
+GIMME hello?
+
+HAI ITZ ME FUNC print_something,
+        PURR Meow WIT "In the print_something function".
+KBYE
+
+HAI ITZ ME NUMBR FUNC Main,
+        PSST Attempt to call a helper function
+        PURR print_something.
+        GIVE 0.
+KBYE

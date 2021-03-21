@@ -1,0 +1,50 @@
+
+HAI ITZ ME NUMBR FUNC Add_Three WIT NUMBR num1 AN NUMBR num2 AN NUMBR num3,
+        PSST Trying to add three numbers
+
+        ITZ ME NUMBR sum.
+        sum IZ SUM OF num1 AN SUM OF num2 AN num3.
+        GIVE sum.
+KBYE
+
+HAI ITZ ME NUMBR FUNC Subtract_Two WIT NUMBR num1 AN NUMBR num2,
+        PSST Trying to add three numbers
+
+        ITZ ME NUMBR diff.
+        diff IZ DIFF OF num1 AN num2.
+        GIVE diff.
+KBYE
+
+HAI ITZ ME NUMBR FUNC Multiply_Four WIT NUMBR num1 AN NUMBR num2
+        AN NUMBR num3 AN NUMBR num4,
+
+        PSST Trying to add three numbers
+
+        ITZ ME NUMBR product.
+        product IZ PRODUKT OF num1 AN PRODUKT OF num2 AN PRODUKT OF num3 AN num4.
+        GIVE product.
+KBYE
+
+HAI ITZ ME NUMBR FUNC Main,
+
+        ITZ ME NUMBR one IZ 1.
+        ITZ ME NUMBR two IZ 2.
+        ITZ ME NUMBR three IZ 3.
+        ITZ ME NUMBR sum.
+        ITZ ME NUMBR diff.
+        ITZ ME NUMBR product.
+
+        PSST * ATTEMPT TO ADD *
+        sum IZ PURR Add_Three WIT one AN two AN three.
+        PURR Meow WIT sum.
+
+        PSST * ATTEMPT TO SUBTRACT *
+        diff IZ PURR Subtract_Two WIT three AN two.
+        PURR Meow WIT diff.
+
+        PSST * ATTEMPT TO SUBTRACT *
+        product IZ PURR Multiply_Four WIT one AN two AN diff AN sum.
+        PURR Meow WIT product.
+
+        GIVE 0.
+KBYE

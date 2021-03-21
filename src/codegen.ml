@@ -51,11 +51,15 @@ let format (typ, _) =
   | A.Bool   -> "%d\n"
   | _ -> raise (NotYetSupported("formatting for complex expr and functions not yet supported"))
 
-(* Return the value for a variable name or argument, else raise error *)
-let lookup var_name map =
-      try StringMap.find var_name map
-      with _ -> raise(VariableNotFound(undeclared_msg ^ var_name))
+(* Return the value for a variable, else raise error *)
+let lookup_variable var_name map =
+  try StringMap.find var_name map
+  with _ -> raise (VariableNotFound("codegen error: " ^ undeclared_msg ^ var_name))
 
+(* Return the value for a function name or argument *)
+let lookup_function func_name map =
+  try StringMap.find func_name map
+  with _ -> raise (FunctionNotFound("codegen error: " ^ func_name))
 
 (****************************************************************
   Translate : Takes a Sast.program and produces an Llvm.module
@@ -70,7 +74,8 @@ let translate (_, functions, _) =
 
   (****************** Create each function's prototype ************************)
   (* this so we can call it even before we've created its body. *)
-  (* this function builds up a map of function_name: prototype *)
+  (* this function builds up a map of function_name: prototype  *)
+  (* Maps {function_name: (func_prototype, func_decl)} *)
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
       let add_function_to_map m fdecl =
         StringMap.add fdecl.sfname (create_func_prototype fdecl) m in
@@ -114,19 +119,19 @@ let translate (_, functions, _) =
       | SBoolLit b         -> L.const_int i1_t (if b then 1 else 0)
       | SFliteral l        -> L.const_float_of_string float_t l
       | SStringLit s       -> L.build_global_stringptr s "str" builder
-      | SId var            -> L.build_load (lookup var local_vars) var builder
+      | SId var            -> L.build_load (lookup_variable var local_vars) var builder
       | SAssign (var, e)   -> let e' = expr builder e in
-          ignore(L.build_store e' (lookup var local_vars) builder); e'
+          ignore(L.build_store e' (lookup_variable var local_vars) builder); e'
 
       (* Binary operation between two integers *)
       | SBinop(((A.Int, _) as e1), op, ((A.Int, _) as e2)) ->
           let lhs = expr builder e1
           and rhs = expr builder e2 in
             (match op with
-                A.Add     -> L.build_fadd
-              | A.Sub     -> L.build_fsub
-              | A.Mult    -> L.build_fmul
-              | A.Div     -> L.build_fdiv
+                A.Add     -> L.build_add
+              | A.Sub     -> L.build_sub
+              | A.Mult    -> L.build_mul
+              | A.Div     -> L.build_sdiv
               | A.Equal   -> L.build_icmp L.Icmp.Eq
               | A.Neq     -> L.build_icmp L.Icmp.Ne
               | A.Less    -> L.build_icmp L.Icmp.Slt
@@ -163,8 +168,19 @@ let translate (_, functions, _) =
           ) lhs rhs "binop_bool_tmp" builder
 
       (* Call to built in printf function *)
-      | SFunctionCall ("Meow", [e]) ->
-	        L.build_call printf_func [| format_str (format e) ; (expr builder e) |] "printf" builder
+      | SFunctionCall ("Meow", [arg]) ->
+	        L.build_call printf_func [| format_str (format arg) ; (expr builder arg) |] "printf" builder
+
+      (* Call a user-defined function *)
+      | SFunctionCall (fname, args) ->
+          let (fdef, fdecl) = lookup_function fname function_decls in
+          let llargs = List.rev (List.map (expr builder) (List.rev args))
+          and result = (
+            match fdecl.styp with
+                A.Void -> ""
+              | _ -> fname ^ "_result"
+          ) in
+          L.build_call fdef (Array.of_list llargs) result builder
 
       | _ -> raise (NotYetSupported("found expr or functions not yet supported"))
     in
