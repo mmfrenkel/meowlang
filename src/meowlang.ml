@@ -1,7 +1,6 @@
 (*
     Main CLI for running the compiler. Command line arguments specify behavior.
 *)
-open Ast
 open Pretty
 
 type action = Ast | Sast | LLVM_IR | Compile

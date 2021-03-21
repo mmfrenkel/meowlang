@@ -1,15 +1,15 @@
+include "hello"
 
-
-int Main()
+char * Main()
 {
-	int count = 2;
+	int count;
 	float random;
 	bool say_hello;
 	char * msg;
 	msg = "hello world";
 	say_hello = true;
-	count = 2;
+	count = "hi";
 	random = 2.34;
-	return 0;
+	return msg;
 }
 

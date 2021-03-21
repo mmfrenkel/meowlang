@@ -1,0 +1,10 @@
+
+
+int Main()
+{
+	int count;
+	count = 2;
+	printf("%X\n", count);
+	return 0;
+}
+

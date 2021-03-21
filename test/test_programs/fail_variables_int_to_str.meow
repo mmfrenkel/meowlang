@@ -1,17 +1,18 @@
+GIMME hello?
 
-HAI ITZ ME NUMBR FUNC Main,
+HAI ITZ ME YARN FUNC Main,
 
         PSST Creating some local variables
-        ITZ ME NUMBR count IZ 2.
+        ITZ ME NUMBR count.
         ITZ ME NUMBAR random.
         ITZ ME BOO say_hello.
         ITZ ME YARN msg.
 
         PSST Assigning local varibles values
-        msg IZ "hello world".
+        msg IZ 2.                       PSST ** This should be a string **
         say_hello IZ AYE.
         count IZ 2.
         random IZ 2.34.
 
-        GIVE 0.
+        GIVE msg.  PSST Returning Hello to user
 KBYE
