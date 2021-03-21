@@ -9,6 +9,8 @@ $ make
 
 ## Test
 
+### Indiviudal Test
+
 To run an individual test:
 ```
 $ ./src/meowlang.native < test/test_programs/<test_program_name>.meow
@@ -18,6 +20,8 @@ Currently the following options are supported as a (mutually exclusive) command 
 * `-s`: Run semantic checks
 * `-c`: Compile to LLVM (limited)
 If not specified, `-a` is used.
+
+### Regression Test Suite 
 
 You can run regression tests for the project with the following command:
 ```
