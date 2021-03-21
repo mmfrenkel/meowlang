@@ -15,9 +15,13 @@ fi
 name=$(basename $1 .meow)
 
 $MEOWLANG < "$PROGRAM_PATH/$1" -c > "$name.ll"
-$LLC -relocation-model=pic "$name.ll" > "$name.s" &&
-$CC -o "$name.exe" "$name.s" &&
-"./$name.exe"
+
+if [[ $? -eq 0 ]];
+then
+        $LLC -relocation-model=pic "$name.ll" > "$name.s" &&
+        $CC -o "$name.exe" "$name.s" &&
+        "./$name.exe"
+fi
 
 # clean up, unless --keep flag is provided
 if [[ $# -lt 2 || $2 != "--keep" ]]

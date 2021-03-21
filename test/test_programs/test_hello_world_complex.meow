@@ -11,11 +11,15 @@ HAI ITZ ME YARN FUNC create_message WIT YARN name,
 KBYE
 
 HAI ITZ ME NUMBR FUNC Main,
-        PSST Attempt to call a helper function
 
+        ITZ ME YARN full_msg.
         ITZ ME YARN my_name.
         my_name IZ "Cherry".
 
-        PURR create_message WIT my_name.
+        PSST Attempt to call a helper function
+        full_msg IZ PURR create_message WIT my_name.
+
+        PSST Test printing an integer
+        PURR Meow WIT full_msg.
         GIVE 0.
 KBYE
