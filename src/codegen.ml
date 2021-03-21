@@ -108,19 +108,65 @@ let translate (_, functions, _) =
     let format_str fmt = L.build_global_stringptr fmt "fmt" builder in
 
     (************ Construct code for an expression; return its value **********)
-    let rec expr builder ((_, e) : sexpr) = match e with
-        SILiteral i      -> L.const_int i32_t i
-      | SBoolLit b       -> L.const_int i1_t (if b then 1 else 0)
-      | SFliteral l      -> L.const_float_of_string float_t l
-      | SStringLit s     -> L.build_global_stringptr s "str" builder
-      | SId var          -> L.build_load (lookup var local_vars) var builder
-      | SAssign (var, e) -> let e' = expr builder e in
+    let rec expr builder ((_, e) : sexpr) =
+      match e with
+        SILiteral i        -> L.const_int i32_t i
+      | SBoolLit b         -> L.const_int i1_t (if b then 1 else 0)
+      | SFliteral l        -> L.const_float_of_string float_t l
+      | SStringLit s       -> L.build_global_stringptr s "str" builder
+      | SId var            -> L.build_load (lookup var local_vars) var builder
+      | SAssign (var, e)   -> let e' = expr builder e in
           ignore(L.build_store e' (lookup var local_vars) builder); e'
 
+      (* Binary operation between two integers *)
+      | SBinop(((A.Int, _) as e1), op, ((A.Int, _) as e2)) ->
+          let lhs = expr builder e1
+          and rhs = expr builder e2 in
+            (match op with
+                A.Add     -> L.build_fadd
+              | A.Sub     -> L.build_fsub
+              | A.Mult    -> L.build_fmul
+              | A.Div     -> L.build_fdiv
+              | A.Equal   -> L.build_icmp L.Icmp.Eq
+              | A.Neq     -> L.build_icmp L.Icmp.Ne
+              | A.Less    -> L.build_icmp L.Icmp.Slt
+              | A.Greater -> L.build_icmp L.Icmp.Sgt
+              | _         -> raise (NotYetSupported("found binary operation not supported for two integers"))
+            ) lhs rhs "binop_int_tmp" builder
+
+      (* Binary operation between one or more floats *)
+      | SBinop(((A.Float, _) as e1), op, ((A.Int, _) as e2))
+      | SBinop(((A.Int, _) as e1), op, ((A.Float, _) as e2))
+      | SBinop(((A.Float, _) as e1), op, ((A.Float, _) as e2)) ->
+        let lhs = expr builder e1
+        and rhs = expr builder e2 in
+          (match op with
+              A.Add     -> L.build_fadd
+            | A.Sub     -> L.build_fsub
+            | A.Mult    -> L.build_fmul
+            | A.Div     -> L.build_fdiv
+            | A.Equal   -> L.build_fcmp L.Fcmp.Oeq
+            | A.Neq     -> L.build_fcmp L.Fcmp.One
+            | A.Less    -> L.build_fcmp L.Fcmp.Olt
+            | A.Greater -> L.build_fcmp L.Fcmp.Ogt
+            | _         -> raise (NotYetSupported("found binary operation not supported for one or more floats"))
+          ) lhs rhs "binop_float_tmp" builder
+
+      (* Binary operation for two booleans *)
+      | SBinop(((A.Bool, _) as e1), op, ((A.Bool, _) as e2)) ->
+        let lhs = expr builder e1
+        and rhs = expr builder e2 in
+          (match op with
+              A.Or      -> L.build_or
+            | A.And     -> L.build_and
+            | _         -> raise (NotYetSupported("found binary operation not supported for two boolean values"))
+          ) lhs rhs "binop_bool_tmp" builder
+
+      (* Call to built in printf function *)
       | SFunctionCall ("Meow", [e]) ->
 	        L.build_call printf_func [| format_str (format e) ; (expr builder e) |] "printf" builder
 
-      | _ -> raise (NotYetSupported("complex expr and functions other than Meow not yet supported"))
+      | _ -> raise (NotYetSupported("found expr or functions not yet supported"))
     in
 
     (* LLVM insists each basic block end with exactly one "terminator"

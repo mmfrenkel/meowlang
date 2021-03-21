@@ -2,7 +2,7 @@
 
 ## I. Compile:
 
-From root or src directories:
+To compile the compiler, from `/` or `src/` directories:
 ```
 $ make
 ```
@@ -11,7 +11,7 @@ $ make
 
 ### i. Individual Test
 
-To run an individual test:
+To test the compiler against an individual `.meow` file:
 ```
 $ ./src/meowlang.native < test/test_programs/<test_program_name>.meow
 ```
@@ -19,14 +19,17 @@ Currently the following options are supported as a (mutually exclusive) command 
 * `-a`: Print out abstract syntax tree
 * `-s`: Run semantic checks
 * `-c`: Compile to LLVM (limited)
-If not specified, `-a` is used.
 
-If you want to compile and run a specific `.meow` file, the best option is to use the `test_single_program.sh` script, specifying the filename (not full path) of the test file. Here is an example of running this script for "hello world":
+If flag is not specified, `-a` is used.
+
+If you want to compile **and run** a specific `.meow` file, the best option is
+to use the `test_single_program.sh` script, specifying the filename (not full path)
+of the test file. Here is an example of running this script for "hello world":
 ```
 $ test/test_single_program.sh test_hello_world.meow
 ```
 
-### ii. Regression Test Suite 
+### ii. Regression Test Suite
 
 You can run regression tests for the project with the following command:
 ```
