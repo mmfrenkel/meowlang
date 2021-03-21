@@ -80,17 +80,24 @@ else
         run_type=$1
 fi
 
-echo $run_type
-
 # find the test type (e.g., AST, Semantic Checks, Or Whole Shabang)
 if [ $run_type == "-a" ]
 then
+        echo "*****************************************"
+        echo " RUNNING CHECKS ON ABSTRACT SYNTAX TREE" | tee -a $global_log
+        echo "*****************************************"
         test_type_dir="ast"
 elif [ $run_type == '-s' ]
 then
+        echo "*****************************************"
+        echo "     RUNNING CHECKS ON SEMANTICS" | tee -a $global_log
+        echo "*****************************************"
         test_type_dir="semantic"
 elif [ $run_type == "-c" ]
 then
+        echo "*****************************************"
+        echo "    RUNNING CHECKS ON FULL PIPELINE" | tee -a $global_log
+        echo "*****************************************"
         test_type_dir="full_pipeline"
 else
         echo "Command line arg $1 is not yet a supported test type"
