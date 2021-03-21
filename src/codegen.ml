@@ -24,10 +24,10 @@ let str_t     = L.pointer_type  (L.i8_type  context)
 
 (* Finds the LLVM type corresponding to the Meowlang type *)
 let ltype_of_typ = function
-    A.Int   -> i32_t
-  | A.Bool  -> i1_t
-  | A.Float -> float_t
-  | A.Void  -> void_t
+    A.Int    -> i32_t
+  | A.Bool   -> i1_t
+  | A.Float  -> float_t
+  | A.Void   -> void_t
   | A.String -> str_t
   | _ -> raise (NotYetSupported("complex types not yet supported"))
   (* | A.Arrtype(sz, typ) -> L.array_type (ltype_of_typ typ) sz *)
@@ -48,6 +48,7 @@ let format (typ, _) =
     A.Int    -> "%d\n"
   | A.Float  -> "%g\n"
   | A.String -> "%s\n"
+  | A.Bool   -> "%d\n"
   | _ -> raise (NotYetSupported("formatting for complex expr and functions not yet supported"))
 
 (* Return the value for a variable name or argument, else raise error *)
@@ -108,7 +109,7 @@ let translate (_, functions, _) =
 
     (************ Construct code for an expression; return its value **********)
     let rec expr builder ((_, e) : sexpr) = match e with
-	      SILiteral i      -> L.const_int i32_t i
+        SILiteral i      -> L.const_int i32_t i
       | SBoolLit b       -> L.const_int i1_t (if b then 1 else 0)
       | SFliteral l      -> L.const_float_of_string float_t l
       | SStringLit s     -> L.build_global_stringptr s "str" builder

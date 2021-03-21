@@ -64,12 +64,12 @@ let rec semant_expr expr symbol_tbl =
   in
 
   match expr with
-    ILiteral i -> (Int, SILiteral i)
-  | Fliteral f -> (Float, SFliteral f)
-  | BoolLit b -> (Bool, SBoolLit b)
+    ILiteral i  -> (Int, SILiteral i)
+  | Fliteral f  -> (Float, SFliteral f)
+  | BoolLit b   -> (Bool, SBoolLit b)
   | StringLit s -> (String, SStringLit s)
-  | Id id -> (find_type_of_id symbol_tbl id, SId id)
-  | Noexpr -> (Void, SNoexpr)
+  | Id id       -> (find_type_of_id symbol_tbl id, SId id)
+  | Noexpr      -> (Void, SNoexpr)
 
   | Binop (e1, op, e2) as ex ->
       (* Binary operations work with operands of the same type *)
@@ -245,8 +245,8 @@ let rec semant_stmt stmt symbol_tbl =
 
   (* Incomplete *)
   match stmt with
-    Expr e -> SExpr(semant_expr e symbol_tbl)
-  | Return e -> SReturn(semant_expr e symbol_tbl)
+    Expr e    -> SExpr(semant_expr e symbol_tbl)
+  | Return e  -> SReturn(semant_expr e symbol_tbl)
   | If (e, stmt1, stmt2) ->
       SIf(check_bool_expr e,
       semant_stmt stmt1 symbol_tbl,
