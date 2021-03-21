@@ -25,6 +25,8 @@ $ ./test/run_regression_tests.sh [run-type] [files]
 ```
 Specifying the `run-type` is mandatory. Options for `run-type` currently include:
 * `-a`: Test output of scanner and parser (against pretty printed AST)
+* `-s`: Test the semantic checker only
+* `-c`: Test the full pipeline (compile the `.meow` test file and run it!)
 
 Specifying a list of `files` is optional. By default, all files with a `.meow` extension
 will be run as a test.
