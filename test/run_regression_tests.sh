@@ -33,7 +33,7 @@ Check() {
                 ./src/meowlang.native $run_type < $test_file &> $actual_output
         else
                 # testing full compilation requires help from test script
-                ./test/test_single_program.sh "$base_name.meow"> $actual_output
+                ./test/test_single_program.sh "$base_name.meow" &> $actual_output
         fi
 
         # see if the result is what we expected
