@@ -9,6 +9,13 @@ $ make
 
 ## II. Test
 
+### 0. Hello World
+
+To run our hello world program:
+```
+$ test/test_single_program.sh test_hello_world.meow
+```
+
 ### i. Individual Test
 
 To test the compiler against an individual `.meow` file:
@@ -24,9 +31,9 @@ If flag is not specified, `-a` is used.
 
 If you want to compile **and run** a specific `.meow` file, the best option is
 to use the `test_single_program.sh` script, specifying the filename (not full path)
-of the test file. Here is an example of running this script for "hello world":
+of the test file:
 ```
-$ test/test_single_program.sh test_hello_world.meow
+$ test/test_single_program.sh <name-of-file>.meow
 ```
 
 ### ii. Regression Test Suite

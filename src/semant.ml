@@ -139,7 +139,6 @@ let rec semant_expr expr symbol_tbl =
         (meth.typ, SMethodCall(vname, mname, args'))
 
   | NewArray (arr_name, arr_typ, arr_size, expr_list) as ex ->
-
       (* 1. Check to make sure that size is integer *)
       let array_size_typ =
         match arr_size with
@@ -170,7 +169,6 @@ let rec semant_expr expr symbol_tbl =
         (Arrtype(arr_size, arr_typ), SNewArray(arr_name, arr_typ, arr_size, expr_list'))
 
   | NewInstance (obj_name, typ, expr_list) as ex ->
-
       (* 1. You can only create an "instance" of something that is type Objtype *)
       let cname = match typ with
           Obtype o -> o
@@ -318,7 +316,6 @@ let rec semant_stmt stmt symbol_tbl =
           raise (InvalidClassMemberAssignment(msg)))
 
   | ArrayAssign (id, idx_e, e) as s ->
-
     (* 1. make sure that the variable is an array type *)
     let typ = find_type_of_id symbol_tbl id in
     (match typ with
@@ -336,13 +333,12 @@ let rec semant_stmt stmt symbol_tbl =
           | _ -> raise (InvalidArrayAssignment(array_access_integer ^ string_of_stmt s)))
       | _ -> raise (InvalidArrayAssignment(array_access_array_only ^ id ^ " is not an array")))
 
+(* Checks a function body, while converting it from AST -> SAST format. *)
 let check_function_body func =
-
   (*
     1. Build local symbol table of variables for this scope
   *)
-  let symbol_table:(string, Ast.typ) Hashtbl.t = Hashtbl.create 10
-  in
+  let symbol_table:(string, Ast.typ) Hashtbl.t = Hashtbl.create 10 in
   List.iter (fun (typ, name) -> Hashtbl.add symbol_table name typ) func.formals;
   List.iter (fun (typ, name, _) -> Hashtbl.add symbol_table name typ) func.locals;
 
@@ -355,21 +351,15 @@ let check_function_body func =
   let create_assignment_stmt build local_var_bind =
     (match local_var_bind with
       (_, _, Noexpr) -> build
-    | (_, name, expr)   -> Expr(Assign(name, expr)) :: build)
-  in
-  let new_assignments =
-    List.fold_left create_assignment_stmt [] func.locals
-  in
+    | (_, name, expr)   -> Expr(Assign(name, expr)) :: build) in
+  let new_assignments =  List.fold_left create_assignment_stmt [] func.locals in
   let adjusted_body = List.rev new_assignments @ func.body in
 
-  (*
-    3. Build up the SAST Tree for the Function
-  *)
+  (* 3. Build up the SAST Tree for the Function *)
   semant_stmt (Block adjusted_body) symbol_table
 
 (* Checks to ensure that a function is semantically valid, producing a SAST equivalent *)
 let check_function func =
-
   (*
     1. Get a list of formal names and local variable names then
     2. Check for duplicate formal and duplicate local variable names on their own
@@ -382,16 +372,11 @@ let check_function func =
   find_duplicate (list_locals_names) dup_local_var_msg;
   find_duplicate (list_formal_names @ list_locals_names) dup_form_local_msg;
 
-  (*
-    4. Step to make LLVM code happy; main function must be 'main' not 'Main'
-  *)
-  let adjusted_function_name f =
-    if f.fname = "Main" then "main" else f.fname
+  (* 4. Step to make LLVM code happy; main function must be 'main' not 'Main' *)
+  let adjusted_function_name f = if f.fname = "Main" then "main" else f.fname
   in
 
-  (*
-    5. Check contents of function body, producting SAST version
-  *)
+  (* 5. Check contents of function body, producting SAST version *)
   let checked_func = {
     styp = func.typ;
     sfname = adjusted_function_name func;
@@ -436,9 +421,7 @@ let check (_, functions, classes) =
   let functions' = add_built_ins functions in
   check_duplicates functions' classes;
 
-  (*
-    3. Since functions/classes are global, create maps of functions, classes
-  *)
+  (* 3. Since functions/classes are global, create maps of functions, classes *)
   List.iter (fun func -> Hashtbl.add function_tbl func.fname func) functions';
   List.iter (fun cls-> Hashtbl.add class_tbl cls.cname cls) classes;
 

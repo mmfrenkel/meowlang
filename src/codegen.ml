@@ -191,7 +191,7 @@ let translate (_, functions, _) =
        e.g., to handle the "fall off the end of the function" case. *)
     let add_terminal builder instr =
       match L.block_terminator (L.insertion_block builder) with
-	      Some _ -> ()
+        Some _ -> ()
       | None -> ignore (instr builder) in
 
     (* Build the code for the given statement; return the builder for
