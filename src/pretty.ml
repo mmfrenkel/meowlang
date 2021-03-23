@@ -80,6 +80,7 @@ let rec string_of_stmt = function
       "\tfor (" ^string_of_expr e_opt ^ " " ^ string_of_expr e1 ^ string_of_op o ^ " " ^ string_of_expr e2 ^ ") {\n\t\t" ^ string_of_stmt s ^ "\t}\n"
   | Dealloc(e) -> "\tfree(" ^ e ^ ");\n"
   | ClassAssign(s1, s2, e) -> "\t" ^ s1 ^ "." ^ s2 ^ " = " ^ string_of_expr e ^ ";\n"
+  | ArrayAssign(s, e1, e2) -> "\t" ^ s ^ "[" ^ string_of_expr e1 ^ "] = " ^ string_of_expr e2 ^";\n"
 
 let string_of_vdecl (t, id, expr) =
     match expr with
