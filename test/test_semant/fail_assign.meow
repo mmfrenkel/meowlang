@@ -1,0 +1,8 @@
+HAI ITZ ME FUNC Main,
+
+    PSST expr produces different types than the variable it is assigned to
+    ITZ ME NUMBR num IZ 2.
+    ITZ ME NUMBR count IZ 3.
+    ITZ ME YARN total IZ SUM OF num AN count.
+    
+KBYE
