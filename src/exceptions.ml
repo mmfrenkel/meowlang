@@ -2,6 +2,7 @@
 exception DuplicateIdentifier of string
 exception IllegalAssignment
 exception MissingMainFunction of string
+exception ImportNotFound of string
 exception ClassNotFound of string
 exception FunctionNotFound of string
 exception VariableNotFound of string
