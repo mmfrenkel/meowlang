@@ -12,10 +12,6 @@ module StringMap = Map.Make(String)
 let function_tbl:(string, Ast.func_decl) Hashtbl.t = Hashtbl.create 10
 let class_tbl:(string, Ast.class_decl) Hashtbl.t = Hashtbl.create 10
 
-(* Return import file by name, check that filenmae is uppercase with no extension: i.e. GIMME STDIO? *)
-let find_import_file fname =
-
-
 (* Return function by name; Raise exception if it doesn't exist *)
 let find_function fname =
   try Hashtbl.find function_tbl fname
@@ -328,10 +324,7 @@ let check_function func =
   checked_func
 
 (* Checks for duplicates *)
-let check_duplicates imports functions classes =
-  (* duplicates in imports names *)
-  find_duplicate (List.map (fun i -> i.iname) imports) dup_import_msg;
-
+let check_duplicates functions classes =
   (* duplicates in function names *)
   find_duplicate (List.map (fun f -> f.fname) functions) dup_func_msg;
 
@@ -354,29 +347,17 @@ let add_built_ins existing_funcs =
   } in
   printf :: existing_funcs
 
-(* Add functions from imports to the list of functions *)
-let add_import_functions existing_funcs import_funcs =
-  List.iter (fun func_name -> func_name :: existing_funcs ) import_funcs
-
-(* Add classes from imports to the list of classes *)
-let add_import_classes existing_classes import_classes =
-  List.iter (fun class_name -> class_name :: existing_classes ) import_classes
-
-let check (imports, functions, classes) =
+let check (_, functions, classes) =
 
   (* 1. add built in functions to list of functions *)
   let functions' = add_built_ins functions in
-  (* 2. add functions from imports to list of functions *)
-  let functions'' = add_import_functions functions' in
-  (* 3. add classes from imports to list of classes *)
-  let classes' = add_import_classes classes in
 
   (* 2. Check for any duplicate function, method and class names *)
-  check_duplicates imports functions'' classes';
+  check_duplicates functions' classes;
 
   (* 3. Since functions/classes are global, create maps of functions, classes *)
-  List.iter (fun func -> Hashtbl.add function_tbl func.fname func) functions'';
-  List.iter (fun cls-> Hashtbl.add class_tbl cls.cname cls) classes';
+  List.iter (fun func -> Hashtbl.add function_tbl func.fname func) functions';
+  List.iter (fun cls-> Hashtbl.add class_tbl cls.cname cls) classes;
 
   (* 4. Make sure that a main function exists*)
   if Hashtbl.mem function_tbl "Main"
