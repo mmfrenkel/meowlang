@@ -25,7 +25,8 @@ let _ =
 
     match !action with
           Ast -> print_string (string_of_program ast)
-        | _   -> let sast = Semant.check ast in
+        | _   -> let ast_with_imports = Import.add ast in
+                   let sast = Semant.check ast_with_imports in
 
             match !action with
               Ast     -> ()
