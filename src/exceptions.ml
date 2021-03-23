@@ -23,6 +23,7 @@ exception NotYetSupported of string
 exception InternalError of string
 
 (* Message Templates for Exceptions *)
+let dup_import_msg = "duplicate import name: "
 let dup_func_msg = "duplicate function name, or conflict with built-in: "
 let dup_class_msg = "duplicate class name: "
 let dup_method_msg = "duplicate class method name: "

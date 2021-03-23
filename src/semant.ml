@@ -328,7 +328,10 @@ let check_function func =
   checked_func
 
 (* Checks for duplicates *)
-let check_duplicates functions classes =
+let check_duplicates imports functions classes =
+  (* duplicates in imports names *)
+  find_duplicate (List.map (fun i -> i.iname) imports) dup_import_msg;
+
   (* duplicates in function names *)
   find_duplicate (List.map (fun f -> f.fname) functions) dup_func_msg;
 
@@ -359,7 +362,7 @@ let add_import_functions existing_funcs import_funcs =
 let add_import_classes existing_classes import_classes =
   List.iter (fun class_name -> class_name :: existing_classes ) import_classes
 
-let check (_, functions, classes) =
+let check (imports, functions, classes) =
 
   (* 1. add built in functions to list of functions *)
   let functions' = add_built_ins functions in
@@ -369,7 +372,7 @@ let check (_, functions, classes) =
   let classes' = add_import_classes classes in
 
   (* 2. Check for any duplicate function, method and class names *)
-  check_duplicates functions'' classes';
+  check_duplicates imports functions'' classes';
 
   (* 3. Since functions/classes are global, create maps of functions, classes *)
   List.iter (fun func -> Hashtbl.add function_tbl func.fname func) functions'';
