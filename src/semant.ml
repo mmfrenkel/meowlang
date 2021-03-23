@@ -202,9 +202,20 @@ let rec semant_expr expr symbol_tbl =
         let msg = obj_name ^ " of class " ^ cname ^ " has no member " ^ class_var in
         raise (InstanceVariableNotFound(msg))
 
-  (* | ArrayAccess (id, e) -> (typ, SArrayAccess (id, e')) *)
+  | ArrayAccess (array_id, e) as ex ->
+      (* 1. Check that the array exists in the symbol table  *)
+      let typ = find_type_of_id symbol_tbl array_id in
 
-  | _ as ex -> raise (NotYetSupported("compiler doesn't support this expression type yet: " ^ string_of_expr ex))
+      (* 2. You can only "access" instance variables of type Obtype *)
+      let _ = match typ with
+            Arrtype (sz, typ) -> (sz, typ)
+          | _ -> raise (InvalidArrayAccess(array_access_array_only ^ string_of_expr ex))
+      in
+      (* 3. Check to make sure that the array is going to be indexed by an integer typ *)
+      let (typ', e') = semant_expr e symbol_tbl in
+      (match typ' with
+          Int -> (typ, SArrayAccess (array_id, (typ', e')))
+        | _ -> (raise (InvalidArrayAccess(array_access_integer ^ "found index expression " ^ string_of_expr ex))))
 
 (* Return a semantically-checked statement i.e. containing sexprs *)
 let rec semant_stmt stmt symbol_tbl =
@@ -300,14 +311,30 @@ let rec semant_stmt stmt symbol_tbl =
             if List.mem (vtype, instance_var) cvars then
               SClassAssign(id, instance_var, (vtype, e'))
             else
-              let msg = invalid_class_member_assignent ^ string_of_typ typ ^ " to " ^ cname ^ "." ^ instance_var in
+              let msg = invalid_cls_member_assign ^ string_of_typ typ ^ " to " ^ cname ^ "." ^ instance_var in
               raise (InvalidClassMemberAssignment(msg))
         | _ ->
-          let msg = class_member_assignment_class_only ^ id ^ " is of type " ^ string_of_typ typ in
+          let msg = member_assign_cls_only ^ id ^ " is of type " ^ string_of_typ typ in
           raise (InvalidClassMemberAssignment(msg)))
 
-  (* | ArrayAssign (id, idx_e, e) -> SArrayAssign (id, idx_e', e') *)
-  | _ as s -> raise (NotYetSupported("compiler doesn't support this statement type yet: " ^ string_of_stmt s))
+  | ArrayAssign (id, idx_e, e) as s ->
+
+    (* 1. make sure that the variable is an array type *)
+    let typ = find_type_of_id symbol_tbl id in
+    (match typ with
+        Arrtype (_, ty) ->
+          (* 2. make sure that the idx_e expression yields an integer *)
+          let (idx_typ, idx_e') = semant_expr idx_e symbol_tbl in
+          (match idx_typ with
+            Int ->
+              (* 3. make sure that the expression type being assigned matches array content type *)
+              let (exp_typ, e') = semant_expr e symbol_tbl in
+              if exp_typ = ty then
+                SArrayAssign(id, (idx_typ, idx_e'), (exp_typ, e'))
+              else
+                raise (InvalidArrayAssignment(invalid_array_item_msg ^ string_of_stmt s))
+          | _ -> raise (InvalidArrayAssignment(array_access_integer ^ string_of_stmt s)))
+      | _ -> raise (InvalidArrayAssignment(array_access_array_only ^ id ^ " is not an array")))
 
 let check_function_body func =
 
