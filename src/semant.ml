@@ -194,9 +194,17 @@ let rec semant_expr expr symbol_tbl =
         | _ -> raise (InstanceVariableAccessInvalid(invalid_instance_var_access ^ string_of_expr ex))
       in
       (* 3. Check that the instance variable exists within the class *)
-      (Obtype(cname), (SClassAccess(obj_name, class_var)))
+      let cls = find_class cname in
+      let cvars = List.map (fun (_, name, _) -> name) cls.cvars in
+      if List.mem class_var cvars then
+        (Obtype(cname), (SClassAccess(obj_name, class_var)))
+      else
+        let msg = obj_name ^ " of class " ^ cname ^ " has no member " ^ class_var in
+        raise (InstanceVariableNotFound(msg))
+
+  (* | ArrayAccess (id, e) -> (typ, SArrayAccess (id, e')) *)
+
   | _ as ex -> raise (NotYetSupported("compiler doesn't support this expression type yet: " ^ string_of_expr ex))
-  (* | ArrayAccess *)
 
 (* Return a semantically-checked statement i.e. containing sexprs *)
 let rec semant_stmt stmt symbol_tbl =
@@ -205,7 +213,9 @@ let rec semant_stmt stmt symbol_tbl =
   let check_bool_expr e =
     let (t', e') = semant_expr e symbol_tbl in
       if t' == Bool then (t', e')
-      else raise (ControlFlowIllegalArgument(expr_type_mismatch ^ "expected Boolean but got type " ^ string_of_typ t' ^ " in expression " ^ string_of_expr e))
+      else
+        let msg = op_type_mismatch_boolean ^ string_of_typ t' ^ string_of_expr e in
+        raise (ControlFlowIllegalArgument(msg))
   and
 
   (* for looping: checks that op is Increment or Decrement *)
@@ -213,14 +223,16 @@ let rec semant_stmt stmt symbol_tbl =
     match op with
       Increment -> op
     | Decrement -> op
-    | _ -> raise (ControlFlowIllegalArgument(op_type_mismatch ^ "expected Increment or Decrement but got type " ^  string_of_op op))
+    | _ -> raise (ControlFlowIllegalArgument(op_type_mismatch_inc_dec ^ string_of_op op))
   and
 
   (* for looping: checks that index is an Integer *)
   check_control_index e =
     let (t', e') = semant_expr e symbol_tbl in
       if t' == Int then (t', e')
-      else raise (ControlFlowIllegalArgument(expr_type_mismatch ^ "expected Integer but got type " ^ (string_of_typ t') ^ " in expression " ^ string_of_expr e))
+      else
+        let msg = op_type_mismatch_int ^ (string_of_typ t') ^ string_of_expr e in
+        raise (ControlFlowIllegalArgument(msg))
   and
 
   (* for looping: second expr is optional or index assignment *)
@@ -239,7 +251,7 @@ let rec semant_stmt stmt symbol_tbl =
         SBinop(_, op, _) ->
           (match op with
               Less | Greater | Equal | Neq -> (t', e')
-            | _ -> raise (ControlFlowIllegalArgument(op_type_mismatch ^ "expected <, >, =, != as loop termination condition: " ^ string_of_expr e)))
+            | _ -> raise (ControlFlowIllegalArgument(op_type_mismatch_loop_term ^ string_of_expr e )))
       | _ -> raise (ControlFlowIllegalArgument(expr_type_mismatch ^ "expected binary operation in loop: " ^ string_of_expr e))
   in
 
@@ -251,12 +263,14 @@ let rec semant_stmt stmt symbol_tbl =
       SIf(check_bool_expr e,
       semant_stmt stmt1 symbol_tbl,
       semant_stmt stmt2 symbol_tbl)
+
   | For (op, e1, e2, e3, stmt) ->
       SFor(check_control_op op,         (* increment or decrement *)
           check_control_index e1,       (* index *)
           check_index_assignment e2,    (* optional index assignment *)
           check_loop_termination e3,    (* termination condition *)
           semant_stmt stmt symbol_tbl)  (* loop body *)
+
   | Block b ->
     let rec check_stmt_list = function
         [Return _ as s] -> [semant_stmt s symbol_tbl]
@@ -264,19 +278,53 @@ let rec semant_stmt stmt symbol_tbl =
       | s :: ss         -> semant_stmt s symbol_tbl :: check_stmt_list ss
       | []              -> []
     in SBlock(check_stmt_list b)
+
+  | Dealloc id ->
+    (* Check that the dealloced item is of type ObjType or ArrType *)
+    let typ = find_type_of_id symbol_tbl id in
+    (match typ with
+          Obtype _ | Arrtype _ -> SDealloc(id)
+        | _ -> raise (InvalidDealloc(invalid_deallocation_msg ^ id ^" is of typ " ^ string_of_typ typ)))
+
+  | ClassAssign (id, instance_var, e) ->
+    (* 1. id must correspond to an ObjType *)
+    let typ = find_type_of_id symbol_tbl id in
+    (match typ with
+        | Obtype (cname) ->
+            let cls = find_class cname in
+            let cvars = List.map (fun (typ, name, _) -> (typ, name)) cls.cvars in
+            let (vtype, e') = semant_expr e symbol_tbl in
+
+            (* 2. the instance variable must exist in the class and the
+            item being assigned must be of the correct type *)
+            if List.mem (vtype, instance_var) cvars then
+              SClassAssign(id, instance_var, (vtype, e'))
+            else
+              let msg = invalid_class_member_assignent ^ string_of_typ typ ^ " to " ^ cname ^ "." ^ instance_var in
+              raise (InvalidClassMemberAssignment(msg))
+        | _ ->
+          let msg = class_member_assignment_class_only ^ id ^ " is of type " ^ string_of_typ typ in
+          raise (InvalidClassMemberAssignment(msg)))
+
+  (* | ArrayAssign (id, idx_e, e) -> SArrayAssign (id, idx_e', e') *)
   | _ as s -> raise (NotYetSupported("compiler doesn't support this statement type yet: " ^ string_of_stmt s))
-  (* | Dealloc id -> SDealloc(id) *)
-  (* | ClassAssign (id, meth_name, e) -> SClassAssign() *)
 
 let check_function_body func =
 
-  (* Build local symbol table of variables for this scope *)
+  (*
+    1. Build local symbol table of variables for this scope
+  *)
   let symbol_table:(string, Ast.typ) Hashtbl.t = Hashtbl.create 10
   in
   List.iter (fun (typ, name) -> Hashtbl.add symbol_table name typ) func.formals;
   List.iter (fun (typ, name, _) -> Hashtbl.add symbol_table name typ) func.locals;
 
-  (* Refactoring step: moves real assignments in func.locals into function body beginning *)
+  (*
+    2. Refactoring step: moves assignments in func.locals into function body
+       beginning analogous to make the following change in a c function :
+          int value = 2;   -> int value;
+                              value = 2;
+  *)
   let create_assignment_stmt build local_var_bind =
     (match local_var_bind with
       (_, _, Noexpr) -> build
@@ -287,31 +335,36 @@ let check_function_body func =
   in
   let adjusted_body = List.rev new_assignments @ func.body in
 
-  (* Build up the SAST Tree for the Function Here *)
-  (* List.iter (fun stmt -> print_string (string_of_stmt stmt)) adjusted_body; *)
+  (*
+    3. Build up the SAST Tree for the Function
+  *)
   semant_stmt (Block adjusted_body) symbol_table
 
 (* Checks to ensure that a function is semantically valid, producing a SAST equivalent *)
 let check_function func =
 
-  (* 1. Get a list of formal names and local variable names *)
+  (*
+    1. Get a list of formal names and local variable names then
+    2. Check for duplicate formal and duplicate local variable names on their own
+    3. Check for duplicates in formals and locals together
+  *)
   let list_formal_names = List.fold_left (fun acc (_, name) -> name :: acc) [] func.formals
   and list_locals_names = List.fold_left (fun acc (_, name, _) -> name  :: acc) [] func.locals
   in
-
-  (* 2. Check for duplicate formal and duplicate local variable names on their own *)
   find_duplicate (list_formal_names) dup_formal_msg;
   find_duplicate (list_locals_names) dup_local_var_msg;
-
-  (* 3. Check for duplicates in formals and locals together *)
   find_duplicate (list_formal_names @ list_locals_names) dup_form_local_msg;
 
-  (* 4. Step to make LLVM code happy; main function must be 'main' not 'Main' *)
+  (*
+    4. Step to make LLVM code happy; main function must be 'main' not 'Main'
+  *)
   let adjusted_function_name f =
     if f.fname = "Main" then "main" else f.fname
   in
 
-  (* 5. Check contents of function body *)
+  (*
+    5. Check contents of function body, producting SAST version
+  *)
   let checked_func = {
     styp = func.typ;
     sfname = adjusted_function_name func;
@@ -349,17 +402,23 @@ let add_built_ins existing_funcs =
 
 let check (_, functions, classes) =
 
-  (* 1. add built in functions to list of functions *)
+  (*
+    1. add built in functions to list of functions and
+    2. Check for any duplicate function, method and class names
+  *)
   let functions' = add_built_ins functions in
-
-  (* 2. Check for any duplicate function, method and class names *)
   check_duplicates functions' classes;
 
-  (* 3. Since functions/classes are global, create maps of functions, classes *)
+  (*
+    3. Since functions/classes are global, create maps of functions, classes
+  *)
   List.iter (fun func -> Hashtbl.add function_tbl func.fname func) functions';
   List.iter (fun cls-> Hashtbl.add class_tbl cls.cname cls) classes;
 
-  (* 4. Make sure that a main function exists*)
+  (*
+    4. Make sure that a main function exists, and if so, continue with
+       creating a list of checked functions, converted to SAST form
+  *)
   if Hashtbl.mem function_tbl "Main"
 
     (* Create the SAST, with just functions for now *)

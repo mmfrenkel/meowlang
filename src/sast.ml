@@ -17,6 +17,7 @@ and sx =
   | SNoexpr
   | SNewInstance of string * typ * sexpr list
   | SClassAccess of string * string
+  | SArrayAccess of string * sexpr
 
 type sstmt =
     SBlock of sstmt list
