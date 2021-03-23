@@ -26,11 +26,16 @@ let check_import_names imports =
     in
       List.iter check_name imports
 
-(* Scan each import file *)
-let scan_imports imports = imports
-
-(* Parse each scenned import *)
-let generate_asts scanned_imports = scanned_imports
+(* Scan each import file, returns a list of lexbuf *)
+let scan_imports imports =
+    let channel_in fname = open_in fname in
+      let scan channel = Lexing.from_channel channel in
+        List.map scan (List.map channel_in imports)
+        
+(* Parse each scenned import, returns a list of AST programs *)
+let generate_asts lexbuf_imports =
+  let parse_ast lexbuf = Parser.program Scanner.token lexbuf in
+    List.map parse_ast lexbuf_imports
 
 (* Add functions from imports to the list of functions *)
 let add_import_functions existing_funcs imports =
@@ -49,9 +54,9 @@ let add (imports, functions, classes) =
   check_import_names imports;
 
   (* scan each file: lexbuf = Lexing.from_channel each_import *)
-  let scanned_imports = scan_imports imports in
+  let lexbuf_imports = scan_imports imports in
     (* parse each file: import_ast = Parser.program Scanner.token lexbuf *)
-    let import_asts = generate_asts scanned_imports in 
+    let import_asts = generate_asts lexbuf_imports in 
       (* add functions from each import_ast to functions except for import_ast main function *)
       let functions' = add_import_functions functions import_asts in
       (* add classes from each import_ast to classes *)
