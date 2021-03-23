@@ -1,0 +1,11 @@
+
+
+int Main()
+{
+	bool is_true = true;
+	bool is_false = false;
+	printf("%X\n", is_true);
+	printf("%X\n", is_false);
+	return 0;
+}
+

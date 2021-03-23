@@ -1,0 +1,9 @@
+
+
+int Main()
+{
+	float pi = 3.14159;
+	printf("%X\n", pi);
+	return 0;
+}
+
