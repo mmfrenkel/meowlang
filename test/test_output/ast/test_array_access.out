@@ -6,6 +6,7 @@ Main()
 	int [3] cool_array = [ 1, 2, 3 ];
 	cool_array[1];
 	idx = 1;
-	cool_array[idx];
+	cool_array[idx] = 2;
+	printf("%X\n", cool_array[idx]);
 }
 

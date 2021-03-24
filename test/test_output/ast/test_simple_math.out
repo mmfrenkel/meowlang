@@ -1,0 +1,50 @@
+
+
+int Main()
+{
+	int one = 1;
+	int two = 2;
+	int three = 3;
+	int sum;
+	int diff;
+	int product;
+	int quotient;
+	sum = Add_Three(one, two, three);
+	printf("%X\n", sum);
+	diff = Subtract_Two(three, two);
+	printf("%X\n", diff);
+	product = Multiply_Four(one, two, diff, sum);
+	printf("%X\n", product);
+	quotient = Divide_Two(sum, two);
+	printf("%X\n", quotient);
+	return 0;
+}
+
+int Divide_Two(int num1, int num2)
+{
+	int quotient;
+	quotient = num1 / num2;
+	return quotient;
+}
+
+int Multiply_Four(int num1, int num2, int num3, int num4)
+{
+	int product;
+	product = num1 * num2 * num3 * num4;
+	return product;
+}
+
+int Subtract_Two(int num1, int num2)
+{
+	int diff;
+	diff = num1 - num2;
+	return diff;
+}
+
+int Add_Three(int num1, int num2, int num3)
+{
+	int sum;
+	sum = num1 + num2 + num3;
+	return sum;
+}
+

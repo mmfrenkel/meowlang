@@ -1,0 +1,13 @@
+include "hello"
+
+int Main()
+{
+	print_something();
+	return 0;
+}
+
+print_something()
+{
+	printf("%X\n", "In the print_something function");
+}
+

@@ -3,6 +3,7 @@
 Main()
 {
 	int count;
+	int index;
 	char * condition;
 	count = 0;
 	for ( count++ count < 10) {

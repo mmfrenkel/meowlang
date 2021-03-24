@@ -105,6 +105,7 @@ stmt:
   | FOR expr INCREMENT expr_opt COMMA expr stmt   { For(Increment, $2, $4, $6, $7) }
   | FOR expr DECREMENT expr_opt COMMA expr stmt   { For(Decrement, $2, $4, $6, $7) }
   | ID IN ID ASSIGN expr SEMI                     { ClassAssign($1, $3, $5)        }
+  | ID LBRACKET expr RBRACKET ASSIGN expr SEMI    { ArrayAssign($1, $3, $6)        }
   | FREE ID SEMI                                  { Dealloc($2)                    }
   | ID ASSIGN function_call SEMI                  { Expr(Assign($1, $3))           }
 

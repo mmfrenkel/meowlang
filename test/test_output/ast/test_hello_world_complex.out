@@ -2,9 +2,11 @@ include "hello"
 
 int Main()
 {
+	char * full_msg;
 	char * my_name;
 	my_name = "Cherry";
-	create_message(my_name);
+	full_msg = create_message(my_name);
+	printf("%X\n", full_msg);
 	return 0;
 }
 

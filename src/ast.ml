@@ -40,6 +40,7 @@ type stmt =
   | For of op * expr * expr * expr * stmt
   | Dealloc of string
   | ClassAssign of string * string * expr
+  | ArrayAssign of string * expr * expr
 
 type func_decl = {
     typ : typ;

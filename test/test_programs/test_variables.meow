@@ -1,9 +1,8 @@
-GIMME hello?
 
-HAI ITZ ME YARN FUNC Main,
+HAI ITZ ME NUMBR FUNC Main,
 
         PSST Creating some local variables
-        ITZ ME NUMBR count.
+        ITZ ME NUMBR count IZ 2.
         ITZ ME NUMBAR random.
         ITZ ME BOO say_hello.
         ITZ ME YARN msg.
@@ -14,5 +13,5 @@ HAI ITZ ME YARN FUNC Main,
         count IZ 2.
         random IZ 2.34.
 
-        GIVE msg.  PSST Returning Hello to user
+        GIVE 0.
 KBYE

@@ -1,8 +1,8 @@
-include "hello"
 
-char * Main()
+
+int Main()
 {
-	int count;
+	int count = 2;
 	float random;
 	bool say_hello;
 	char * msg;
@@ -10,6 +10,6 @@ char * Main()
 	say_hello = true;
 	count = 2;
 	random = 2.34;
-	return msg;
+	return 0;
 }
 

@@ -1,0 +1,1 @@
+Fatal error: exception Exceptions.VariableAssignmentError("variables can only be assigned to items of the expected type: count = "hi"")

@@ -17,6 +17,7 @@ and sx =
   | SNoexpr
   | SNewInstance of string * typ * sexpr list
   | SClassAccess of string * string
+  | SArrayAccess of string * sexpr
 
 type sstmt =
     SBlock of sstmt list
@@ -26,7 +27,7 @@ type sstmt =
   | SFor of op * sexpr * sexpr * sexpr * sstmt
   | SDealloc of string
   | SClassAssign of string * string * sexpr
-  | SArrayAssign of string * sexpr
+  | SArrayAssign of string * sexpr * sexpr
 
 type sfunc_decl = {
     styp : typ;
