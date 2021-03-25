@@ -1,0 +1,14 @@
+
+
+Main()
+{
+	int Jerry = 1;
+	Jerry.cookies;
+}
+
+Class MOUSE {
+
+	int cookies = 0;
+
+
+}

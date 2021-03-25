@@ -4,6 +4,5 @@ HAI ITZ ME FUNC Main,
     ITZ ME YARN string IZ "Value".
     ITZ ME NUMBR value IZ 2.
 
-    PRODUKT OF string AN value.
-
+    ITZ ME NUMBR product IZ PRODUKT OF string AN value.
 KBYE

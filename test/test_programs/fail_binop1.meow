@@ -2,8 +2,7 @@ HAI ITZ ME FUNC Main,
     PSST Addition of operands with different types
 
     ITZ ME YARN string IZ "Value".
-    ITZ ME NUMBAR value IZ 2.
+    ITZ ME NUMBR value IZ 2.
 
-    SUM OF string AN value.
-
+    ITZ ME NUMBR sum IZ SUM OF string AN value.
 KBYE

@@ -2,8 +2,8 @@ HAI ITZ ME FUNC Main,
     PSST Subtraction of operands with different types
 
     ITZ ME YARN string IZ "Value".
-    ITZ ME NUMBAR value IZ 2.
+    ITZ ME NUMBAR value IZ 2.0.
 
-    DIFF OF string AN value.
+    ITZ ME NUMBR diff IZ DIFF OF string AN value.
 
 KBYE

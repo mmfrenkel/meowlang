@@ -1,0 +1,9 @@
+
+
+Main()
+{
+	char * string = "Value";
+	float value = 2.0;
+	int diff = string - value;
+}
+

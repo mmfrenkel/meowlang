@@ -2,9 +2,10 @@
 
 Main()
 {
-	int jerrys_cookies = Jerry.cookies;
+	int jerrys_cookies;
 	class MOUSE Jerry;
-	cookies.Jerry = 2;
+	jerrys_cookies = Jerry.cookies;
+	Jerry.cookies = 2;
 	Jerry.Give_Cookie(2);
 	jerrys_cookies = Jerry.Count_Cookies();
 	free(Jerry);
