@@ -1,0 +1,1 @@
+Fatal error: exception Exceptions.ObjectConstructorInvalid("cannot assign instance variables of new object to items of incorrect type, found: cookies = "this is a string"")

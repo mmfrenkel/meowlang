@@ -1,0 +1,13 @@
+PSST cannot have duplicates in class names
+
+HAI ITZ ME CLASS FELINES,
+    PSST This is one class!
+KBYE
+
+HAI ITZ ME CLASS FELINES,
+    PSST This is another class!
+KBYE
+
+HAI ITZ ME FUNC Main,
+    PSST This won't do much
+KBYE

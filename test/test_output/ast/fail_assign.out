@@ -1,0 +1,9 @@
+
+
+Main()
+{
+	int num = 2;
+	int count = 3;
+	char * total = num + count;
+}
+

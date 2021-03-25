@@ -76,7 +76,7 @@ let rec semant_expr expr symbol_tbl =
       let (typ1, e1') = semant_expr e1 symbol_tbl
       and (typ2, e2') = semant_expr e2 symbol_tbl in
       let same_type = typ1 = typ2 in
-      let end_typ = match op with 
+      let end_typ = match op with
           Add | Sub | Mult | Div when same_type && typ1 = Int -> Int
         | Add | Sub | Mult | Div when (typ1 = Float || typ1 = Int) && (typ2 = Float || typ2 = Int) -> Float (* This is casting from float to int *)
         | Equal | Neq     when same_type -> Bool
@@ -84,7 +84,10 @@ let rec semant_expr expr symbol_tbl =
         | And | Or        when same_type && typ1 = Bool -> Bool
         | Concat          when (typ1 = String && (typ2 = String || typ2 == Int || typ2 == Float)) ||
                                (typ2 = String && (typ1 == Int || typ1 == Float)) -> String
-        | _               -> raise (IllegalBinaryOp(string_of_expr ex))
+        | _               ->
+          let msg = "unexpected types in binary op (" ^ string_of_typ typ1 ^ " and "
+                    ^ string_of_typ typ2 ^ "): " ^ string_of_expr ex
+          in raise (IllegalBinaryOp(msg))
     in (end_typ, SBinop((typ1, e1'), op, (typ2, e2')))
 
   | Unop (op, e) as ex ->
@@ -97,7 +100,10 @@ let rec semant_expr expr symbol_tbl =
     (* Check that the expr produces the same type as the variable it is assigned to *)
       let var_typ = find_type_of_id symbol_tbl var
       and (ret_type, e') = semant_expr e symbol_tbl in
-      let err = VariableAssignmentError(assignment_typ_mismatch ^ string_of_expr ex)
+      let err =
+        let msg = assignment_typ_mismatch ^ "expected " ^ string_of_typ var_typ
+                  ^ ", got " ^ string_of_typ ret_type ^ " here: " ^ string_of_expr ex
+        in VariableAssignmentError(msg)
       in (check_matching_types var_typ ret_type err, SAssign(var, (ret_type, e')))
 
   | FunctionCall (fname, args) ->
@@ -170,13 +176,27 @@ let rec semant_expr expr symbol_tbl =
 
   | NewInstance (obj_name, typ, expr_list) as ex ->
       (* 1. You can only create an "instance" of something that is type Objtype *)
-      let cname = match typ with
-          Obtype o -> o
+      let (cname, cls) = match typ with
+          (* 2. Check that the class of new instance actually exists - valid *)
+          Obtype o -> (o, find_class o)
         | _ -> raise (ObjectCreationInvalid(invalid_object_creation ^ string_of_expr ex))
-      and expr_list' = List.fold_left (fun acc e -> semant_expr e symbol_tbl :: acc) [] expr_list
       in
-      (* 2. Check that the class of new instance actually exists - valid*)
-      let _ = find_class cname in
+      (* This tricky code is meant to allow someone to assign instance vars
+       by name, using assignment-like expressions, to create a new class instance *)
+      let expr_list' =
+        let check_constructor_arg acc expr =
+          (* 3. make sure that all variables/types in assignment are part of class *)
+          (match expr with
+            | Assign(instance_var, e) ->
+                let (typ, e') = semant_expr e symbol_tbl in
+                let cvars = List.map (fun (typ, name, _) -> (typ, name)) cls.cvars in
+                if List.mem (typ, instance_var) cvars
+                  then (Void, SAssign(instance_var, (typ, e'))) :: acc
+                else raise (ObjectConstructorInvalid(object_constructor_types ^ string_of_expr expr))
+            | _ -> raise(ObjectConstructorInvalid(object_constructor_error ^ string_of_expr expr)))
+          in
+          List.fold_left check_constructor_arg [] expr_list
+      in
 
       (* make sure to add the allocated obj to symbol table so it can be referenced *)
       Hashtbl.add symbol_tbl obj_name (Obtype (cname));
@@ -197,7 +217,7 @@ let rec semant_expr expr symbol_tbl =
       if List.mem class_var cvars then
         (Obtype(cname), (SClassAccess(obj_name, class_var)))
       else
-        let msg = obj_name ^ " of class " ^ cname ^ " has no member " ^ class_var in
+        let msg = obj_name ^ ", instance of class " ^ cname ^ ", has no member " ^ class_var in
         raise (InstanceVariableNotFound(msg))
 
   | ArrayAccess (array_id, e) as ex ->
@@ -284,7 +304,10 @@ let rec semant_stmt stmt symbol_tbl =
     let rec check_stmt_list = function
         [Return _ as s] -> [semant_stmt s symbol_tbl]
       | Block sl :: ss  -> check_stmt_list (sl @ ss) (* Flatten blocks *)
-      | s :: ss         -> semant_stmt s symbol_tbl :: check_stmt_list ss
+      | s :: ss         ->
+            let fst = semant_stmt s symbol_tbl
+            and lst = check_stmt_list ss in
+            fst :: lst
       | []              -> []
     in SBlock(check_stmt_list b)
 
@@ -432,5 +455,5 @@ let check (_, functions, classes) =
   if Hashtbl.mem function_tbl "Main"
 
     (* Create the SAST, with just functions for now *)
-    then ([], List.map check_function functions, []) 
+    then ([], List.map check_function functions, [])
     else raise (MissingMainFunction (missing_main_func_msg))

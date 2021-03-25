@@ -24,6 +24,7 @@ exception ClassMethodNotFound of string
 exception MethodArgumentLengthMismatch of string
 exception InvalidMethodCall of string
 exception ObjectCreationInvalid of string
+exception ObjectConstructorInvalid of string
 exception InstanceVariableAccessInvalid of string
 
 (* Array Exceptions *)
@@ -58,8 +59,8 @@ let op_type_mismatch_loop_term  = "operation type mismatch: expected <, >, =, !=
 let class_method_unknown        = "method does not exist for this class: "
 let invalid_method_call         = "methods can only be called on objects: "
 let invalid_array_size_msg      = "arrays sizes must be integer literals or variables only: "
-let invalid_object_creation     = "you can only create objects from classes: "
-let invalid_instance_var_access = "instance variables only exist in classes: "
+let invalid_object_creation     = "you can only create objects from classes; found: "
+let invalid_instance_var_access = "instance variables only exist in classes; found: "
 let invalid_array_item_msg      = "array elements can only be of the specified type for the array: "
 let excess_array_item           = "array contents exceeded specified array size: "
 let invalid_deallocation_msg    = "BLEEP (free) can only be called on variables of object or array type that have been allocated: "
@@ -67,3 +68,5 @@ let invalid_cls_member_assign   = "you must assign valid instance variables with
 let member_assign_cls_only      = "you can only assign instance variables for class objects: "
 let array_access_array_only     = "array indexing is only available for array types: "
 let array_access_integer        = "arrays can only be indexed with integer types: "
+let object_constructor_error    = "to assign instance variables on object creation, you must use assignment expressions, found: "
+let object_constructor_types    = "cannot assign instance variables of new object to items of incorrect type, found: "

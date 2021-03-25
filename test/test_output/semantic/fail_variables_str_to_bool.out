@@ -1,1 +1,1 @@
-Fatal error: exception Exceptions.VariableAssignmentError("variables can only be assigned to items of the expected type: say_hello = "I shouldn't be here"")
+Fatal error: exception Exceptions.VariableAssignmentError("variables can only be assigned to items of the expected type: expected bool, got char * here: say_hello = "I shouldn't be here"")

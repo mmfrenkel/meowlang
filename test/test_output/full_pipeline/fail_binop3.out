@@ -1,0 +1,1 @@
+Fatal error: exception Exceptions.IllegalBinaryOp("unexpected types in binary op (char * and int): string * value")

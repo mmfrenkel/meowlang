@@ -1,0 +1,1 @@
+Fatal error: exception Exceptions.ObjectCreationInvalid("you can only create objects from classes; found: int count")

@@ -55,7 +55,6 @@ rule token = parse
 | "]"             { RBRACKET }
 
 (* Operators *)
-
 | "SUM OF"        { PLUS }
 | "DIFF OF"       { MINUS }
 | "PRODUKT OF"    { TIMES }

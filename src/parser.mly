@@ -104,7 +104,7 @@ stmt:
   | expr IF THEN stmt ELSE stmt                   { If($1, $4, $6)                 }
   | FOR expr INCREMENT expr_opt COMMA expr stmt   { For(Increment, $2, $4, $6, $7) }
   | FOR expr DECREMENT expr_opt COMMA expr stmt   { For(Decrement, $2, $4, $6, $7) }
-  | ID IN ID ASSIGN expr SEMI                     { ClassAssign($1, $3, $5)        }
+  | ID IN ID ASSIGN expr SEMI                     { ClassAssign($3, $1, $5)        }
   | ID LBRACKET expr RBRACKET ASSIGN expr SEMI    { ArrayAssign($1, $3, $6)        }
   | FREE ID SEMI                                  { Dealloc($2)                    }
   | ID ASSIGN function_call SEMI                  { Expr(Assign($1, $3))           }
@@ -129,7 +129,7 @@ expr:
   | NOT expr                  { Unop(Not, $2)          }
   | LPAREN expr RPAREN        { $2                     }
   | CONCAT expr COMMA expr    { Binop($2, Concat, $4)  }
-  | ID IN ID                  { ClassAccess($1, $3)    }
+  | ID IN ID                  { ClassAccess($3, $1)    }
   | ID LBRACKET expr RBRACKET { ArrayAccess($1, $3)    }
 
  function_call:
@@ -179,8 +179,8 @@ methods:
  /* Class Instantiation */
 
 c_instance:
-    MAKE ID NEW typ                           { NewInstance($2, $4, []) }
-  | MAKE ID NEW typ RPAREN LPAREN class_opt   { NewInstance($2, $4, $7) }
+    MAKE ID NEW typ                    { NewInstance($2, $4, []) }
+  | MAKE ID NEW typ RPAREN class_opt   { NewInstance($2, $4, $6) }
 
 class_opt:
     /* nothing */             { [] }
