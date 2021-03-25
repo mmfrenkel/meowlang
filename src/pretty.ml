@@ -58,7 +58,7 @@ let rec string_of_expr = function
       (match f with
           "Meow" -> "printf" ^ "(\"%X\\n\", " ^ String.concat ", " (List.map string_of_expr el) ^ ")"
         | _      -> f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")")
-  | MethodCall(f, ob, el) ->
+  | MethodCall(ob, f, el) ->
       ob ^ "." ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | NewArray(i, typ, s, contents) ->
       string_of_typ typ ^ " [" ^ string_of_array_size s ^ "] " ^ i ^ " = [ " ^ String.concat ", " (List.map string_of_expr contents) ^ " ]"

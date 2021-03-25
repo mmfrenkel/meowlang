@@ -134,9 +134,9 @@ expr:
 
  function_call:
     CALL ID                       { FunctionCall($2, [])   }
-  | CALL ID IN ID                 { MethodCall($2, $4, []) }
+  | CALL ID IN ID                 { MethodCall($4, $2, []) }
   | CALL ID LPAREN args_opt       { FunctionCall($2, $4)   }
-  | CALL ID IN ID LPAREN args_opt { MethodCall($2, $4, $6) }
+  | CALL ID IN ID LPAREN args_opt { MethodCall($4, $2, $6) }
 
 expr_opt:
   /* nothing */               { Noexpr }

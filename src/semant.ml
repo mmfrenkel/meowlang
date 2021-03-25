@@ -60,7 +60,7 @@ let rec semant_expr expr symbol_tbl =
     in
     if actual_type = expected_type
       then (actual_type, arg_expr')
-    else raise (FunctionArgumentTypeMismatch("" ^ string_of_expr arg_expr))
+    else raise (ArgumentTypeMismatch("" ^ string_of_expr arg_expr))
   in
 
   match expr with
@@ -126,23 +126,31 @@ let rec semant_expr expr symbol_tbl =
         in
         (func.typ, SFunctionCall(fname, args'))
 
-  | MethodCall (vname, mname, args) as ex ->
+  | MethodCall (obj_name, meth_name, args) as ex ->
       (* 1. Check that the object exists in the symbol table  *)
-      let v_type = find_type_of_id symbol_tbl vname in
+      let v_type = find_type_of_id symbol_tbl obj_name in
 
       (* 2. Check that the method exists within the class and get it *)
       let meth =
         match v_type with
-        | Obtype object_type -> find_class_method object_type mname
+        | Obtype object_type -> find_class_method object_type meth_name
         | _ -> raise (InvalidMethodCall(invalid_method_call ^ string_of_expr ex))
       in
       (* 3. Check that param length is equal to the num args provided *)
       if List.length args != List.length meth.formals
-        then raise (MethodArgumentLengthMismatch(meth_arg_num_mismatch ^ mname))
+        then
+          let msg = meth_arg_num_mismatch ^ meth_name ^ " (got " ^
+                    string_of_int (List.length args) ^ ", expected " ^ string_of_int (List.length meth.formals) ^ ")"
+          in raise (MethodArgumentLengthMismatch(msg))
       else
       (* 4. Check that the arguments passed are of the expected type *)
-        let args' = List.map2 check_arg_type meth.formals args in
-        (meth.typ, SMethodCall(vname, mname, args'))
+        let args' =
+          try List.map2 check_arg_type meth.formals args
+          with ArgumentTypeMismatch(s) ->
+            let msg = "method " ^ meth_name ^ " received arg of unexpected type: " ^ s
+            in raise(ArgumentTypeMismatch(msg))
+        in
+        (meth.typ, SMethodCall(obj_name, meth_name, args'))
 
   | NewArray (arr_name, arr_typ, arr_size, expr_list) as ex ->
       (* 1. Check to make sure that size is integer *)
@@ -215,7 +223,12 @@ let rec semant_expr expr symbol_tbl =
       let cls = find_class cname in
       let cvars = List.map (fun (_, name, _) -> name) cls.cvars in
       if List.mem class_var cvars then
-        (Obtype(cname), (SClassAccess(obj_name, class_var)))
+        let rec find_typ n vars =
+          match vars with
+              [] -> raise (InternalError("unexpectedly could not determine type of class variable\n"))
+            | (typ, name, _) :: t -> if name = n then typ else find_typ n t
+        in
+        (find_typ class_var cls.cvars, (SClassAccess(obj_name, class_var)))
       else
         let msg = obj_name ^ ", instance of class " ^ cname ^ ", has no member " ^ class_var in
         raise (InstanceVariableNotFound(msg))
