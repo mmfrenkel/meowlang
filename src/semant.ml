@@ -51,6 +51,9 @@ let find_class_method cname mname =
   try StringMap.find mname cls_methods
   with Not_found -> raise (ClassMethodNotFound(class_method_unknown))
 
+(****************************************
+ Main function for checking expressions
+****************************************)
 let rec semant_expr expr symbol_tbl =
 
   (* Checks that argument types match formal var types *)
@@ -248,7 +251,9 @@ let rec semant_expr expr symbol_tbl =
           Int -> (typ, SArrayAccess (array_id, (typ', e')))
         | _ -> (raise (InvalidArrayAccess(array_access_integer ^ "found index expression " ^ string_of_expr ex))))
 
-(* Return a semantically-checked statement i.e. containing sexprs *)
+(****************************************
+ Main function for checking statements
+ ****************************************)
 let rec semant_stmt stmt symbol_tbl =
 
   (* if/else branching: checks that termination expr is a Boolean *)
@@ -369,7 +374,10 @@ let rec semant_stmt stmt symbol_tbl =
           | _ -> raise (InvalidArrayAssignment(array_access_integer ^ string_of_stmt s)))
       | _ -> raise (InvalidArrayAssignment(array_access_array_only ^ id ^ " is not an array")))
 
-(* Checks a function body, while converting it from AST -> SAST format. *)
+(****************************************
+ Checks that a function body is
+ semantically correct.
+ ****************************************)
 let check_function_body func =
   (*
     1. Build local symbol table of variables for this scope
@@ -394,13 +402,14 @@ let check_function_body func =
   (* 3. Build up the SAST Tree for the Function *)
   semant_stmt (Block adjusted_body) symbol_table
 
-(* Checks to ensure that a function is semantically valid, producing a SAST equivalent *)
+(****************************************
+ Main function for checking to ensure
+  that a function is semantically valid
+ ****************************************)
 let check_function func =
-  (*
-    1. Get a list of formal names and local variable names then
-    2. Check for duplicate formal and duplicate local variable names on their own
-    3. Check for duplicates in formals and locals together
-  *)
+  (* 1. Get a list of formal names and local variable names then
+     2. Check for duplicate formal and duplicate local variable names on their own
+     3. Check for duplicates in formals and locals together *)
   let list_formal_names = List.fold_left (fun acc (_, name) -> name :: acc) [] func.formals
   and list_locals_names = List.fold_left (fun acc (_, name, _) -> name  :: acc) [] func.locals
   in
@@ -424,7 +433,7 @@ let check_function func =
   } in
   checked_func
 
-(* Checks for duplicates *)
+(*** Checks for duplicates ****)
 let check_duplicates functions classes =
   (* duplicates in function names *)
   find_duplicate (List.map (fun f -> f.fname) functions) dup_func_msg;
@@ -448,12 +457,14 @@ let add_built_ins existing_funcs =
   } in
   printf :: existing_funcs
 
+
+(******************************************************************************)
+(* Entry point for Semantic Checker, transforming AST to SAST *)
+(******************************************************************************)
 let check (_, functions, classes) =
 
-  (*
-    1. add built in functions to list of functions and
-    2. Check for any duplicate function, method and class names
-  *)
+  (* 1. add built in functions to list of functions and
+     2. Check for any duplicate function, method and class names *)
   let functions' = add_built_ins functions in
   check_duplicates functions' classes;
 
@@ -461,10 +472,8 @@ let check (_, functions, classes) =
   List.iter (fun func -> Hashtbl.add function_tbl func.fname func) functions';
   List.iter (fun cls-> Hashtbl.add class_tbl cls.cname cls) classes;
 
-  (*
-    4. Make sure that a main function exists, and if so, continue with
-       creating a list of checked functions, converted to SAST form
-  *)
+  (* 4. Make sure that a main function exists, and if so, continue with
+       creating a list of checked functions, converted to SAST form *)
   if Hashtbl.mem function_tbl "Main"
 
     (* Create the SAST, with just functions for now *)
