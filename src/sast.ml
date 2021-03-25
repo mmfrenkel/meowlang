@@ -19,6 +19,8 @@ and sx =
   | SClassAccess of string * string
   | SArrayAccess of string * sexpr
 
+  type sbind_var = typ * string * sexpr
+
 type sstmt =
     SBlock of sstmt list
   | SExpr of sexpr
@@ -33,14 +35,14 @@ type sfunc_decl = {
     styp : typ;
     sfname : string;
     sformals : bind_formals list;
-    slocals : bind_var list;
+    slocals : bind_var list; (* this is still a bind_var because exprs get moved to body *)
     sbody : sstmt list;
   }
 
 type sclass_decl = {
     scname : string;
-    scvars : bind_var list;
-    scfuncs : func_decl list;
+    scvars : sbind_var list;
+    scfuncs : sfunc_decl list;
 }
 
 type program = import list * sfunc_decl list * sclass_decl list

@@ -47,7 +47,10 @@ let find_type_of_id symbol_tbl id =
 (*Find the class method by method name and class type *)
 let find_class_method cname mname =
   let cls = find_class cname in
-  let cls_methods = List.fold_left (fun m cls_method -> StringMap.add cls_method.fname cls_method m) StringMap.empty (cls.cfuncs) in
+  let cls_methods = List.fold_left (
+      fun m cls_method -> StringMap.add cls_method.fname cls_method m
+    ) StringMap.empty (cls.cfuncs)
+  in
   try StringMap.find mname cls_methods
   with Not_found -> raise (ClassMethodNotFound(class_method_unknown))
 
@@ -378,11 +381,10 @@ let rec semant_stmt stmt symbol_tbl =
  Checks that a function body is
  semantically correct.
  ****************************************)
-let check_function_body func =
+let check_function_body func symbol_table =
   (*
     1. Build local symbol table of variables for this scope
   *)
-  let symbol_table:(string, Ast.typ) Hashtbl.t = Hashtbl.create 10 in
   List.iter (fun (typ, name) -> Hashtbl.add symbol_table name typ) func.formals;
   List.iter (fun (typ, name, _) -> Hashtbl.add symbol_table name typ) func.locals;
 
@@ -402,20 +404,23 @@ let check_function_body func =
   (* 3. Build up the SAST Tree for the Function *)
   semant_stmt (Block adjusted_body) symbol_table
 
-(****************************************
- Main function for checking to ensure
-  that a function is semantically valid
- ****************************************)
-let check_function func =
+(******************************************
+ Main function for checking to ensure contents of
+ function/method is semantically valid.
+******************************************)
+let check_function_or_method func env =
   (* 1. Get a list of formal names and local variable names then
      2. Check for duplicate formal and duplicate local variable names on their own
-     3. Check for duplicates in formals and locals together *)
+     3. Check for duplicates in formals and locals together
+     4. If there are other variables in env (i.e., instance vars) also check those *)
   let list_formal_names = List.fold_left (fun acc (_, name) -> name :: acc) [] func.formals
   and list_locals_names = List.fold_left (fun acc (_, name, _) -> name  :: acc) [] func.locals
+  and list_other_names = Hashtbl.fold (fun k _ acc -> k :: acc) env []
   in
   find_duplicate (list_formal_names) dup_formal_msg;
   find_duplicate (list_locals_names) dup_local_var_msg;
   find_duplicate (list_formal_names @ list_locals_names) dup_form_local_msg;
+  find_duplicate (list_formal_names @ list_locals_names @ list_other_names) dup_form_instance_msg;
 
   (* 4. Step to make LLVM code happy; main function must be 'main' not 'Main' *)
   let adjusted_function_name f = if f.fname = "Main" then "main" else f.fname
@@ -427,20 +432,59 @@ let check_function func =
     sfname = adjusted_function_name func;
     sformals = func.formals;
     slocals  = func.locals;
-    sbody = match check_function_body func with
+    sbody = match check_function_body func env with
         SBlock(stmt_list) -> stmt_list
       | _ -> raise (InternalError ("unexpected_error: no block in function body"))
   } in
   checked_func
 
+(****************************************
+ Checks that class definition is
+ semantically correct.
+ ****************************************)
+ let check_class cls =
+
+  (* instance vars are in scope for all functions *)
+  let list_instance_vars = List.fold_left (fun acc (_, name, _) -> name  :: acc) [] cls.cvars
+  in
+  find_duplicate (list_instance_vars) dup_instance_var_msg;
+
+  (* check the expression statements in the instance vars, if they exist *)
+  let env:(string, Ast.typ) Hashtbl.t = Hashtbl.create 10 in
+
+  let eval_instance_var (typ, name, expr) =
+    let (typ', expr') = semant_expr expr env in
+    let msg = ObjectInstanceVariableInvalid(object_constructor_types ^ string_of_typ typ' ^ ", expected " ^ string_of_typ typ)
+    in
+    ignore(check_matching_types typ typ' msg);
+    Hashtbl.add env name typ;
+    (typ, name, (typ', expr'))
+  in
+
+  (* check the methods in each class, passing a symbol tbl
+     that includes the instance vars *)
+  let checked_cls = {
+    scname = cls.cname;
+    scvars = List.map eval_instance_var cls.cvars;
+    scfuncs = List.map (fun f -> check_function_or_method f env) cls.cfuncs;
+  } in
+  checked_cls
+
+(****************************************
+ Checks that function definition is
+ semantically correct.
+ ****************************************)
+let check_function func =
+  (* create a new symbol table for the function scope *)
+  let env:(string, Ast.typ) Hashtbl.t = Hashtbl.create 10
+  in check_function_or_method func env
+
 (*** Checks for duplicates ****)
 let check_duplicates functions classes =
   (* duplicates in function names *)
   find_duplicate (List.map (fun f -> f.fname) functions) dup_func_msg;
-
   (* duplicates in class names*)
   find_duplicate (List.map (fun c -> c.cname) classes) dup_class_msg;
-
   (* duplicates in methods within a class*)
   List.iter (fun cls -> find_duplicate (List.map (fun m -> m.fname) cls.cfuncs) dup_method_msg) classes;
   ()
