@@ -13,7 +13,7 @@ exception ControlFlowIllegalArgument of string
 exception MissingMainFunction of string
 exception FunctionNotFound of string
 exception FunctionArgumentLengthMismatch of string
-exception FunctionArgumentTypeMismatch of string
+exception ArgumentTypeMismatch of string
 
 (* Object Exceptions *)
 exception ClassNotFound of string
