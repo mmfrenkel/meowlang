@@ -206,8 +206,8 @@ let rec semant_expr expr symbol_tbl =
                 let cvars = List.map (fun (typ, name, _) -> (typ, name)) cls.cvars in
                 if List.mem (typ, instance_var) cvars
                   then (Void, SAssign(instance_var, (typ, e'))) :: acc
-                else raise (ObjectConstructorInvalid(object_constructor_types ^ string_of_expr expr))
-            | _ -> raise(ObjectConstructorInvalid(object_constructor_error ^ string_of_expr expr)))
+                else raise (ObjectConstructorInvalid(object_constructor_types ^ string_of_expr expr ^ " in allocation of new " ^ cname))
+            | _ -> raise(ObjectConstructorInvalid(object_constructor_error ^ string_of_expr expr ^ " in allocation of new " ^ cname)))
           in
           List.fold_left check_constructor_arg [] expr_list
       in
@@ -443,29 +443,35 @@ let check_function_or_method func env =
  semantically correct.
  ****************************************)
  let check_class cls =
-
-  (* instance vars are in scope for all functions *)
+  (* instance variables defined cannot be duplicated within a single cls *)
   let list_instance_vars = List.fold_left (fun acc (_, name, _) -> name  :: acc) [] cls.cvars
   in
   find_duplicate (list_instance_vars) dup_instance_var_msg;
 
-  (* check the expression statements in the instance vars, if they exist *)
+  (* create local symbol table, will contain instance vars *)
   let env:(string, Ast.typ) Hashtbl.t = Hashtbl.create 10 in
 
+  (* Make sure that default values for instance variables make sense *)
   let eval_instance_var (typ, name, expr) =
-    let (typ', expr') = semant_expr expr env in
-    let msg = ObjectInstanceVariableInvalid(object_constructor_types ^ string_of_typ typ' ^ ", expected " ^ string_of_typ typ)
-    in
-    ignore(check_matching_types typ typ' msg);
-    Hashtbl.add env name typ;
-    (typ, name, (typ', expr'))
+    (match expr with
+        (* no default value for instance var provided *)
+        Noexpr -> Hashtbl.add env name typ; (typ, name, (Void, SNoexpr))
+      | _ ->
+        (* check assignment statement types *)
+        let (typ', expr') = semant_expr expr env in
+        let msg = object_constructor_types ^ string_of_typ typ' ^ ", expected " ^ string_of_typ typ
+        in
+        ignore(check_matching_types typ typ' ObjectInstanceVariableInvalid(msg));
+        Hashtbl.add env name typ;
+        (typ, name, (typ', expr')))
   in
+  let instance_vars_evaluated = List.map eval_instance_var (List.rev cls.cvars) in
 
   (* check the methods in each class, passing a symbol tbl
      that includes the instance vars *)
   let checked_cls = {
     scname = cls.cname;
-    scvars = List.map eval_instance_var cls.cvars;
+    scvars = instance_vars_evaluated;
     scfuncs = List.map (fun f -> check_function_or_method f env) cls.cfuncs;
   } in
   checked_cls
@@ -519,7 +525,10 @@ let check (_, functions, classes) =
   (* 4. Make sure that a main function exists, and if so, continue with
        creating a list of checked functions, converted to SAST form *)
   if Hashtbl.mem function_tbl "Main"
-
-    (* Create the SAST, with just functions for now *)
-    then ([], List.map check_function functions, [])
+    then
+      let semantically_checked_classes = List.map check_class classes
+      and semantically_checked_functions = List.map check_function functions
+      in
+      (* Create the SAST, with just functions for now *)
+      ([], semantically_checked_functions, semantically_checked_classes)
     else raise (MissingMainFunction (missing_main_func_msg))
