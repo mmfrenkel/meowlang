@@ -65,6 +65,29 @@ let instance_variables_of_cls cls_name =
   let cls = find_class cls_name in
   List.fold_left (fun acc (_, name, _) -> name  :: acc) [] cls.cvars
 
+
+(*** Checks for duplicates ****)
+let check_duplicates functions classes =
+  (* duplicates in function names *)
+  find_duplicate (List.map (fun f -> f.fname) functions) dup_func_msg;
+  (* duplicates in class names*)
+  find_duplicate (List.map (fun c -> c.cname) classes) dup_class_msg;
+  (* duplicates in methods within a class*)
+  List.iter (fun cls -> find_duplicate (List.map (fun m -> m.fname) cls.cfuncs) dup_method_msg) classes;
+  ()
+
+(* Add built in functions to the list of functions *)
+let add_built_ins existing_funcs =
+  (*  printf function, corresponding to Meow in Meowlang *)
+  let printf = {
+    typ = Void;
+    fname = "Meow";
+    formals = [(String, "x")];
+    locals = [];
+    body = []
+  } in
+  printf :: existing_funcs
+
 (****************************************
  Main function for checking expressions
 ****************************************)
@@ -522,28 +545,6 @@ let check_function func =
     symbols = Hashtbl.create 10;
   }
   in check_function_or_method func env
-
-(*** Checks for duplicates ****)
-let check_duplicates functions classes =
-  (* duplicates in function names *)
-  find_duplicate (List.map (fun f -> f.fname) functions) dup_func_msg;
-  (* duplicates in class names*)
-  find_duplicate (List.map (fun c -> c.cname) classes) dup_class_msg;
-  (* duplicates in methods within a class*)
-  List.iter (fun cls -> find_duplicate (List.map (fun m -> m.fname) cls.cfuncs) dup_method_msg) classes;
-  ()
-
-(* Add built in functions to the list of functions *)
-let add_built_ins existing_funcs =
-  (*  printf function, corresponding to Meow in Meowlang *)
-  let printf = {
-    typ = Void;
-    fname = "Meow";
-    formals = [(String, "x")];
-    locals = [];
-    body = []
-  } in
-  printf :: existing_funcs
 
 (*************************************************)
 (* Moves a method within a class into the global
