@@ -1,0 +1,28 @@
+HAI ITZ ME FUNC Main,
+
+    ITZ ME NUMBR jerrys_cookies IZ 0.
+
+    MAEK Jerry NEW MOUSE.
+    PURR Incr_Cookies IN Jerry.
+    jerrys_cookies IZ PURR Get_Num_Cookies IN Jerry.
+    BLEEP Jerry.
+
+    PURR Meow WIT jerrys_cookies.
+
+KBYE
+
+HAI ITZ ME CLASS MOUSE,
+
+    ITZ ME NUMBR cookies IZ 2.
+
+    HAI ITZ ME NUMBR FUNC Get_Num_Cookies,
+        GIVE cookies.
+    KBYE
+
+    HAI ITZ ME FUNC Incr_Cookies,
+        PSST Testing that this method call works correctly
+        ITZ ME NUMBR existing_cookies IZ PURR Get_Num_Cookies IN HERE.
+        cookies IZ SUM OF existing_cookies AN 1.
+    KBYE
+
+KBYE

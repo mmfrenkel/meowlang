@@ -11,7 +11,7 @@ HAI ITZ ME CLASS MOUSE,
     ITZ ME NUMBR candies IZ 5.
     ITZ ME NUMBR treats IZ SUM OF cookies AN candies.
 
-    HAI ITZ ME FUNC Get_Num_Treats,
+    HAI ITZ ME NUMBR FUNC Get_Num_Treats,
         PSST This uses the SUM prefix operator
         GIVE treats.
     KBYE

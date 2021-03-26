@@ -44,6 +44,7 @@ rule token = parse
 | "BLEEP"         { FREE }
 | "CLASS"         { CLASS }
 | "IN"            { IN }
+| "HERE"          { HERE }
 
 (* Functions *)
 | "PURR"          { CALL }

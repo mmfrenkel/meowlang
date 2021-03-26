@@ -1,0 +1,21 @@
+HAI ITZ ME FUNC Main,
+
+    ITZ ME NUMBR jerrys_cookies.
+    MAEK Jerry NEW MOUSE.
+
+    PSST Cannot use keyword HERE outside of a class
+    jerrys_cookies IZ PURR Count_Cookies IN HERE.
+
+    BLEEP Jerry.
+
+KBYE
+
+HAI ITZ ME CLASS MOUSE,
+
+    ITZ ME NUMBR cookies IZ 2.
+
+    HAI ITZ ME FUNC Give_Cookie WIT NUMBR count_cookies,
+        cookies IZ SUM OF cookies AN count_cookies.
+    KBYE
+
+KBYE

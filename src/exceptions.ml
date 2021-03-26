@@ -73,3 +73,4 @@ let array_access_array_only     = "array indexing is only available for array ty
 let array_access_integer        = "arrays can only be indexed with integer types: "
 let object_constructor_error    = "to assign instance variables on object creation, you must use assignment expressions, found: "
 let object_constructor_types    = "cannot assign instance variables of new object to items of incorrect type, found: "
+let use_of_this_outside_class   = "use of HERE ('this') keyword can only be used inside of a class to refer to its own methods/variables"

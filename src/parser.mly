@@ -2,7 +2,7 @@
 open Ast
 %}
 
-%token RETURN MODULE IMPORT CALL FUNCTION DEF COMP CLASS NEW FREE MAKE
+%token RETURN MODULE IMPORT CALL FUNCTION DEF COMP CLASS NEW FREE MAKE HERE
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN LBRACKET RBRACKET
 %token NOT EQ NEQ LT GT AND OR CONCAT CONTAINS IN
 %token IF THEN ELSE FOR INCREMENT DECREMENT INT BOOL FLOAT STRING ARRAY
@@ -86,8 +86,9 @@ vdecls:
   | vdecls vdecl              { $2 :: $1 }
 
 vdecl:
-    DEF typ ID SEMI             { ($2, $3, Noexpr) }
-  | DEF typ ID ASSIGN expr SEMI { ($2, $3, $5) }
+    DEF typ ID SEMI                      { ($2, $3, Noexpr) }
+  | DEF typ ID ASSIGN expr SEMI          { ($2, $3, $5)     }
+  | DEF typ ID ASSIGN function_call SEMI { ($2, $3, $5)     }
 
 stmt_list:
     /* nothing */             { []        }
@@ -133,10 +134,12 @@ expr:
   | ID LBRACKET expr RBRACKET { ArrayAccess($1, $3)    }
 
  function_call:
-    CALL ID                       { FunctionCall($2, [])   }
-  | CALL ID IN ID                 { MethodCall($4, $2, []) }
-  | CALL ID LPAREN args_opt       { FunctionCall($2, $4)   }
-  | CALL ID IN ID LPAREN args_opt { MethodCall($4, $2, $6) }
+    CALL ID                          { FunctionCall($2, [])       }
+  | CALL ID IN ID                    { MethodCall($4, $2, [])     }
+  | CALL ID IN HERE                  { MethodCall("this", $2, []) }
+  | CALL ID LPAREN args_opt          { FunctionCall($2, $4)       }
+  | CALL ID IN ID LPAREN args_opt    { MethodCall($4, $2, $6)     }
+  | CALL ID IN HERE LPAREN args_opt  { MethodCall("this", $2, $6) }
 
 expr_opt:
   /* nothing */               { Noexpr }

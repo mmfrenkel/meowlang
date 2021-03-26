@@ -12,7 +12,7 @@ Class MOUSE {
 	int candies = 5;
 	int cookies = 2;
 
-	Get_Num_Treats()
+	int Get_Num_Treats()
 	{
 	return treats;
 	}
