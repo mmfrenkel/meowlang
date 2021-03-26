@@ -61,6 +61,10 @@ let find_class_method cname mname =
   try StringMap.find mname cls_methods
   with Not_found -> raise (ClassMethodNotFound(class_method_unknown))
 
+let instance_variables_of_cls cls_name =
+  let cls = find_class cls_name in
+  List.fold_left (fun acc (_, name, _) -> name  :: acc) [] cls.cvars
+
 (****************************************
  Main function for checking expressions
 ****************************************)
@@ -81,7 +85,6 @@ let rec semant_expr expr env =
   | Fliteral f  -> (Float, SFliteral f)
   | BoolLit b   -> (Bool, SBoolLit b)
   | StringLit s -> (String, SStringLit s)
-  | Id id       -> (find_type_of_id env.symbols id, SId id)
   | Noexpr      -> (Void, SNoexpr)
 
   | Binop (e1, op, e2) as ex ->
@@ -108,6 +111,15 @@ let rec semant_expr expr env =
       let (vtype, e') = semant_expr e env in
       if vtype == Bool then (vtype, SUnop(op, (vtype, e')))
       else raise (IllegalUnaryOp (string_of_expr ex))
+
+  | Id id ->
+    (* if we are in a class, adjust the ID to be a class access, of a "<ClassName>*" parameter *)
+    let typ = find_type_of_id env.symbols id in
+      if env.in_class then
+        if List.mem id (instance_variables_of_cls env.class_name) then
+          (typ, SClassAccess(env.class_name ^ "*", id))
+        else (typ, SId id)
+      else (typ, SId id)
 
   | Assign (var, e) as ex ->
     (* Check that the expr produces the same type as the variable it is assigned to *)
@@ -151,11 +163,13 @@ let rec semant_expr expr env =
       in
 
       (* 2. Check that the method exists within the class and get it *)
-      let meth =
+      let cname =
         match v_type with
-        | Obtype object_type -> find_class_method object_type meth_name
+        | Obtype object_type -> object_type
         | _ -> raise (InvalidMethodCall(invalid_method_call ^ string_of_expr ex))
       in
+      let meth = find_class_method cname meth_name in
+
       (* 3. Check that param length is equal to the num args provided *)
       if List.length args != List.length meth.formals
         then
@@ -170,7 +184,9 @@ let rec semant_expr expr env =
             let msg = "method " ^ meth_name ^ " received arg of unexpected type: " ^ s
             in raise(ArgumentTypeMismatch(msg))
         in
-        (meth.typ, SMethodCall(obj_name, meth_name, args'))
+        (* 5. Convert to function call; add the object as the first argument *)
+        let full_args = (v_type, SId(obj_name)) :: args' in
+        (meth.typ, SFunctionCall(cname ^ "*" ^ meth_name, full_args))
 
   | NewArray (arr_name, arr_typ, arr_size, expr_list) as ex ->
       (* 1. Check to make sure that size is integer *)
@@ -319,7 +335,6 @@ let rec semant_stmt stmt env =
       | _ -> raise (ControlFlowIllegalArgument(expr_type_mismatch ^ "expected binary operation in loop: " ^ string_of_expr e))
   in
 
-  (* Incomplete *)
   match stmt with
     Expr e    -> SExpr(semant_expr e env)
   | Return e  -> SReturn(semant_expr e env)
@@ -333,7 +348,7 @@ let rec semant_stmt stmt env =
           check_control_index e1,       (* index *)
           check_index_assignment e2,    (* optional index assignment *)
           check_loop_termination e3,    (* termination condition *)
-          semant_stmt stmt env)  (* loop body *)
+          semant_stmt stmt env)         (* loop body *)
 
   | Block b ->
     let rec check_stmt_list = function
@@ -530,22 +545,23 @@ let add_built_ins existing_funcs =
   } in
   printf :: existing_funcs
 
-(*
-let lift_and_shift funcs classes =
-
-  let lift_method cls m =
+(*************************************************)
+(* Moves a method within a class into the global
+   space by renaming it "<Class_Name>*<MethodName>"
+   and providing the Objtype(Class_Name) as the first
+   argument, an argument named "<Class_Name>*" *)
+(*************************************************)
+let lift_methods_to_global_space cls =
+  let lift_method m =
     {
       styp = m.styp;
-      sfname = cls ^ "-" ^ m.sfname;
-      sformals = (Obtype(cls), cls ^ "*") :: m.sformals;
-      slocals  = func.locals;
-      sbody = match check_function_body func env with
-          SBlock(stmt_list) -> stmt_list
-        | _ -> raise (InternalError ("unexpected_error: no block in function body"))
-  } in
-
-  let lifted_methods =
-*)
+      sfname = cls.scname ^ "*" ^ m.sfname;
+      sformals = (Obtype(cls.scname), cls.scname ^ "*") :: m.sformals;
+      slocals  = m.slocals;
+      sbody = m.sbody;
+    }
+  in
+  List.map lift_method cls.scfuncs
 
 (******************************************************************************)
 (* Entry point for Semantic Checker, transforming AST to SAST *)
@@ -565,9 +581,12 @@ let check (_, functions, classes) =
        creating a list of checked functions, converted to SAST form *)
   if Hashtbl.mem function_tbl "Main"
     then
-      let semantically_checked_classes = List.map check_class classes
-      and semantically_checked_functions = List.map check_function functions
+      let semant_classes = List.map check_class classes
+      and semant_funcs = List.map check_function functions in
+
+      (* 5. The combined functions represent the "lifted" class methods and usual functions *)
+      let combined_functions =
+        List.fold_left (fun fs cls -> lift_methods_to_global_space cls @ fs) semant_funcs semant_classes
       in
-      (* Create the SAST, with just functions for now *)
-      ([], semantically_checked_functions, semantically_checked_classes)
+      ([], combined_functions, semant_classes)
     else raise (MissingMainFunction (missing_main_func_msg))
