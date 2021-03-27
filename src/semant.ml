@@ -174,11 +174,11 @@ let rec semant_expr expr env =
         let args' =
           (match fname with
           (* this is a work around for handling the built in print function, which can accept multiple types *)
-            | "Meow" ->
-                ( match args with
-                | arg :: []  -> [semant_expr arg env]
-                | _ -> raise (FunctionArgumentLengthMismatch("built in string function takes 1 argument only\n")))
-            | _ -> List.map2 check_arg_type func.formals args)
+          | "Meow" ->
+              (match args with
+              | arg :: []  -> [semant_expr arg env]
+              | _ -> raise (FunctionArgumentLengthMismatch("built in string function takes 1 argument only\n")))
+          | _ -> List.map2 check_arg_type func.formals args)
         in
         (func.typ, SFunctionCall(fname, args'))
 
@@ -254,7 +254,8 @@ let rec semant_expr expr env =
 
   | NewInstance (obj_name, typ, expr_list) as ex ->
       (* 1. You can only create an "instance" of something that is type Objtype *)
-      let (cname, cls) = match typ with
+      let (cname, cls) =
+        match typ with
           (* 2. Check that the class of new instance actually exists - valid *)
           Obtype o -> (o, find_class o)
         | _ -> raise (ObjectCreationInvalid(invalid_object_creation ^ string_of_expr ex))
@@ -289,9 +290,10 @@ let rec semant_expr expr env =
       in
       let (typ, identifer) = semant_expr v env in
       (* 2. You can only "access" instance variables of type Obtype *)
-      let cname = match typ with
+      let cname =
+        (match typ with
           Obtype o -> o
-        | _ -> raise (InstanceVariableAccessInvalid(invalid_instance_var_access ^ string_of_expr ex))
+        | _ -> raise (InstanceVariableAccessInvalid(invalid_instance_var_access ^ string_of_expr ex)))
       in
       (* 3. Check that the instance variable exists within the class *)
       let cls = find_class cname in
@@ -312,15 +314,16 @@ let rec semant_expr expr env =
       let typ = find_type_of_id env.symbols array_id in
 
       (* 2. You can only "access" instance variables of type Obtype *)
-      let _ = match typ with
-            Arrtype (sz, typ) -> (sz, typ)
-          | _ -> raise (InvalidArrayAccess(array_access_array_only ^ string_of_expr ex))
+      let _ =
+        match typ with
+          Arrtype (sz, typ) -> (sz, typ)
+        | _ -> raise (InvalidArrayAccess(array_access_array_only ^ string_of_expr ex))
       in
       (* 3. Check to make sure that the array is going to be indexed by an integer typ *)
       let (typ', e') = semant_expr e env in
       (match typ' with
-          Int -> (typ, SArrayAccess (array_id, (typ', e')))
-        | _ -> (raise (InvalidArrayAccess(array_access_integer ^ "found index expression " ^ string_of_expr ex))))
+        Int -> (typ, SArrayAccess (array_id, (typ', e')))
+      | _ -> (raise (InvalidArrayAccess(array_access_integer ^ "found index expression " ^ string_of_expr ex))))
 
 (****************************************)
 (* Main function for checking semantics *)
@@ -369,8 +372,8 @@ let rec semant_stmt stmt env =
       match e' with
         SBinop(_, op, _) ->
           (match op with
-              Less | Greater | Equal | Neq -> (t', e')
-            | _ -> raise (ControlFlowIllegalArgument(op_type_mismatch_loop_term ^ string_of_expr e )))
+            Less | Greater | Equal | Neq -> (t', e')
+          | _ -> raise (ControlFlowIllegalArgument(op_type_mismatch_loop_term ^ string_of_expr e )))
       | _ -> raise (ControlFlowIllegalArgument(expr_type_mismatch ^ "expected binary operation in loop: " ^ string_of_expr e))
   in
 
@@ -409,28 +412,28 @@ let rec semant_stmt stmt env =
     in
     let typ = find_type_of_id env.symbols id in
     (match typ with
-          Obtype _ | Arrtype _ -> SDealloc(typ, SId(id))
-        | _ -> raise (InvalidDealloc(invalid_deallocation_msg ^ id ^ " is of typ " ^ string_of_typ typ)))
+      Obtype _ | Arrtype _ -> SDealloc(typ, SId(id))
+    | _ -> raise (InvalidDealloc(invalid_deallocation_msg ^ id ^ " is of typ " ^ string_of_typ typ)))
 
   | ClassAssign (id, instance_var, e) ->
     (* 1. id must correspond to an ObjType *)
     let (typ, identifier) = semant_expr id env in
     (match typ with
-        | Obtype (cname) ->
-            let cls = find_class cname in
-            let cvars = List.map (fun (typ, name, _) -> (typ, name)) cls.cvars in
-            let (vtype, e') = semant_expr e env in
+      Obtype (cname) ->
+        let cls = find_class cname in
+        let cvars = List.map (fun (typ, name, _) -> (typ, name)) cls.cvars in
+        let (vtype, e') = semant_expr e env in
 
-            (* 2. the instance variable must exist in the class and the
-            item being assigned must be of the correct type *)
-            if List.mem (vtype, instance_var) cvars then
-              SClassAssign(Obtype(cname), (typ, identifier), instance_var, (vtype, e'))
-            else
-              let msg = invalid_cls_member_assign ^ string_of_typ typ ^ " to " ^ cname ^ "." ^ instance_var in
-              raise (InvalidClassMemberAssignment(msg))
-        | _ ->
-          let msg = member_assign_cls_only ^ (string_of_expr id) ^ " is of type " ^ string_of_typ typ in
-          raise (InvalidClassMemberAssignment(msg)))
+        (* 2. the instance variable must exist in the class and the
+        item being assigned must be of the correct type *)
+        if List.mem (vtype, instance_var) cvars then
+          SClassAssign(Obtype(cname), (typ, identifier), instance_var, (vtype, e'))
+        else
+          let msg = invalid_cls_member_assign ^ string_of_typ typ ^ " to " ^ cname ^ "." ^ instance_var in
+          raise (InvalidClassMemberAssignment(msg))
+    | _ ->
+      let msg = member_assign_cls_only ^ (string_of_expr id) ^ " is of type " ^ string_of_typ typ in
+      raise (InvalidClassMemberAssignment(msg)))
 
   | ArrayAssign (id, idx_e, e) as s ->
     (* 1. make sure that the variable is an array type *)

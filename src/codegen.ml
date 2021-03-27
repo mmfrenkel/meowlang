@@ -106,14 +106,14 @@ let build_function fdecl =
 
   (* Construct the functions locals (formal + local vars) *)
   let add_formal acc (typ, formal_name) param =
-      (* set name of param value to corresponding formal name *)
-      L.set_value_name formal_name param;
+    (* set name of param value to corresponding formal name *)
+    L.set_value_name formal_name param;
 
-      (* allocate space stack for formal *)
-      let new_formal = L.build_alloca (ltype_of_typ typ) formal_name builder in
-      ignore (L.build_store param new_formal builder);  (* store %param %new_formal *)
-      Hashtbl.add local_variables formal_name new_formal;
-      (formal_name, new_formal) :: acc (* to make compiler happy *)
+    (* allocate space stack for formal *)
+    let new_formal = L.build_alloca (ltype_of_typ typ) formal_name builder in
+    ignore (L.build_store param new_formal builder);  (* store %param %new_formal *)
+    Hashtbl.add local_variables formal_name new_formal;
+    (formal_name, new_formal) :: acc (* to make compiler happy *)
 
   and add_local (typ, local_name, _) =
     let new_local = L.build_alloca (ltype_of_typ typ) local_name builder
