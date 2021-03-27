@@ -27,6 +27,7 @@ exception ObjectCreationInvalid of string
 exception ObjectConstructorInvalid of string
 exception ObjectInstanceVariableInvalid of string
 exception InstanceVariableAccessInvalid of string
+exception UnknownStruct of string
 
 (* Array Exceptions *)
 exception InvalidArraySizeSpecified of string

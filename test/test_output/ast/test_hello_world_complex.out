@@ -1,20 +1,19 @@
-include "hello"
+
 
 int Main()
 {
-	char * full_msg;
-	char * my_name;
-	my_name = "Cherry";
-	full_msg = create_message(my_name);
-	printf("%X\n", full_msg);
+	printf("%X\n", "hello world\n");
 	return 0;
 }
 
-char * create_message(char * name)
-{
-	char * msg;
-	msg = "hello, ";
-	msg = "*" + msg + name;
-	return msg;
-}
+Class PERSON {
 
+	int height_inches = 70;
+	char * name = "Alexandra";
+
+	char * Get_Name()
+	{
+	return name;
+	}
+
+}

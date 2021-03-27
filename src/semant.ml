@@ -140,7 +140,7 @@ let rec semant_expr expr env =
     let typ = find_type_of_id env.symbols id in
       if env.in_class then
         if List.mem id (instance_variables_of_cls env.class_name) then
-          (typ, SClassAccess(env.class_name ^ "*", id))
+          (typ, SClassAccess(Obtype(env.class_name), env.class_name ^ "*", id))
         else (typ, SId id)
       else (typ, SId id)
 
@@ -209,7 +209,7 @@ let rec semant_expr expr env =
         in
         (* 5. Convert to function call; add the object as the first argument *)
         let full_args = (v_type, SId(obj_name)) :: args' in
-        (meth.typ, SFunctionCall(cname ^ "*" ^ meth_name, full_args))
+        (meth.typ, SFunctionCall(cname ^ "." ^ meth_name, full_args))
 
   | NewArray (arr_name, arr_typ, arr_size, expr_list) as ex ->
       (* 1. Check to make sure that size is integer *)
@@ -287,7 +287,7 @@ let rec semant_expr expr env =
               [] -> raise (InternalError("unexpectedly could not determine type of class variable\n"))
             | (typ, name, _) :: t -> if name = n then typ else find_typ n t
         in
-        (find_typ class_var cls.cvars, (SClassAccess(obj_name, class_var)))
+        (find_typ class_var cls.cvars, (SClassAccess(Obtype(cname), obj_name, class_var)))
       else
         let msg = obj_name ^ ", instance of class " ^ cname ^ ", has no member " ^ class_var in
         raise (InstanceVariableNotFound(msg))
@@ -403,7 +403,7 @@ let rec semant_stmt stmt env =
             (* 2. the instance variable must exist in the class and the
             item being assigned must be of the correct type *)
             if List.mem (vtype, instance_var) cvars then
-              SClassAssign(id, instance_var, (vtype, e'))
+              SClassAssign(Obtype(cname), id, instance_var, (vtype, e'))
             else
               let msg = invalid_cls_member_assign ^ string_of_typ typ ^ " to " ^ cname ^ "." ^ instance_var in
               raise (InvalidClassMemberAssignment(msg))
@@ -548,7 +548,7 @@ let check_function func =
 
 (*************************************************)
 (* Moves a method within a class into the global
-   space by renaming it "<Class_Name>*<MethodName>"
+   space by renaming it "<Class_Name>.<MethodName>"
    and providing the Objtype(Class_Name) as the first
    argument, an argument named "<Class_Name>*" *)
 (*************************************************)
@@ -556,7 +556,7 @@ let lift_methods_to_global_space cls =
   let lift_method m =
     {
       styp = m.styp;
-      sfname = cls.scname ^ "*" ^ m.sfname;
+      sfname = cls.scname ^ "." ^ m.sfname;
       sformals = (Obtype(cls.scname), cls.scname ^ "*") :: m.sformals;
       slocals  = m.slocals;
       sbody = m.sbody;

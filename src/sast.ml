@@ -16,7 +16,7 @@ and sx =
   | SNewArray of string * typ * array_size * sexpr list
   | SNoexpr
   | SNewInstance of string * typ * sexpr list
-  | SClassAccess of string * string
+  | SClassAccess of typ * string * string
   | SArrayAccess of string * sexpr
 
   type sbind_var = typ * string * sexpr
@@ -28,7 +28,7 @@ type sstmt =
   | SIf of sexpr * sstmt * sstmt
   | SFor of op * sexpr * sexpr * sexpr * sstmt
   | SDealloc of string
-  | SClassAssign of string * string * sexpr
+  | SClassAssign of typ * string * string * sexpr
   | SArrayAssign of string * sexpr * sexpr
 
 type sfunc_decl = {
