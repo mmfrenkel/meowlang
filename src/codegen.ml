@@ -1,10 +1,8 @@
-(*
-  Code generation: translate takes a semantically checked AST and produces LLVM IR
-
-  Note: This code significantly inspired by codegen.ml of the MicroC Compiler by S Edwards
-  (Programming Languages and Translators, Spring 2021)
-*)
-
+(******************************************************************************)
+(* Code generation: translate takes a semantically checked AST and produces   *)
+(* LLVM IR. Note: This code significantly inspired by codegen.ml of the       *)
+(* MicroC Compiler by S Edwards (PLT, Spring 2021)                            *)
+(******************************************************************************)
 module L = Llvm
 module A = Ast
 open Exceptions

@@ -1,6 +1,9 @@
-(*
-  Performs semantic checks on the AST, producing a new SAST
-*)
+(******************************************************************************)
+(* Performs semantic checks on the AST, producing a new SAST                  *)
+(* Also responsible for converting classes into structs and functions that    *)
+(* are more easily processed in the LLVM step (i.e., call site adjustments    *)
+(* and lifing methods to global space with new struct arguments)              *)
+(******************************************************************************)
 open Exceptions
 open Ast
 open Sast
@@ -65,7 +68,6 @@ let instance_variables_of_cls cls_name =
   let cls = find_class cls_name in
   List.fold_left (fun acc (_, name, _) -> name  :: acc) [] cls.cvars
 
-
 (*** Checks for duplicates ****)
 let check_duplicates functions classes =
   (* duplicates in function names *)
@@ -88,9 +90,10 @@ let add_built_ins existing_funcs =
   } in
   printf :: existing_funcs
 
-(****************************************
- Main function for checking expressions
-****************************************)
+(****************************************)
+(* Main function for checking semantics *)
+(* of expressions                       *)
+(****************************************)
 let rec semant_expr expr env =
 
   (* Checks that argument types match formal var types *)
@@ -319,9 +322,10 @@ let rec semant_expr expr env =
           Int -> (typ, SArrayAccess (array_id, (typ', e')))
         | _ -> (raise (InvalidArrayAccess(array_access_integer ^ "found index expression " ^ string_of_expr ex))))
 
-(****************************************
- Main function for checking statements
- ****************************************)
+(****************************************)
+(* Main function for checking semantics *)
+(* of statements                        *)
+(****************************************)
 let rec semant_stmt stmt env =
 
   (* if/else branching: checks that termination expr is a Boolean *)
@@ -447,10 +451,10 @@ let rec semant_stmt stmt env =
       | _ -> raise (InvalidArrayAssignment(array_access_array_only ^ id ^ " is not an array")))
 
 
-(****************************************
- Checks that a function body is
- semantically correct.
- ****************************************)
+(****************************************)
+(* Checks that a function body is       *)
+(* semantically correct.                *)
+(****************************************)
 let check_function_body func env =
   (*
     1. Build local symbol table of variables for this scope
@@ -474,10 +478,10 @@ let check_function_body func env =
   (* 3. Build up the SAST Tree for the Function *)
   semant_stmt (Block adjusted_body) env
 
-(******************************************
- Main function for checking to ensure contents of
- function/method is semantically valid.
-******************************************)
+(****************************************************)
+(* Main function for checking to ensure contents of *)
+(* function/method is semantically valid.           *)
+(****************************************************)
 let check_function_or_method func env =
   (* 1. Get a list of formal names and local variable names then
      2. Check for duplicate formal and duplicate local variable names on their own
@@ -508,10 +512,10 @@ let check_function_or_method func env =
   } in
   checked_func
 
-(****************************************
- Checks that class definition is
- semantically correct.
- ****************************************)
+(****************************************)
+(* Checks that class definition is      *)
+(* semantically correct.                *)
+(****************************************)
  let check_class cls =
   (* instance variables defined cannot be duplicated within a single cls *)
   let list_instance_vars = List.fold_left (fun acc (_, name, _) -> name  :: acc) [] cls.cvars
@@ -550,10 +554,10 @@ let check_function_or_method func env =
   } in
   checked_cls
 
-(****************************************
- Checks that function definition is
- semantically correct.
- ****************************************)
+(****************************************************)
+(* Wrapper for function that checks of function is  *)
+(* semantically correct.                            *)
+(****************************************************)
 let check_function func =
   (* create a new environment for the function scope *)
   let env = {
@@ -564,12 +568,12 @@ let check_function func =
   }
   in check_function_or_method func env
 
-(*************************************************)
-(* Moves a method within a class into the global
-   space by renaming it "<Class_Name>.<MethodName>"
-   and providing the Objtype(Class_Name) as the first
-   argument, an argument named "<Class_Name>*" *)
-(*************************************************)
+(******************************************************)
+(* Moves a method within a class into the global      *)
+(* space by renaming it "<Class_Name>.<MethodName>"   *)
+(* and providing the Objtype(Class_Name) as the first *)
+(* argument, an argument named "<Class_Name>*"        *)
+(******************************************************)
 let lift_methods_to_global_space cls =
   let lift_method m =
     {
@@ -583,7 +587,7 @@ let lift_methods_to_global_space cls =
   List.map lift_method cls.scfuncs
 
 (******************************************************************************)
-(* Entry point for Semantic Checker, transforming AST to SAST *)
+(* Entry point for Semantic Checker, transforming AST to SAST                 *)
 (******************************************************************************)
 let check (_, functions, classes) =
 
