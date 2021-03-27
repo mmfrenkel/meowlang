@@ -145,13 +145,14 @@ let build_function fdecl =
           (* Used in assigning variables; not used in assigning class members *)
             SId(var) ->
               ignore(L.build_store rhs (lookup_variable var) builder); rhs
-          (* Handle this class access PLUS Assignment case *)
+          (* Handle this class access PLUS Assignment case -- this could be merged with ClassAssign, if time allows *)
           | SClassAccess(A.Obtype(cname), v, inst_v) ->
               let index = lookup_index cname inst_v
               and load_tmp = expr builder v in
               let lhs = L.build_struct_gep load_tmp index "tmp" builder in
               ignore(L.build_store rhs lhs builder); rhs
-          | _ -> raise (NotYetSupported("codegen: assignment not supported for anything but class instance vars and regular variables")))
+          | _ ->
+            raise (NotYetSupported("codegen: assignment not supported for anything but class instance vars and regular variables")))
 
     (* Binary operation between two integers *)
     | SBinop(((A.Int, _) as e1), op, ((A.Int, _) as e2)) ->
@@ -218,7 +219,6 @@ let build_function fdecl =
          A.Obtype (cname) as cls -> (
           (* add new variable to local vars; a pointer to malloc'd item *)
           add_local (cls, v, None);
-          (* lhs *)
           (* assign the malloc to the new variable *)
           let rhs = L.build_malloc (find_struct_by_cls cname) "new_struct" builder
           and lhs = lookup_variable v in
@@ -227,10 +227,10 @@ let build_function fdecl =
         | _ -> raise (ObjectCreationInvalid("codegen: cannot create instance of anything but Obtype")))
 
     | SClassAccess(A.Obtype(cname), v, inst_v) ->
-      let tmp_value = expr builder v
-      and index = lookup_index cname inst_v in
-			let deref = L.build_struct_gep tmp_value index "tmp" builder in
-			L.build_load deref "dr" builder
+        let tmp_value = expr builder v
+        and index = lookup_index cname inst_v in
+        let deref = L.build_struct_gep tmp_value index "tmp" builder in
+        L.build_load deref "dr" builder
 
     | _ -> raise (NotYetSupported("found expr or functions not yet supported"))
   in
@@ -259,15 +259,15 @@ let build_function fdecl =
       ); builder
 
     | SClassAssign (A.Obtype(cname), v, inst_v, e) ->
-      let rhs = expr builder e
-      and index = lookup_index cname inst_v
-      and load_tmp = expr builder v in
-			let lhs = L.build_struct_gep load_tmp index "tmp" builder in
-      ignore(L.build_store rhs lhs builder); builder
+        let rhs = expr builder e
+        and index = lookup_index cname inst_v
+        and load_tmp = expr builder v in
+        let lhs = L.build_struct_gep load_tmp index "tmp" builder in
+        ignore(L.build_store rhs lhs builder); builder
 
     | SDealloc (v) ->
-      let tmp_value = expr builder v in
-      ignore(L.build_free (tmp_value) builder); builder
+        let tmp_value = expr builder v in
+        ignore(L.build_free (tmp_value) builder); builder
 
     | _ -> raise (NotYetSupported("complex stmts not yet supported"))
   in
@@ -285,6 +285,12 @@ let build_function fdecl =
 
 (****************************************************************
   Translate : Takes a Sast.program and produces an Llvm.module
+
+  Note that all "actionable" items in the program are now functions
+  (there are no longer class methods/etc). Classes are useful because
+  they provide the struct definition corresponding to the class, but
+  all class methods have been lifted to global scope in the semantic
+  checking step.
 *****************************************************************)
 let translate (_, functions, classes) =
 
