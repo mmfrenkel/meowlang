@@ -15,7 +15,7 @@ type environment = {
   in_class : bool;
   class_name: string;
   mutable function_name: string;
-	symbols : (string, Ast.typ) Hashtbl.t;
+  symbols : (string, Ast.typ) Hashtbl.t;
 }
 
 (* Hashtable of valid functions and classes to be used globally *)
@@ -125,7 +125,7 @@ let rec semant_expr expr env =
         | Less | Greater  when same_type && (typ1 = Float || typ1 = Int) && (typ2 = Float || typ2 = Int) -> Bool
         | And | Or        when same_type && typ1 = Bool -> Bool
         | Concat          when (typ1 = String && (typ2 = String || typ2 == Int || typ2 == Float)) ||
-                               (typ2 = String && (typ1 == Int || typ1 == Float)) -> String
+                                (typ2 = String && (typ1 == Int || typ1 == Float)) -> String
         | _               ->
           let msg = "unexpected types in binary op (" ^ string_of_typ typ1 ^ " and "
                     ^ string_of_typ typ2 ^ "): " ^ string_of_expr ex

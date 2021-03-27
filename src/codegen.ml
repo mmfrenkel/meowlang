@@ -18,8 +18,8 @@ let global_functions:(string, (L.llvalue * sfunc_decl)) Hashtbl.t = Hashtbl.crea
 
 (* Finds a struct by its original class name *)
 let find_struct_by_cls cls_name =
-	try Hashtbl.find struct_types cls_name
-	with | Not_found -> raise (UnknownStruct("struct for class " ^ cls_name ^ "unknown"))
+  try Hashtbl.find struct_types cls_name
+  with | Not_found -> raise (UnknownStruct("struct for class " ^ cls_name ^ "unknown"))
 
 (* Return the value for a variable, else raise error *)
 let lookup_variable var_name =
@@ -58,18 +58,18 @@ let ltype_of_typ = function
 
 (* Creates a function prototype *)
 let create_func_prototype fdecl =
-    let name =  fdecl.sfname
-    and return_typ = ltype_of_typ fdecl.styp
-    and formal_types = Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.sformals)
-    in
-    let ftype = L.function_type return_typ formal_types in
-    L.define_function name ftype the_module, fdecl
+  let name =  fdecl.sfname
+  and return_typ = ltype_of_typ fdecl.styp
+  and formal_types = Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.sformals)
+  in
+  let ftype = L.function_type return_typ formal_types in
+  L.define_function name ftype the_module, fdecl
 
 (* Declare and setup required hash tables for a struct based on an object *)
 let codegen_struct cls =
   (* save new struct to known struct list *)
-	let struct_t = L.named_struct_type context cls.scname in
-	Hashtbl.add struct_types cls.scname struct_t;
+  let struct_t = L.named_struct_type context cls.scname in
+  Hashtbl.add struct_types cls.scname struct_t;
 
   let var_name_list = List.map (fun (_, n, _) -> n) cls.scvars
   and inst_var_ltyps = List.map (fun (t, _, _) -> ltype_of_typ t) cls.scvars in
