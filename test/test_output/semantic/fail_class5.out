@@ -1,0 +1,1 @@
+Fatal error: exception Exceptions.InvalidMethodCall("use of HERE ('this') keyword can only be used inside of a class to refer to its own methods/variables, but found in func Main")

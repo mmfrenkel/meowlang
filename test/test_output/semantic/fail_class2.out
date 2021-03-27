@@ -1,0 +1,1 @@
+Fatal error: exception Exceptions.VariableNotFound("undeclared identifier: this_var_doesnt_exist")

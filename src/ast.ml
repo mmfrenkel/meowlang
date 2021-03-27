@@ -20,13 +20,13 @@ type expr =
   | Id of string
   | Binop of expr * op * expr
   | Unop of uop * expr
-  | Assign of string * expr
+  | Assign of expr * expr
   | FunctionCall of string * expr list
   | MethodCall of string * string * expr list
   | NewArray of string * typ * array_size * expr list
   | Noexpr
   | NewInstance of string * typ * expr list
-  | ClassAccess of string * string
+  | ClassAccess of expr * string
   | ArrayAccess of string * expr
 
 type bind_var = typ * string * expr
@@ -38,8 +38,8 @@ type stmt =
   | Return of expr
   | If of expr * stmt * stmt
   | For of op * expr * expr * expr * stmt
-  | Dealloc of string
-  | ClassAssign of string * string * expr
+  | Dealloc of expr
+  | ClassAssign of expr * string * expr
   | ArrayAssign of string * expr * expr
 
 type func_decl = {

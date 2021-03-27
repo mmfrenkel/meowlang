@@ -25,7 +25,9 @@ exception MethodArgumentLengthMismatch of string
 exception InvalidMethodCall of string
 exception ObjectCreationInvalid of string
 exception ObjectConstructorInvalid of string
+exception ObjectInstanceVariableInvalid of string
 exception InstanceVariableAccessInvalid of string
+exception UnknownStruct of string
 
 (* Array Exceptions *)
 exception InvalidArraySizeSpecified of string
@@ -43,9 +45,11 @@ exception InternalError of string
 let dup_func_msg                = "duplicate function name, or conflict with built-in: "
 let dup_class_msg               = "duplicate class name: "
 let dup_method_msg              = "duplicate class method name: "
+let dup_instance_var_msg        = "duplicate instance variable name identified in class declaration: "
 let dup_formal_msg              = "duplicate formal name :"
 let dup_local_var_msg           = "duplicate local variable name :"
 let dup_form_local_msg          = "duplicate identifers (formal and local) name : "
+let dup_form_instance_msg       = "duplicate identifier (formal and local conflict with instance vars)"
 let undeclared_msg              = "undeclared identifier: "
 let assignment_typ_mismatch     = "variables can only be assigned to items of the expected type: "
 let missing_main_func_msg       = "all programs must have a 'Main' function"
@@ -70,3 +74,4 @@ let array_access_array_only     = "array indexing is only available for array ty
 let array_access_integer        = "arrays can only be indexed with integer types: "
 let object_constructor_error    = "to assign instance variables on object creation, you must use assignment expressions, found: "
 let object_constructor_types    = "cannot assign instance variables of new object to items of incorrect type, found: "
+let use_of_this_outside_class   = "use of HERE ('this') keyword can only be used inside of a class to refer to its own methods/variables"

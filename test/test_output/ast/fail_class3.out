@@ -1,0 +1,18 @@
+
+
+Main()
+{
+	class MOUSE Jerry;
+	free(Jerry);
+}
+
+Class MOUSE {
+
+	int cookies = "this is the wrong type";
+
+	Give_Cookie(int count_cookies)
+	{
+	cookies = cookies + count_cookies;
+	}
+
+}

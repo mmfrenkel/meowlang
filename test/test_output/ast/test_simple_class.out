@@ -1,0 +1,23 @@
+
+
+Main()
+{
+	int jerrys_cookies;
+	class MOUSE Jerry;
+	Jerry.cookies = 15;
+	jerrys_cookies = Jerry.Count_Cookies();
+	printf("%X\n", "Jerry has this many cookies: ");
+	printf("%X\n", jerrys_cookies);
+}
+
+Class MOUSE {
+
+	char * name;
+	int cookies;
+
+	int Count_Cookies()
+	{
+	return cookies;
+	}
+
+}

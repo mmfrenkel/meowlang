@@ -1,1 +1,1 @@
-Fatal error: exception Exceptions.ObjectConstructorInvalid("to assign instance variables on object creation, you must use assignment expressions, found: 2 + 1")
+Fatal error: exception Exceptions.ObjectConstructorInvalid("to assign instance variables on object creation, you must use assignment expressions, found: 2 + 1 in allocation of new MOUSE")
