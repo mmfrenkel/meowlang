@@ -11,7 +11,7 @@ module StringMap = Map.Make(String)
 type environment = {
   in_class : bool;
   class_name: string;
-  function_name: string;
+  mutable function_name: string;
 	symbols : (string, Ast.typ) Hashtbl.t;
 }
 
@@ -140,19 +140,24 @@ let rec semant_expr expr env =
     let typ = find_type_of_id env.symbols id in
       if env.in_class then
         if List.mem id (instance_variables_of_cls env.class_name) then
-          (typ, SClassAccess(Obtype(env.class_name), env.class_name ^ "*", id))
+          (typ, SClassAccess(Obtype(env.class_name), (typ, SId(String.lowercase_ascii (env.class_name ^ "*"))), id))
         else (typ, SId id)
       else (typ, SId id)
 
-  | Assign (var, e) as ex ->
+  | Assign (v, e) as ex ->
     (* Check that the expr produces the same type as the variable it is assigned to *)
-      let var_typ = find_type_of_id env.symbols var
+      let _ =
+        (match v with
+          Id (id) -> id
+        | _ -> raise (VariableAssignmentError("assignment is performed on a variable\n")))
+      in
+      let (var_typ, id) = semant_expr v env
       and (ret_type, e') = semant_expr e env in
       let err =
         let msg = assignment_typ_mismatch ^ "expected " ^ string_of_typ var_typ
                   ^ ", got " ^ string_of_typ ret_type ^ " here: " ^ string_of_expr ex
         in VariableAssignmentError(msg)
-      in (check_matching_types var_typ ret_type err, SAssign(var, (ret_type, e')))
+      in (check_matching_types var_typ ret_type err, SAssign((var_typ, id), (ret_type, e')))
 
   | FunctionCall (fname, args) ->
       (* 1. Make sure function exists *)
@@ -208,8 +213,11 @@ let rec semant_expr expr env =
             in raise(ArgumentTypeMismatch(msg))
         in
         (* 5. Convert to function call; add the object as the first argument *)
-        let full_args = (v_type, SId(obj_name)) :: args' in
-        (meth.typ, SFunctionCall(cname ^ "." ^ meth_name, full_args))
+        let new_arg =
+          if obj_name = "this" then (v_type, SId(String.lowercase_ascii cname ^ "*"))
+          else (v_type, SId(obj_name))
+        in
+        (meth.typ, SFunctionCall(cname ^ "." ^ meth_name, new_arg :: args'))
 
   | NewArray (arr_name, arr_typ, arr_size, expr_list) as ex ->
       (* 1. Check to make sure that size is integer *)
@@ -254,11 +262,11 @@ let rec semant_expr expr env =
         let check_constructor_arg acc expr =
           (* 3. make sure that all variables/types in assignment are part of class *)
           (match expr with
-            | Assign(instance_var, e) ->
+            | Assign(Id(id), e) ->
                 let (typ, e') = semant_expr e env in
                 let cvars = List.map (fun (typ, name, _) -> (typ, name)) cls.cvars in
-                if List.mem (typ, instance_var) cvars
-                  then (Void, SAssign(instance_var, (typ, e'))) :: acc
+                if List.mem (typ, id) cvars
+                  then (Void, SAssign((typ, SId(id)), (typ, e'))) :: acc
                 else raise (ObjectConstructorInvalid(object_constructor_types ^ string_of_expr expr ^ " in allocation of new " ^ cname))
             | _ -> raise(ObjectConstructorInvalid(object_constructor_error ^ string_of_expr expr ^ " in allocation of new " ^ cname)))
           in
@@ -269,10 +277,14 @@ let rec semant_expr expr env =
       Hashtbl.add env.symbols obj_name (Obtype (cname));
       (typ, SNewInstance(obj_name, typ, expr_list'))
 
-  | ClassAccess (obj_name, class_var) as ex ->
+  | ClassAccess (v, class_var) as ex ->
       (* 1. Check that the object exists in the symbol table  *)
-      let typ = find_type_of_id env.symbols obj_name in
-
+      let obj_name =
+        (match v with
+          Id (id) -> id
+        | _ -> raise (InstanceVariableAccessInvalid("class access is performed on an object identified by a variable\n")))
+      in
+      let (typ, identifer) = semant_expr v env in
       (* 2. You can only "access" instance variables of type Obtype *)
       let cname = match typ with
           Obtype o -> o
@@ -287,7 +299,7 @@ let rec semant_expr expr env =
               [] -> raise (InternalError("unexpectedly could not determine type of class variable\n"))
             | (typ, name, _) :: t -> if name = n then typ else find_typ n t
         in
-        (find_typ class_var cls.cvars, (SClassAccess(Obtype(cname), obj_name, class_var)))
+        (find_typ class_var cls.cvars, (SClassAccess(Obtype(cname), (typ, identifer), class_var)))
       else
         let msg = obj_name ^ ", instance of class " ^ cname ^ ", has no member " ^ class_var in
         raise (InstanceVariableNotFound(msg))
@@ -384,16 +396,21 @@ let rec semant_stmt stmt env =
       | []              -> []
     in SBlock(check_stmt_list b)
 
-  | Dealloc id ->
+  | Dealloc (id) as s ->
     (* Check that the dealloced item is of type ObjType or ArrType *)
+    let id =
+      (match id with
+        Id(v) -> v
+        | _ -> raise (InvalidDealloc(invalid_deallocation_msg ^ string_of_stmt s)))
+    in
     let typ = find_type_of_id env.symbols id in
     (match typ with
-          Obtype _ | Arrtype _ -> SDealloc(id)
-        | _ -> raise (InvalidDealloc(invalid_deallocation_msg ^ id ^" is of typ " ^ string_of_typ typ)))
+          Obtype _ | Arrtype _ -> SDealloc(typ, SId(id))
+        | _ -> raise (InvalidDealloc(invalid_deallocation_msg ^ id ^ " is of typ " ^ string_of_typ typ)))
 
   | ClassAssign (id, instance_var, e) ->
     (* 1. id must correspond to an ObjType *)
-    let typ = find_type_of_id env.symbols id in
+    let (typ, identifier) = semant_expr id env in
     (match typ with
         | Obtype (cname) ->
             let cls = find_class cname in
@@ -403,12 +420,12 @@ let rec semant_stmt stmt env =
             (* 2. the instance variable must exist in the class and the
             item being assigned must be of the correct type *)
             if List.mem (vtype, instance_var) cvars then
-              SClassAssign(Obtype(cname), id, instance_var, (vtype, e'))
+              SClassAssign(Obtype(cname), (typ, identifier), instance_var, (vtype, e'))
             else
               let msg = invalid_cls_member_assign ^ string_of_typ typ ^ " to " ^ cname ^ "." ^ instance_var in
               raise (InvalidClassMemberAssignment(msg))
         | _ ->
-          let msg = member_assign_cls_only ^ id ^ " is of type " ^ string_of_typ typ in
+          let msg = member_assign_cls_only ^ (string_of_expr id) ^ " is of type " ^ string_of_typ typ in
           raise (InvalidClassMemberAssignment(msg)))
 
   | ArrayAssign (id, idx_e, e) as s ->
@@ -429,6 +446,7 @@ let rec semant_stmt stmt env =
           | _ -> raise (InvalidArrayAssignment(array_access_integer ^ string_of_stmt s)))
       | _ -> raise (InvalidArrayAssignment(array_access_array_only ^ id ^ " is not an array")))
 
+
 (****************************************
  Checks that a function body is
  semantically correct.
@@ -448,8 +466,8 @@ let check_function_body func env =
   *)
   let create_assignment_stmt build local_var_bind =
     (match local_var_bind with
-      (_, _, Noexpr) -> build
-    | (_, name, expr)   -> Expr(Assign(name, expr)) :: build) in
+      (_, _, Noexpr)  -> build
+    | (_, name, expr) -> Expr(Assign(Id(name), expr)) :: build) in
   let new_assignments =  List.fold_left create_assignment_stmt [] func.locals in
   let adjusted_body = List.rev new_assignments @ func.body in
 
@@ -476,7 +494,7 @@ let check_function_or_method func env =
 
   (* 4. Step to make LLVM code happy; main function must be 'main' not 'Main' *)
   let adjusted_function_name f = if f.fname = "Main" then "main" else f.fname
-  in
+  in env.function_name <- func.fname;
 
   (* 5. Check contents of function body, producting SAST version *)
   let checked_func = {
@@ -557,7 +575,7 @@ let lift_methods_to_global_space cls =
     {
       styp = m.styp;
       sfname = cls.scname ^ "." ^ m.sfname;
-      sformals = (Obtype(cls.scname), cls.scname ^ "*") :: m.sformals;
+      sformals = (Obtype(cls.scname), String.lowercase_ascii (cls.scname ^ "*")) :: m.sformals;
       slocals  = m.slocals;
       sbody = m.sbody;
     }

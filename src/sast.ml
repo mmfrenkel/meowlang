@@ -10,13 +10,13 @@ and sx =
   | SId of string
   | SBinop of sexpr * op * sexpr
   | SUnop of uop * sexpr
-  | SAssign of string * sexpr
+  | SAssign of sexpr * sexpr
   | SFunctionCall of string * sexpr list
   | SMethodCall of string * string * sexpr list
   | SNewArray of string * typ * array_size * sexpr list
   | SNoexpr
   | SNewInstance of string * typ * sexpr list
-  | SClassAccess of typ * string * string
+  | SClassAccess of typ * sexpr * string
   | SArrayAccess of string * sexpr
 
   type sbind_var = typ * string * sexpr
@@ -27,8 +27,8 @@ type sstmt =
   | SReturn of sexpr
   | SIf of sexpr * sstmt * sstmt
   | SFor of op * sexpr * sexpr * sexpr * sstmt
-  | SDealloc of string
-  | SClassAssign of typ * string * string * sexpr
+  | SDealloc of sexpr
+  | SClassAssign of typ * sexpr * string * sexpr
   | SArrayAssign of string * sexpr * sexpr
 
 type sfunc_decl = {

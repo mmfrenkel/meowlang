@@ -26,12 +26,12 @@ let find_struct_by_cls cls_name =
 (* Return the value for a variable, else raise error *)
 let lookup_variable var_name =
   try Hashtbl.find local_variables var_name
-  with _ -> raise (VariableNotFound("codegen error: " ^ undeclared_msg ^ var_name))
+  with _ -> raise (VariableNotFound("codegen error: " ^ undeclared_msg ^ "variable: " ^ var_name))
 
 (* Return the value for a function name or argument *)
 let lookup_function func_name =
   try Hashtbl.find global_functions func_name
-  with _ -> raise (FunctionNotFound("codegen error: " ^ func_name))
+  with _ -> raise (FunctionNotFound("codegen error: " ^ undeclared_msg ^  "function: " ^ func_name))
 
 let lookup_index cls_name field_name =
   try Hashtbl.find struct_field_idx (cls_name ^ "." ^ field_name)
@@ -139,10 +139,19 @@ let build_function fdecl =
     | SStringLit s       -> L.build_global_stringptr s "str" builder
     | SId var            -> L.build_load (lookup_variable var) var builder
 
-    (* Used in assigning variables; not used in assigning class members *)
-    | SAssign (var, e)   ->
-        let e' = expr builder e in
-        ignore(L.build_store e' (lookup_variable var) builder); e'
+    | SAssign ((_, lhs), e)   ->
+        let rhs = expr builder e in
+        (match lhs with
+          (* Used in assigning variables; not used in assigning class members *)
+            SId(var) ->
+              ignore(L.build_store rhs (lookup_variable var) builder); rhs
+          (* Handle this class access PLUS Assignment case *)
+          | SClassAccess(A.Obtype(cname), v, inst_v) ->
+              let index = lookup_index cname inst_v
+              and load_tmp = expr builder v in
+              let lhs = L.build_struct_gep load_tmp index "tmp" builder in
+              ignore(L.build_store rhs lhs builder); rhs
+          | _ -> raise (NotYetSupported("codegen: assignment not supported for anything but class instance vars and regular variables")))
 
     (* Binary operation between two integers *)
     | SBinop(((A.Int, _) as e1), op, ((A.Int, _) as e2)) ->
@@ -218,9 +227,9 @@ let build_function fdecl =
         | _ -> raise (ObjectCreationInvalid("codegen: cannot create instance of anything but Obtype")))
 
     | SClassAccess(A.Obtype(cname), v, inst_v) ->
-      let load_tmp = L.build_load (lookup_variable v) "tmp" builder
+      let tmp_value = expr builder v
       and index = lookup_index cname inst_v in
-			let deref = L.build_struct_gep load_tmp index "tmp" builder in
+			let deref = L.build_struct_gep tmp_value index "tmp" builder in
 			L.build_load deref "dr" builder
 
     | _ -> raise (NotYetSupported("found expr or functions not yet supported"))
@@ -252,12 +261,12 @@ let build_function fdecl =
     | SClassAssign (A.Obtype(cname), v, inst_v, e) ->
       let rhs = expr builder e
       and index = lookup_index cname inst_v
-      and load_tmp = L.build_load (lookup_variable v) "tmp" builder in
+      and load_tmp = expr builder v in
 			let lhs = L.build_struct_gep load_tmp index "tmp" builder in
       ignore(L.build_store rhs lhs builder); builder
 
-    | SDealloc(v) ->
-      let tmp_value = L.build_load (lookup_variable v) "tmp" builder in
+    | SDealloc (v) ->
+      let tmp_value = expr builder v in
       ignore(L.build_free (tmp_value) builder); builder
 
     | _ -> raise (NotYetSupported("complex stmts not yet supported"))

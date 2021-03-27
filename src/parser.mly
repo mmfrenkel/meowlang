@@ -105,10 +105,10 @@ stmt:
   | expr IF THEN stmt ELSE stmt                   { If($1, $4, $6)                 }
   | FOR expr INCREMENT expr_opt COMMA expr stmt   { For(Increment, $2, $4, $6, $7) }
   | FOR expr DECREMENT expr_opt COMMA expr stmt   { For(Decrement, $2, $4, $6, $7) }
-  | ID IN ID ASSIGN expr SEMI                     { ClassAssign($3, $1, $5)        }
+  | ID IN ID ASSIGN expr SEMI                     { ClassAssign(Id($3), $1, $5)    }
   | ID LBRACKET expr RBRACKET ASSIGN expr SEMI    { ArrayAssign($1, $3, $6)        }
-  | FREE ID SEMI                                  { Dealloc($2)                    }
-  | ID ASSIGN function_call SEMI                  { Expr(Assign($1, $3))           }
+  | FREE ID SEMI                                  { Dealloc(Id($2))                }
+  | ID ASSIGN function_call SEMI                  { Expr(Assign(Id($1), $3))       }
 
 expr:
     ILIT                      { ILiteral($1)           }
@@ -116,7 +116,7 @@ expr:
   | BLIT                      { BoolLit($1)            }
   | SLIT                      { StringLit($1)          }
   | ID                        { Id($1)                 }
-  | ID ASSIGN expr            { Assign($1, $3)         }
+  | ID ASSIGN expr            { Assign(Id($1), $3)     }
   | PLUS expr COMMA expr      { Binop($2, Add,   $4)   }
   | MINUS expr COMMA expr     { Binop($2, Sub,   $4)   }
   | TIMES expr COMMA expr     { Binop($2, Mult,  $4)   }
@@ -130,7 +130,7 @@ expr:
   | NOT expr                  { Unop(Not, $2)          }
   | LPAREN expr RPAREN        { $2                     }
   | CONCAT expr COMMA expr    { Binop($2, Concat, $4)  }
-  | ID IN ID                  { ClassAccess($3, $1)    }
+  | ID IN ID                  { ClassAccess(Id($3), $1)}
   | ID LBRACKET expr RBRACKET { ArrayAccess($1, $3)    }
 
  function_call:

@@ -14,7 +14,6 @@ fi
 # build everything
 name=$(basename $1 .meow)
 
-echo "$MEOWLANG < "$PROGRAM_PATH/$1" -c > "$name.ll""
 $MEOWLANG < "$PROGRAM_PATH/$1" -c > "$name.ll"
 
 if [[ $? -eq 0 ]];
