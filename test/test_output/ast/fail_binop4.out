@@ -1,0 +1,9 @@
+
+
+Main()
+{
+	char * string = "Value";
+	int integer = 2;
+	int quotient = string / integer;
+}
+

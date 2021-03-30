@@ -1,0 +1,8 @@
+HAI ITZ ME FUNC Main,
+    PSST Multiplicaton of operands with different types
+
+    ITZ ME YARN string IZ "Value".
+    ITZ ME NUMBR value IZ 2.
+
+    ITZ ME NUMBR product IZ PRODUKT OF string AN value.
+KBYE

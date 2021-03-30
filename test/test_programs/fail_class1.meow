@@ -1,0 +1,19 @@
+HAI ITZ ME FUNC Main,
+
+    MAEK Jerry NEW MOUSE.
+    BLEEP Jerry.
+
+KBYE
+
+PSST A class definition cannot have multiple of the same instance variables
+HAI ITZ ME CLASS MOUSE,
+
+    ITZ ME NUMBR cookies IZ 0.
+    ITZ ME YARN cookies IZ "duplicate".
+
+    HAI ITZ ME FUNC Give_Cookie WIT NUMBR count_cookies,
+        PSST This uses the SUM prefix operator
+        cookies IZ SUM OF cookies AN count_cookies.
+    KBYE
+
+KBYE

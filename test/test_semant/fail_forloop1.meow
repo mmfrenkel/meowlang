@@ -1,0 +1,10 @@
+HAI ITZ ME FUNC Main,
+    PSST op is neither Increment nor Decrement
+    ITZ ME NUMBR count.
+    ITZ ME YARN condition.
+    ITZ ME YARN mistake IZ "What".
+    count IZ 0.
+    
+    IM IN YR LOOP count mistake AN SMALLR count THAN 10
+        condition IZ "count is still not 10".
+KBYE

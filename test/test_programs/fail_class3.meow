@@ -1,0 +1,18 @@
+HAI ITZ ME FUNC Main,
+
+    MAEK Jerry NEW MOUSE.
+    BLEEP Jerry.
+
+KBYE
+
+HAI ITZ ME CLASS MOUSE,
+
+    PSST Cannot assign a default value for var that doesn't exist
+    ITZ ME NUMBR cookies IZ "this is the wrong type".
+
+    HAI ITZ ME FUNC Give_Cookie WIT NUMBR count_cookies,
+        PSST This uses the SUM prefix operator
+        cookies IZ SUM OF cookies AN count_cookies.
+    KBYE
+
+KBYE

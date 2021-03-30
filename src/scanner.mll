@@ -44,6 +44,7 @@ rule token = parse
 | "BLEEP"         { FREE }
 | "CLASS"         { CLASS }
 | "IN"            { IN }
+| "HERE"          { HERE }
 
 (* Functions *)
 | "PURR"          { CALL }
@@ -55,7 +56,6 @@ rule token = parse
 | "]"             { RBRACKET }
 
 (* Operators *)
-
 | "SUM OF"        { PLUS }
 | "DIFF OF"       { MINUS }
 | "PRODUKT OF"    { TIMES }

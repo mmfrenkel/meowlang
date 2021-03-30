@@ -1,0 +1,24 @@
+HAI ITZ ME FUNC Main,
+
+    ITZ ME NUMBR jerrys_cookies.
+
+    MAEK Jerry NEW MOUSE.
+    cookies IN Jerry IZ 15.
+
+    PSST Make sure that we can call a method and get back cookies
+    jerrys_cookies IZ PURR Count_Cookies IN Jerry.
+    PURR Meow WIT "Jerry has this many cookies: ".
+    PURR Meow WIT jerrys_cookies.
+
+    PSST BLEEP Jerry.
+KBYE
+
+HAI ITZ ME CLASS MOUSE,
+
+    ITZ ME NUMBR cookies.
+    ITZ ME YARN name.
+
+    HAI ITZ ME NUMBR FUNC Count_Cookies,
+        GIVE cookies.
+    KBYE
+KBYE

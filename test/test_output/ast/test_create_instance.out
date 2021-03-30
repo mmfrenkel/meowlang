@@ -1,0 +1,22 @@
+
+
+Main()
+{
+	class MOUSE jerry(cookies = 2);
+	free(jerry);
+}
+
+Class MOUSE {
+
+	int cookies = 0;
+
+	Give_Cookie(int count_cookies)
+	{
+	cookies = cookies + count_cookies;
+	}
+	int Count_Cookies()
+	{
+	return cookies;
+	}
+
+}

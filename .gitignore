@@ -14,3 +14,6 @@ test/global_log.out
 # files from IDEs, etc.
 .DS_Store
 _build/
+
+# submitted files
+*.tar.gz

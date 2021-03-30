@@ -1,0 +1,17 @@
+HAI ITZ ME FUNC Main,
+
+    MAEK Jerry NEW MOUSE.
+    BLEEP Jerry.
+
+KBYE
+
+HAI ITZ ME CLASS MOUSE,
+
+    ITZ ME NUMBR cookies IZ 2.
+
+    HAI ITZ ME FUNC Give_Cookie WIT NUMBR count_cookies,
+        PSST This variable 'apples' does not exist
+        cookies IZ SUM OF apples AN count_cookies.
+    KBYE
+
+KBYE

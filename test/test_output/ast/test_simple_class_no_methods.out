@@ -1,0 +1,16 @@
+
+
+Main()
+{
+	class MOUSE Jerry;
+	Jerry.cookies = 5;
+	printf("%X\n", Jerry.cookies);
+}
+
+Class MOUSE {
+
+	char * name;
+	int cookies;
+
+
+}

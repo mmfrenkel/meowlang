@@ -2,7 +2,7 @@
 open Ast
 %}
 
-%token RETURN MODULE IMPORT CALL FUNCTION DEF COMP CLASS NEW FREE MAKE
+%token RETURN MODULE IMPORT CALL FUNCTION DEF COMP CLASS NEW FREE MAKE HERE
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN LBRACKET RBRACKET
 %token NOT EQ NEQ LT GT AND OR CONCAT CONTAINS IN
 %token IF THEN ELSE FOR INCREMENT DECREMENT INT BOOL FLOAT STRING ARRAY
@@ -86,8 +86,9 @@ vdecls:
   | vdecls vdecl              { $2 :: $1 }
 
 vdecl:
-    DEF typ ID SEMI             { ($2, $3, Noexpr) }
-  | DEF typ ID ASSIGN expr SEMI { ($2, $3, $5) }
+    DEF typ ID SEMI                      { ($2, $3, Noexpr) }
+  | DEF typ ID ASSIGN expr SEMI          { ($2, $3, $5)     }
+  | DEF typ ID ASSIGN function_call SEMI { ($2, $3, $5)     }
 
 stmt_list:
     /* nothing */             { []        }
@@ -104,10 +105,10 @@ stmt:
   | expr IF THEN stmt ELSE stmt                   { If($1, $4, $6)                 }
   | FOR expr INCREMENT expr_opt COMMA expr stmt   { For(Increment, $2, $4, $6, $7) }
   | FOR expr DECREMENT expr_opt COMMA expr stmt   { For(Decrement, $2, $4, $6, $7) }
-  | ID IN ID ASSIGN expr SEMI                     { ClassAssign($1, $3, $5)        }
+  | ID IN ID ASSIGN expr SEMI                     { ClassAssign(Id($3), $1, $5)    }
   | ID LBRACKET expr RBRACKET ASSIGN expr SEMI    { ArrayAssign($1, $3, $6)        }
-  | FREE ID SEMI                                  { Dealloc($2)                    }
-  | ID ASSIGN function_call SEMI                  { Expr(Assign($1, $3))           }
+  | FREE ID SEMI                                  { Dealloc(Id($2))                }
+  | ID ASSIGN function_call SEMI                  { Expr(Assign(Id($1), $3))       }
 
 expr:
     ILIT                      { ILiteral($1)           }
@@ -115,7 +116,7 @@ expr:
   | BLIT                      { BoolLit($1)            }
   | SLIT                      { StringLit($1)          }
   | ID                        { Id($1)                 }
-  | ID ASSIGN expr            { Assign($1, $3)         }
+  | ID ASSIGN expr            { Assign(Id($1), $3)     }
   | PLUS expr COMMA expr      { Binop($2, Add,   $4)   }
   | MINUS expr COMMA expr     { Binop($2, Sub,   $4)   }
   | TIMES expr COMMA expr     { Binop($2, Mult,  $4)   }
@@ -129,14 +130,16 @@ expr:
   | NOT expr                  { Unop(Not, $2)          }
   | LPAREN expr RPAREN        { $2                     }
   | CONCAT expr COMMA expr    { Binop($2, Concat, $4)  }
-  | ID IN ID                  { ClassAccess($1, $3)    }
+  | ID IN ID                  { ClassAccess(Id($3), $1)}
   | ID LBRACKET expr RBRACKET { ArrayAccess($1, $3)    }
 
  function_call:
-    CALL ID                       { FunctionCall($2, [])   }
-  | CALL ID IN ID                 { MethodCall($2, $4, []) }
-  | CALL ID LPAREN args_opt       { FunctionCall($2, $4)   }
-  | CALL ID IN ID LPAREN args_opt { MethodCall($2, $4, $6) }
+    CALL ID                          { FunctionCall($2, [])       }
+  | CALL ID IN ID                    { MethodCall($4, $2, [])     }
+  | CALL ID IN HERE                  { MethodCall("this", $2, []) }
+  | CALL ID LPAREN args_opt          { FunctionCall($2, $4)       }
+  | CALL ID IN ID LPAREN args_opt    { MethodCall($4, $2, $6)     }
+  | CALL ID IN HERE LPAREN args_opt  { MethodCall("this", $2, $6) }
 
 expr_opt:
   /* nothing */               { Noexpr }
@@ -179,8 +182,8 @@ methods:
  /* Class Instantiation */
 
 c_instance:
-    MAKE ID NEW typ                           { NewInstance($2, $4, []) }
-  | MAKE ID NEW typ RPAREN LPAREN class_opt   { NewInstance($2, $4, $7) }
+    MAKE ID NEW typ                    { NewInstance($2, $4, []) }
+  | MAKE ID NEW typ RPAREN class_opt   { NewInstance($2, $4, $6) }
 
 class_opt:
     /* nothing */             { [] }
