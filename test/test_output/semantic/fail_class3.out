@@ -1,0 +1,1 @@
+Fatal error: exception Exceptions.ObjectInstanceVariableInvalid("cannot assign instance variables of new object to items of incorrect type, found: char *, expected int")

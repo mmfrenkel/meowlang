@@ -22,14 +22,13 @@ KBYE
 
 HAI ITZ ME FUNC Main,
 
-    ITZ ME NUMBR jerrys_cookies IZ cookies IN Jerry.
-
+    ITZ ME NUMBR jerrys_cookies.
     MAEK Jerry NEW MOUSE.   PSST no specification of cookies
 
+    jerrys_cookies IZ cookies IN Jerry.
     cookies IN Jerry IZ 2.
 
     PURR Give_Cookie IN Jerry WIT 2.
-
     jerrys_cookies IZ PURR Count_Cookies IN Jerry.
 
     BLEEP Jerry.

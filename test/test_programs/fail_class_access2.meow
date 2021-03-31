@@ -1,0 +1,10 @@
+HAI ITZ ME FUNC Main,
+    PSST accessing instance variables in items that are not type Obtype
+    ITZ ME NUMBR Jerry IZ 1.
+    cookies IN Jerry.
+
+KBYE
+
+HAI ITZ ME CLASS MOUSE,
+    ITZ ME NUMBR cookies IZ 0.
+KBYE

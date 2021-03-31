@@ -1,0 +1,21 @@
+HAI ITZ ME FUNC Main,
+    PSST If assigning instance variables they must be assignments
+    MAEK jerry NEW MOUSE,
+        WIT SUM OF 2 AN 1.
+    BLEEP jerry.
+KBYE
+
+HAI ITZ ME CLASS MOUSE,
+
+    ITZ ME NUMBR cookies IZ 0.
+
+    HAI ITZ ME NUMBR FUNC Count_Cookies,
+        GIVE cookies.
+    KBYE
+
+    HAI ITZ ME FUNC Give_Cookie WIT NUMBR count_cookies,
+        PSST This uses the SUM prefix operator
+        cookies IZ SUM OF cookies AN count_cookies.
+    KBYE
+
+KBYE

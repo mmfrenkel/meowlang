@@ -1,0 +1,20 @@
+
+
+Main()
+{
+	int jerrys_cookies;
+	class MOUSE Jerry;
+	jerrys_cookies = this.Count_Cookies();
+	free(Jerry);
+}
+
+Class MOUSE {
+
+	int cookies = 2;
+
+	Give_Cookie(int count_cookies)
+	{
+	cookies = cookies + count_cookies;
+	}
+
+}

@@ -53,19 +53,19 @@ let rec string_of_expr = function
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Unop(o, e) -> string_of_uop o ^ string_of_expr e
-  | Assign(v, e) -> v ^ " = " ^ string_of_expr e
+  | Assign(v, e) -> string_of_expr v ^ " = " ^ string_of_expr e
   | FunctionCall(f, el) ->
       (match f with
           "Meow" -> "printf" ^ "(\"%X\\n\", " ^ String.concat ", " (List.map string_of_expr el) ^ ")"
         | _      -> f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")")
-  | MethodCall(f, ob, el) ->
+  | MethodCall(ob, f, el) ->
       ob ^ "." ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | NewArray(i, typ, s, contents) ->
       string_of_typ typ ^ " [" ^ string_of_array_size s ^ "] " ^ i ^ " = [ " ^ String.concat ", " (List.map string_of_expr contents) ^ " ]"
   | Noexpr -> ""
   | NewInstance(var, c, []) -> string_of_typ c ^ " " ^ var
   | NewInstance(var, c, exprs) -> string_of_typ c ^ " " ^ var ^ "(" ^ String.concat "" (List.map string_of_expr exprs) ^ ")"
-  | ClassAccess(el, ob) -> ob ^ "." ^ el
+  | ClassAccess(ob, el) -> string_of_expr ob ^ "." ^ el
   | ArrayAccess(var, e) -> var ^ "[" ^ string_of_expr e ^ "]"
 
 let rec string_of_stmt = function
@@ -78,8 +78,8 @@ let rec string_of_stmt = function
     string_of_stmt s1 ^ "\telse\t" ^ string_of_stmt s2
   | For(o, e1, e_opt, e2, s) ->
       "\tfor (" ^string_of_expr e_opt ^ " " ^ string_of_expr e1 ^ string_of_op o ^ " " ^ string_of_expr e2 ^ ") {\n\t\t" ^ string_of_stmt s ^ "\t}\n"
-  | Dealloc(e) -> "\tfree(" ^ e ^ ");\n"
-  | ClassAssign(s1, s2, e) -> "\t" ^ s1 ^ "." ^ s2 ^ " = " ^ string_of_expr e ^ ";\n"
+  | Dealloc(e) -> "\tfree(" ^ string_of_expr e ^ ");\n"
+  | ClassAssign(e1, s2, e2) -> "\t" ^ string_of_expr e1 ^ "." ^ s2 ^ " = " ^ string_of_expr e2 ^ ";\n"
   | ArrayAssign(s, e1, e2) -> "\t" ^ s ^ "[" ^ string_of_expr e1 ^ "] = " ^ string_of_expr e2 ^";\n"
 
 let string_of_vdecl (t, id, expr) =

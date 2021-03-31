@@ -1,0 +1,8 @@
+HAI ITZ ME FUNC Main,
+    PSST Division of operands with different types
+
+    ITZ ME YARN string IZ "Value".
+    ITZ ME NUMBR integer IZ 2.
+
+    ITZ ME NUMBR quotient IZ QUOSHUNT OF string AN integer.
+KBYE

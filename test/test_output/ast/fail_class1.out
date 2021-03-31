@@ -1,0 +1,19 @@
+
+
+Main()
+{
+	class MOUSE Jerry;
+	free(Jerry);
+}
+
+Class MOUSE {
+
+	char * cookies = "duplicate";
+	int cookies = 0;
+
+	Give_Cookie(int count_cookies)
+	{
+	cookies = cookies + count_cookies;
+	}
+
+}

@@ -1,0 +1,22 @@
+HAI ITZ ME FUNC Main,
+
+    ITZ ME NUMBR jerrys_cookies IZ 3.
+    MAEK Jerry NEW MOUSE.
+
+    PSST You cannot pass an unexpected number of args to a method (TOO MANY)!
+    PURR Give_Cookie IN Jerry WIT jerrys_cookies AN "string!".
+
+    BLEEP Jerry.
+
+KBYE
+
+HAI ITZ ME CLASS MOUSE,
+
+    ITZ ME NUMBR cookies IZ 0.
+
+    HAI ITZ ME FUNC Give_Cookie WIT NUMBR count_cookies,
+        PSST This uses the SUM prefix operator
+        cookies IZ SUM OF cookies AN count_cookies.
+    KBYE
+
+KBYE
