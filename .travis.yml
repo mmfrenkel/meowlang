@@ -12,8 +12,8 @@ addons:
     - m4
     - pkg-config
     - make
-    - llvm-10.0
-    - llvm-10.0-dev
+    - llvm-10.*
+    - llvm-10.*-dev
 
 before_script:
   - opam init -y
