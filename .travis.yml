@@ -1,3 +1,4 @@
+# Structure/Contents of file inspired by: https://github.com/jaredweiss/JaTeste/blob/master/.travis.yml
 branches:
   only:
   - master
@@ -8,7 +9,7 @@ addons:
     - avsm
     - ubuntu-toolchain-r-test
     - llvm-toolchain-precise
-    - llvm-toolchain-precise-3.8
+    - llvm-toolchain-precise-10.0
     packages:
     - opam
     - m4
