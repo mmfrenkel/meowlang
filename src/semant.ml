@@ -14,6 +14,8 @@ module StringMap = Map.Make(String)
 type environment = {
   in_class : bool;
   class_name: string;
+  constructor: bool;
+  obj_name: string; (* empty string if constructor if false *)
   mutable function_name: string;
   symbols : (string, Ast.typ) Hashtbl.t;
 }
@@ -62,7 +64,7 @@ let find_class_method cname mname =
     ) StringMap.empty (cls.cfuncs)
   in
   try StringMap.find mname cls_methods
-  with Not_found -> raise (ClassMethodNotFound(class_method_unknown))
+  with Not_found -> raise (ClassMethodNotFound(class_method_unknown ^ cname ^ "." ^ mname))
 
 let instance_variables_of_cls cls_name =
   let cls = find_class cls_name in
@@ -142,8 +144,12 @@ let rec semant_expr expr env =
     (* if we are in a class, adjust the ID to be a class access, of a "<ClassName>*" parameter *)
     let typ = find_type_of_id env.symbols id in
       if env.in_class then
+        let mangled_name =
+          if env.constructor then env.obj_name
+          else String.lowercase_ascii (env.class_name ^ "*")
+        in
         if List.mem id (instance_variables_of_cls env.class_name) then
-          (typ, SClassAccess(Obtype(env.class_name), (typ, SId(String.lowercase_ascii (env.class_name ^ "*"))), id))
+          (typ, SClassAccess(Obtype(env.class_name), (typ, SId(mangled_name)), id))
         else (typ, SId id)
       else (typ, SId id)
 
@@ -260,26 +266,64 @@ let rec semant_expr expr env =
           Obtype o -> (o, find_class o)
         | _ -> raise (ObjectCreationInvalid(invalid_object_creation ^ string_of_expr ex))
       in
+
+      (* make environment just for constructor setup; this allows
+      one default constructor variable to make use of another; for example,
+        HAI ITZ ME CLASS MOUSE,
+
+            ITZ ME NUMBR cookies IZ 2.
+            ITZ ME NUMBR candies IZ 5.
+            ITZ ME NUMBR treats IZ SUM OF cookies AN candies.
+            ...
+        KBYE
+      *)
+      let construct_env = {
+        in_class = true;  (* turns on auto ClassAccess for instance vars *)
+        class_name = cname;
+        constructor = true; (* tells us we are working on a constructor scenario *)
+        obj_name = obj_name;
+        function_name = "";
+        symbols = Hashtbl.create 10;
+      } in
+
+      (* Create a list of assignment expressions for default args *)
+      let default_vars =
+        let set_default_vars acc (typ, id, expr) =
+          let (typ', e') = semant_expr expr construct_env in
+          (match e' with
+              SNoexpr -> acc
+            | _ ->
+              let lhs = (typ, SClassAccess(Obtype(cname), (Obtype(cname), SId(obj_name)), id))
+              and rhs = (typ', e') in
+              Hashtbl.add construct_env.symbols id typ;
+              (typ, SAssign(lhs, rhs)) :: acc)
+        in
+        List.fold_left set_default_vars [] (List.rev cls.cvars)
+      in
       (* This tricky code is meant to allow someone to assign instance vars
        by name, using assignment-like expressions, to create a new class instance *)
-      let expr_list' =
-        let check_constructor_arg acc expr =
-          (* 3. make sure that all variables/types in assignment are part of class *)
-          (match expr with
-            | Assign(Id(id), e) ->
-                let (typ, e') = semant_expr e env in
-                let cvars = List.map (fun (typ, name, _) -> (typ, name)) cls.cvars in
-                if List.mem (typ, id) cvars
-                  then (Void, SAssign((typ, SId(id)), (typ, e'))) :: acc
-                else raise (ObjectConstructorInvalid(object_constructor_types ^ string_of_expr expr ^ " in allocation of new " ^ cname))
-            | _ -> raise(ObjectConstructorInvalid(object_constructor_error ^ string_of_expr expr ^ " in allocation of new " ^ cname)))
-          in
-          List.fold_left check_constructor_arg [] expr_list
-      in
-
+       let expr_list' =
+       let check_constructor_arg acc expr =
+         (* 3. make sure that all variables/types in assignment are part of class *)
+         (match expr with
+           | Assign(Id(id), e) ->
+               let (typ, e') = semant_expr e env in
+               let cvars = List.map (fun (typ, name, _) -> (typ, name)) cls.cvars in
+               if List.mem (typ, id) cvars
+                 then
+                  (* Convert the assignment statement into an assignment with class access *)
+                  let lhs = (typ, SClassAccess(Obtype(cname), (Obtype(cname), SId(obj_name)), id))
+                  and rhs = (typ, e') in
+                  (* Append the new expression to the growing list *)
+                  (typ, SAssign(lhs, rhs)) :: acc
+               else raise (ObjectConstructorInvalid(object_constructor_types ^ string_of_expr expr ^ " in allocation of new " ^ cname))
+           | _ -> raise(ObjectConstructorInvalid(object_constructor_error ^ string_of_expr expr ^ " in allocation of new " ^ cname)))
+         in
+         List.fold_left check_constructor_arg default_vars expr_list
+     in
       (* make sure to add the allocated obj to symbol table so it can be referenced *)
       Hashtbl.add env.symbols obj_name (Obtype (cname));
-      (typ, SNewInstance(obj_name, typ, expr_list'))
+      (typ, SNewInstance(obj_name, typ, List.rev expr_list'))
 
   | ClassAccess (v, class_var) as ex ->
       (* 1. Check that the object exists in the symbol table  *)
@@ -529,6 +573,8 @@ let check_function_or_method func env =
   let env = {
     in_class = true;
     class_name = cls.cname;
+    constructor = false;
+    obj_name = "";
     function_name = "";
     symbols = Hashtbl.create 10;
   } in
@@ -544,7 +590,8 @@ let check_function_or_method func env =
         if typ != typ'
           then let msg = object_constructor_types ^ string_of_typ typ' ^ ", expected " ^ string_of_typ typ
             in raise (ObjectInstanceVariableInvalid(msg))
-        else Hashtbl.add env.symbols name typ; (typ, name, (typ', expr')))
+        else
+          Hashtbl.add env.symbols name typ; (typ, name, (typ', expr')))
   in
   let instance_vars_evaluated = List.map eval_instance_var (List.rev cls.cvars) in
 
@@ -566,6 +613,8 @@ let check_function func =
   let env = {
     in_class = false;
     class_name = "";
+    constructor = false;
+    obj_name = "";
     function_name = func.fname;
     symbols = Hashtbl.create 10;
   }

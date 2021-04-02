@@ -64,7 +64,7 @@ let rec string_of_expr = function
       string_of_typ typ ^ " [" ^ string_of_array_size s ^ "] " ^ i ^ " = [ " ^ String.concat ", " (List.map string_of_expr contents) ^ " ]"
   | Noexpr -> ""
   | NewInstance(var, c, []) -> string_of_typ c ^ " " ^ var
-  | NewInstance(var, c, exprs) -> string_of_typ c ^ " " ^ var ^ "(" ^ String.concat "" (List.map string_of_expr exprs) ^ ")"
+  | NewInstance(var, c, exprs) -> string_of_typ c ^ " " ^ var ^ "(" ^ String.concat "" (List.map (fun e -> string_of_expr e ^ ", ") exprs) ^ ")"
   | ClassAccess(ob, el) -> string_of_expr ob ^ "." ^ el
   | ArrayAccess(var, e) -> var ^ "[" ^ string_of_expr e ^ "]"
 

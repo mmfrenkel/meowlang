@@ -13,4 +13,14 @@ basename=$(basename $1 .meow)
 
 ./src/meowlang.native < test/test_programs/$test_file -a &> ./test/test_output/ast/$basename.out
 ./src/meowlang.native < test/test_programs/$test_file -s &> ./test/test_output/semantic/$basename.out
-./src/meowlang.native < test/test_programs/$test_file -c &> ./test/test_output/full_pipeline/$basename.out
+
+case $test_file in
+        *test*)
+                ./test/test_single_program.sh $test_file > ./test/test_output/full_pipeline/$basename.out
+                ;;
+        *fail*)
+                ./src/meowlang.native < test/test_programs/$test_file -c &> ./test/test_output/full_pipeline/$basename.out
+                ;;
+        *)
+                echo "Unknown file type $file, skipping..." ;;
+esac
