@@ -1,11 +1,12 @@
 # Structure/Contents of file inspired by: https://github.com/jaredweiss/JaTeste/blob/master/.travis.yml
+language: c
+
 addons:
   apt:
     sources:
     - avsm
     - ubuntu-toolchain-r-test
     - llvm-toolchain-precise
-    - llvm-toolchain-precise-10.0
     packages:
     - opam
     - m4
