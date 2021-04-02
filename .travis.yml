@@ -12,15 +12,14 @@ addons:
     - m4
     - pkg-config
     - make
-    - llvm
-    - llvm-dev
+    - llvm-3.8
 
 before_script:
   - opam init -y
   - eval $(opam config env)
   - opam install ocamlfind -y
-  - opam install llvm.8.0.0 -y
-  - export PATH=/usr/lib/llvm-8.0.0/bin:$PATH
+  - opam install llvm.3.8.0 -y
+  - export PATH=/usr/lib/llvm-3.8.0/bin:$PATH
 
 script:
   - make
