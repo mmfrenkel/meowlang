@@ -1,8 +1,4 @@
 # Structure/Contents of file inspired by: https://github.com/jaredweiss/JaTeste/blob/master/.travis.yml
-branches:
-  only:
-  - master
-
 addons:
   apt:
     sources:
