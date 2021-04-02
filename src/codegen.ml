@@ -271,7 +271,7 @@ let build_function fdecl =
           | _ -> L.build_ret (expr builder e local_variables) builder
       ); builder
     | SIf (predicate, then_stmt, else_stmt) ->
-        let bool_val = expr builder predicate in
+        let bool_val = expr builder predicate local_variables in
         let merge_bb = L.append_block context "merge" the_function in
         let build_br_merge = L.build_br merge_bb in (* partial function *)
 

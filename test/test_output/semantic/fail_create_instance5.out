@@ -1,1 +1,1 @@
-Fatal error: exception Exceptions.ObjectConstructorInvalid("you may only assign instance variables that are defined within the class and that are of the correct type ,found: test = "this is not a valid inst var" in allocation of new MOUSE")
+Fatal error: exception Exceptions.ObjectConstructorInvalid("you may only assign instance variables that are defined within the class and that are of the correct type, found: test = "this is not a valid inst var" in allocation of new MOUSE")

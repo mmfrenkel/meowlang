@@ -116,10 +116,8 @@ let rec semant_expr expr env =
   (* Checks that argument types match formal var types *)
   let check_arg_type formal_param arg_expr =
     let (actual_type, arg_expr') = semant_expr arg_expr env
-    and expected_type = fst formal_param
-    in
-    if actual_type = expected_type
-      then (actual_type, arg_expr')
+    and expected_type = fst formal_param in
+    if actual_type = expected_type then (actual_type, arg_expr')
     else raise (ArgumentTypeMismatch("" ^ string_of_expr arg_expr))
   in
 
@@ -188,8 +186,8 @@ let rec semant_expr expr env =
       let func = find_function fname in
 
       (* 2. Check that param length is equal to the num args provided *)
-      if List.length args != List.length func.formals
-        then raise (FunctionArgumentLengthMismatch (func_arg_num_mismatch ^ fname))
+      if List.length args != List.length func.formals then
+        raise (FunctionArgumentLengthMismatch (func_arg_num_mismatch ^ fname))
       else
       (* 3. Check that the arguments passed are of the expected type *)
         let args' =
@@ -208,11 +206,10 @@ let rec semant_expr expr env =
       let v_type =
         (* if "this" is used, it must be called within a class context *)
         if obj_name = "this" then
-          if env.in_class = false
-            then
-              let msg = Printf.sprintf "%s, but found in func %s"
-                          use_of_this_outside_class env.function_name
-              in raise (InvalidMethodCall(msg))
+          if env.in_class = false then
+            let msg = Printf.sprintf "%s, but found in func %s"
+                        use_of_this_outside_class env.function_name
+            in raise (InvalidMethodCall(msg))
           else Obtype(env.class_name)
         else find_type_of_id env.symbols obj_name
       in
@@ -226,11 +223,10 @@ let rec semant_expr expr env =
       let meth = find_class_method cname meth_name in
 
       (* 3. Check that param length is equal to the num args provided *)
-      if List.length args != List.length meth.formals
-        then
-          let msg = Printf.sprintf "%s %s (got %s, expected %s)"
-                meth_arg_num_mismatch  meth_name (string_of_int (List.length args)) (string_of_int (List.length meth.formals))
-          in raise (MethodArgumentLengthMismatch(msg))
+      if List.length args != List.length meth.formals then
+        let msg = Printf.sprintf "%s %s (got %s, expected %s)"
+              meth_arg_num_mismatch  meth_name (string_of_int (List.length args)) (string_of_int (List.length meth.formals))
+        in raise (MethodArgumentLengthMismatch(msg))
       else
       (* 4. Check that the arguments passed are of the expected type *)
         let args' =
@@ -259,16 +255,15 @@ let rec semant_expr expr env =
             Int
         | VariableArraySize s -> find_type_of_id env.symbols s
       in
-      if array_size_typ != Int
-        then raise (InvalidArraySizeSpecified(invalid_array_size_msg ^ string_of_expr ex ))
+      if array_size_typ != Int then
+        raise (InvalidArraySizeSpecified(invalid_array_size_msg ^ string_of_expr ex ))
       else
-        let expr_list' = List.fold_left (fun acc e -> semant_expr e env :: acc) [] expr_list
-        in
+        let expr_list' = List.fold_left (fun acc e -> semant_expr e env :: acc) [] expr_list in
         (* 3. if expr_list, check that the expressions match the content type of array *)
         List.iter (
           fun (expr_typ, _) ->
-            if expr_typ != arr_typ
-              then raise (InvalidArrayItem(invalid_array_item_msg ^ string_of_expr ex))
+            if expr_typ != arr_typ then
+              raise (InvalidArrayItem(invalid_array_item_msg ^ string_of_expr ex))
             else ()
         ) expr_list';
 
@@ -335,8 +330,7 @@ let rec semant_expr expr env =
           | Assign(Id(id), e) ->
               let (typ, e') = semant_expr e env in
               let cvars = List.map (fun (typ, name, _) -> (typ, name)) cls.cvars in
-              if List.mem (typ, id) cvars
-                then
+              if List.mem (typ, id) cvars then
                 (* Convert the assignment statement into an assignment with class access *)
                 let lhs = (typ, SClassAccess(Obtype(cname), (Obtype(cname), SId(obj_name)), id))
                 and rhs = (typ, e') in
@@ -637,11 +631,10 @@ let check_function_or_method func env =
       | _ ->
         (* check assignment statement types *)
         let (typ', expr') = semant_expr expr env in
-        if typ != typ'
-          then
-            let msg = Printf.sprintf "%s %s, expected %s"
-              object_constructor_types (string_of_typ typ') (string_of_typ typ)
-            in raise (ObjectInstanceVariableInvalid(msg))
+        if typ != typ' then
+          let msg = Printf.sprintf "%s %s, expected %s"
+            object_constructor_types (string_of_typ typ') (string_of_typ typ)
+          in raise (ObjectInstanceVariableInvalid(msg))
         else
           Hashtbl.add env.symbols name typ; (typ, name, (typ', expr')))
   in
@@ -706,14 +699,13 @@ let check (_, functions, classes) =
 
   (* 4. Make sure that a "main" function exists, and if so, continue with
        creating a list of checked functions, converted to SAST form *)
-  if Hashtbl.mem function_tbl "Main"
-    then
-      let semant_classes = List.map check_class classes
-      and semant_funcs = List.map check_function functions in
+  if Hashtbl.mem function_tbl "Main" then
+    let semant_classes = List.map check_class classes
+    and semant_funcs = List.map check_function functions in
 
-      (* 5. The combined functions represent the "lifted" class methods and usual functions *)
-      let combined_functions =
-        List.fold_left (fun fs cls -> lift_methods_to_global_space cls @ fs) semant_funcs semant_classes
-      in
-      ([], combined_functions, semant_classes)
-    else raise (MissingMainFunction (missing_main_func_msg))
+    (* 5. The combined functions represent the "lifted" class methods and usual functions *)
+    let combined_functions =
+      List.fold_left (fun fs cls -> lift_methods_to_global_space cls @ fs) semant_funcs semant_classes
+    in
+    ([], combined_functions, semant_classes)
+  else raise (MissingMainFunction (missing_main_func_msg))
