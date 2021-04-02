@@ -22,8 +22,8 @@ let find_struct_by_cls cls_name =
   with | Not_found -> raise (UnknownStruct("struct for class " ^ cls_name ^ "unknown"))
 
 (* Return the value for a variable, else raise error *)
-let lookup_variable var_name =
-  try Hashtbl.find local_variables var_name
+let lookup_variable var_name env =
+  try Hashtbl.find env var_name
   with _ -> raise (VariableNotFound("codegen error: " ^ undeclared_msg ^ "variable: " ^ var_name))
 
 (* Return the value for a function name or argument *)
@@ -88,6 +88,9 @@ let format (typ, _) =
   | A.Bool   -> "%d\n"
   | _ -> raise (NotYetSupported("formatting for complex expr and functions not yet supported"))
 
+  let add_local (typ, local_name, _) env builder =
+    let new_local = L.build_alloca (ltype_of_typ typ) local_name builder
+    in Hashtbl.add env local_name new_local
 
 (*********************************************************)
 (* Build Function: Fill in the body of the each function *)
@@ -114,16 +117,12 @@ let build_function fdecl =
     ignore (L.build_store param new_formal builder);  (* store %param %new_formal *)
     Hashtbl.add local_variables formal_name new_formal;
     (formal_name, new_formal) :: acc (* to make compiler happy *)
-
-  and add_local (typ, local_name, _) =
-    let new_local = L.build_alloca (ltype_of_typ typ) local_name builder
-    in Hashtbl.add local_variables local_name new_local
   in
 
   (* Clear existing locals and start over *)
   Hashtbl.clear local_variables;
   ignore(List.fold_left2 add_formal [] fdecl.sformals (Array.to_list (L.params the_function)));
-  List.iter add_local fdecl.slocals;
+  List.iter (fun l -> add_local l local_variables builder) fdecl.slocals;
 
   (* Formatting expressions, for printf-ing *)
   let format_str fmt = L.build_global_stringptr fmt "fmt" builder in
@@ -131,24 +130,23 @@ let build_function fdecl =
   (************************************************)
   (* Helper function for building up expressions  *)
   (************************************************)
-  let rec expr builder ((_, e) : sexpr) =
+  let rec expr builder ((_, e) : sexpr) env =
     match e with
       SILiteral i        -> L.const_int i32_t i
     | SBoolLit b         -> L.const_int i1_t (if b then 1 else 0)
     | SFliteral l        -> L.const_float_of_string float_t l
     | SStringLit s       -> L.build_global_stringptr s "str" builder
-    | SId var            -> L.build_load (lookup_variable var) var builder
+    | SId var            -> L.build_load (lookup_variable var env) var builder
 
     | SAssign ((_, lhs), e)   ->
-        let rhs = expr builder e in
+        let rhs = expr builder e env in
         (match lhs with
           (* Used in assigning variables; not used in assigning class members *)
             SId(var) ->
-              ignore(L.build_store rhs (lookup_variable var) builder); rhs
-          (* Handle this class access PLUS Assignment case -- this could be merged with ClassAssign, if time allows *)
-          | SClassAccess(A.Obtype(cname), v, inst_v) ->
+              ignore(L.build_store rhs (lookup_variable var env) builder); rhs
+          | SClassAccess(A.Obtype(cname), ((_, SId(_)) as v), inst_v) ->
               let index = lookup_index cname inst_v
-              and load_tmp = expr builder v in
+              and load_tmp = expr builder v env in
               let lhs = L.build_struct_gep load_tmp index "tmp" builder in
               ignore(L.build_store rhs lhs builder); rhs
           | _ ->
@@ -156,8 +154,8 @@ let build_function fdecl =
 
     (* Binary operation between two integers *)
     | SBinop(((A.Int, _) as e1), op, ((A.Int, _) as e2)) ->
-        let lhs = expr builder e1
-        and rhs = expr builder e2 in
+        let lhs = expr builder e1 env
+        and rhs = expr builder e2 env in
           (match op with
               A.Add     -> L.build_add
             | A.Sub     -> L.build_sub
@@ -174,8 +172,8 @@ let build_function fdecl =
     | SBinop(((A.Float, _) as e1), op, ((A.Int, _) as e2))
     | SBinop(((A.Int, _) as e1), op, ((A.Float, _) as e2))
     | SBinop(((A.Float, _) as e1), op, ((A.Float, _) as e2)) ->
-      let lhs = expr builder e1
-      and rhs = expr builder e2 in
+      let lhs = expr builder e1 env
+      and rhs = expr builder e2 env in
         (match op with
             A.Add     -> L.build_fadd
           | A.Sub     -> L.build_fsub
@@ -190,8 +188,8 @@ let build_function fdecl =
 
     (* Binary operation for two booleans *)
     | SBinop(((A.Bool, _) as e1), op, ((A.Bool, _) as e2)) ->
-      let lhs = expr builder e1
-      and rhs = expr builder e2 in
+      let lhs = expr builder e1 env
+      and rhs = expr builder e2 env in
         (match op with
             A.Or      -> L.build_or
           | A.And     -> L.build_and
@@ -200,12 +198,12 @@ let build_function fdecl =
 
     (* Call to built in printf function *)
     | SFunctionCall ("Meow", [arg]) ->
-        L.build_call printf_func [| format_str (format arg) ; (expr builder arg) |] "printf" builder
+        L.build_call printf_func [| format_str (format arg) ; (expr builder arg env) |] "printf" builder
 
     (* Call a user-defined function *)
     | SFunctionCall (fname, args) ->
         let (fdef, fdecl) = lookup_function fname in
-        let llargs = List.rev (List.map (expr builder) (List.rev args))
+        let llargs = List.rev (List.map (fun a -> expr builder a env) (List.rev args))
         and result = (
           match fdecl.styp with
               A.Void -> ""
@@ -214,20 +212,35 @@ let build_function fdecl =
         L.build_call fdef (Array.of_list llargs) result builder
 
     (* Create a new struct instance of class c with variable name n*)
-    | SNewInstance(v, c, _) ->
+    | SNewInstance(v, c, constructor_exprs) ->
         (match c with
          A.Obtype (cname) as cls -> (
           (* add new variable to local vars; a pointer to malloc'd item *)
-          add_local (cls, v, None);
+          add_local (cls, v, None) env builder;
           (* assign the malloc to the new variable *)
           let rhs = L.build_malloc (find_struct_by_cls cname) "new_struct" builder
-          and lhs = lookup_variable v in
-          ignore(L.build_store rhs lhs builder); rhs
+          and lhs = lookup_variable v env in
+          ignore(L.build_store rhs lhs builder);
+
+          (* now the tricky nonsense of the constructor; since we want the default args
+          to be calculatable against each other, must build a separate symbol table *)
+          let constructor_vars:(string, L.llvalue) Hashtbl.t = Hashtbl.create 10 in
+          (* add all local entries... *)
+          let _ = Hashtbl.iter (fun k v -> Hashtbl.add constructor_vars k v) local_variables in
+          let build_constructor v (typ, e) =
+            (* add it to a "constructor" symbol table *)
+            (match e with
+                SAssign((_, SClassAccess(_, (_, _), id)), _) ->
+                ignore(add_local (typ, id, e) constructor_vars builder);
+                (expr builder (typ, e) constructor_vars) :: v (* build it! *)
+              | _ -> raise (NotYetSupported("codegen: expected class constructor pattern not yet supported\n")))
+          in
+          ignore(List.fold_left build_constructor [] constructor_exprs); rhs
          )
         | _ -> raise (ObjectCreationInvalid("codegen: cannot create instance of anything but Obtype")))
 
     | SClassAccess(A.Obtype(cname), v, inst_v) ->
-        let tmp_value = expr builder v
+        let tmp_value = expr builder v env
         and index = lookup_index cname inst_v in
         let deref = L.build_struct_gep tmp_value index "tmp" builder in
         L.build_load deref "dr" builder
@@ -249,13 +262,13 @@ let build_function fdecl =
   (*****************************************************)
   let rec stmt builder = function
       SBlock sl   -> List.fold_left stmt builder sl
-    | SExpr e     -> ignore(expr builder e); builder
+    | SExpr e     -> ignore(expr builder e local_variables); builder
     | SReturn e   -> ignore(
         match fdecl.styp with
             (* Special "return nothing" instr *)
             A.Void -> L.build_ret_void builder
             (* Build return statement *)
-          | _ -> L.build_ret (expr builder e) builder
+          | _ -> L.build_ret (expr builder e local_variables) builder
       ); builder
     | SIf (predicate, then_stmt, else_stmt) ->
         let bool_val = expr builder predicate in
@@ -274,14 +287,14 @@ let build_function fdecl =
         L.builder_at_end context merge_bb
 
     | SClassAssign (A.Obtype(cname), v, inst_v, e) ->
-        let rhs = expr builder e
+        let rhs = expr builder e local_variables
         and index = lookup_index cname inst_v
-        and load_tmp = expr builder v in
+        and load_tmp = expr builder v local_variables in
         let lhs = L.build_struct_gep load_tmp index "tmp" builder in
         ignore(L.build_store rhs lhs builder); builder
 
     | SDealloc (v) ->
-        let tmp_value = expr builder v in
+        let tmp_value = expr builder v local_variables in
         ignore(L.build_free (tmp_value) builder); builder
 
     | _ -> raise (NotYetSupported("complex stmts not yet supported"))

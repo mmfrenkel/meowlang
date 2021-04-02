@@ -1,1 +1,1 @@
-Fatal error: exception Exceptions.InstanceVariableAccessInvalid("instance variables only exist in classes; found: Jerry.cookies")
+Fatal error: exception Exceptions.InstanceVariableAccessInvalid("instance variables only exist in classes, found: Jerry.cookies")

@@ -1,1 +1,1 @@
-Fatal error: exception Exceptions.ObjectConstructorInvalid("cannot assign instance variables of new object to items of incorrect type, found: cookies = "this is a string" in allocation of new MOUSE")
+Fatal error: exception Exceptions.ObjectConstructorInvalid("you may only assign instance variables that are defined within the class and that are of the correct type ,found: cookies = "this is a string" in allocation of new MOUSE")

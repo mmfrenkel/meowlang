@@ -1,0 +1,43 @@
+
+HAI ITZ ME FUNC Main,
+
+    ITZ ME NUMBR count_cookies IZ 100.
+    ITZ ME NUMBR count_candies IZ 49.
+    ITZ ME NUMBR count_treats IZ SUM OF count_cookies AN count_candies.
+
+    PSST dont use any of the default valuesre
+    MAEK Jerry NEW MOUSE,
+        WIT treats IZ count_treats.
+
+    count_treats IZ PURR Get_Num_Treats IN Jerry.
+    PURR Meow WIT count_treats.
+
+    count_cookies IZ PURR Get_Num_Cookies IN Jerry.
+    PURR Meow WIT count_cookies.
+
+    count_candies IZ PURR Get_Num_Candies IN Jerry.
+    PURR Meow WIT count_candies.
+
+    BLEEP Jerry.
+
+KBYE
+
+HAI ITZ ME CLASS MOUSE,
+
+    ITZ ME NUMBR cookies IZ 2.
+    ITZ ME NUMBR candies IZ 5.
+    ITZ ME NUMBR treats IZ SUM OF cookies AN candies.
+
+    HAI ITZ ME NUMBR FUNC Get_Num_Treats,
+        GIVE treats.
+    KBYE
+
+   HAI ITZ ME NUMBR FUNC Get_Num_Cookies,
+        GIVE cookies.
+    KBYE
+
+   HAI ITZ ME NUMBR FUNC Get_Num_Candies,
+        GIVE candies.
+    KBYE
+
+KBYE

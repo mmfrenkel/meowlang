@@ -1,0 +1,37 @@
+
+
+Main()
+{
+	int count_cookies = 100;
+	int count_candies = 49;
+	int count_treats = count_cookies + count_candies;
+	class MOUSE Jerry(treats = count_treats, );
+	count_treats = Jerry.Get_Num_Treats();
+	printf("%X\n", count_treats);
+	count_cookies = Jerry.Get_Num_Cookies();
+	printf("%X\n", count_cookies);
+	count_candies = Jerry.Get_Num_Candies();
+	printf("%X\n", count_candies);
+	free(Jerry);
+}
+
+Class MOUSE {
+
+	int treats = cookies + candies;
+	int candies = 5;
+	int cookies = 2;
+
+	int Get_Num_Candies()
+	{
+	return candies;
+	}
+	int Get_Num_Cookies()
+	{
+	return cookies;
+	}
+	int Get_Num_Treats()
+	{
+	return treats;
+	}
+
+}

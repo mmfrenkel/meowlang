@@ -1,0 +1,38 @@
+HAI ITZ ME NUMBR FUNC Main,
+
+    ITZ ME NUMBR jerrys_cookies IZ 0.
+
+    MAEK Jerry NEW MOUSE.
+
+    PSST Call class method to set cookies
+    PURR Set_Num_Cookies IN Jerry WIT 10.
+
+    PURR Print_Cookies WIT Jerry.
+    BLEEP Jerry.
+    GIVE 0.
+KBYE
+
+HAI ITZ ME FUNC Print_Cookies WIT MOUSE mouse_guy,
+
+    ITZ ME NUMBR cookies.
+
+    cookies IZ PURR Get_Num_Cookies IN mouse_guy.
+
+    PURR Meow WIT "The mouse has: ".
+    PURR Meow WIT cookies.
+
+KBYE
+
+HAI ITZ ME CLASS MOUSE,
+
+    ITZ ME NUMBR cookies.
+
+    HAI ITZ ME FUNC Set_Num_Cookies WIT NUMBR cookies_given,
+        cookies IZ cookies_given.
+    KBYE
+
+    HAI ITZ ME NUMBR FUNC Get_Num_Cookies,
+        GIVE cookies.
+    KBYE
+
+KBYE

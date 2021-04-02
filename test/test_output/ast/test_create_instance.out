@@ -2,7 +2,7 @@
 
 Main()
 {
-	class MOUSE jerry(cookies = 2);
+	class MOUSE jerry(cookies = 2, );
 	free(jerry);
 }
 
