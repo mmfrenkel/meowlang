@@ -55,7 +55,9 @@ let check_matching_types typ1 typ2 err =
 (* Helper function to check for duplicates of anything *)
 let find_duplicate items exception_msg =
   let rec helper = function
-      n1 :: n2 :: _ when n1 = n2 -> raise (DuplicateIdentifier (exception_msg ^ n1))
+      n1 :: n2 :: _ when n1 = n2 ->
+        let msg = Printf.sprintf "%s %s" exception_msg n1
+        in raise (DuplicateIdentifier (msg))
     | _ :: t -> helper t
     | [] -> ()
   in helper (List.sort compare items)
@@ -63,7 +65,9 @@ let find_duplicate items exception_msg =
 (* Find the type of something, given a symbol table *)
 let find_type_of_id symbol_tbl id =
   try Hashtbl.find symbol_tbl id
-  with Not_found -> raise (VariableNotFound (undeclared_msg ^ id))
+  with Not_found ->
+    let msg = Printf.sprintf "%s %s" undeclared_msg id
+    in raise (VariableNotFound (msg))
 
 (*Find the class method by method name and class type *)
 let find_class_method cname mname =
@@ -73,7 +77,9 @@ let find_class_method cname mname =
     ) StringMap.empty (cls.cfuncs)
   in
   try StringMap.find mname cls_methods
-  with Not_found -> raise (ClassMethodNotFound(class_method_unknown ^ m_to_f_name cname mname))
+  with Not_found ->
+    let msg = Printf.sprintf "%s %s" class_method_unknown (m_to_f_name cname mname)
+    in raise (ClassMethodNotFound(msg))
 
 let instance_variables_of_cls cls_name =
   let cls = find_class cls_name in
@@ -138,8 +144,8 @@ let rec semant_expr expr env =
         | Concat          when (typ1 = String && (typ2 = String || typ2 == Int || typ2 == Float)) ||
                                 (typ2 = String && (typ1 == Int || typ1 == Float)) -> String
         | _               ->
-          let msg = "unexpected types in binary op (" ^ string_of_typ typ1 ^ " and "
-                    ^ string_of_typ typ2 ^ "): " ^ string_of_expr ex
+          let msg = Printf.sprintf "unexpected types in binary op (%s and %s): %s"
+                (string_of_typ typ1)  (string_of_typ typ2) (string_of_expr ex)
           in raise (IllegalBinaryOp(msg))
     in (end_typ, SBinop((typ1, e1'), op, (typ2, e2')))
 
@@ -172,8 +178,8 @@ let rec semant_expr expr env =
       let (var_typ, id) = semant_expr v env
       and (ret_type, e') = semant_expr e env in
       let err =
-        let msg = assignment_typ_mismatch ^ "expected " ^ string_of_typ var_typ
-                  ^ ", got " ^ string_of_typ ret_type ^ " here: " ^ string_of_expr ex
+        let msg = Printf.sprintf "%s expected %s, got %s here: %s\n"
+              assignment_typ_mismatch (string_of_typ var_typ) (string_of_typ ret_type) (string_of_expr ex)
         in VariableAssignmentError(msg)
       in (check_matching_types var_typ ret_type err, SAssign((var_typ, id), (ret_type, e')))
 
@@ -203,7 +209,10 @@ let rec semant_expr expr env =
         (* if "this" is used, it must be called within a class context *)
         if obj_name = "this" then
           if env.in_class = false
-            then raise (InvalidMethodCall(use_of_this_outside_class ^ ", but found in func " ^ env.function_name))
+            then
+              let msg = Printf.sprintf "%s, but found in func %s"
+                          use_of_this_outside_class env.function_name
+              in raise (InvalidMethodCall(msg))
           else Obtype(env.class_name)
         else find_type_of_id env.symbols obj_name
       in
@@ -219,15 +228,15 @@ let rec semant_expr expr env =
       (* 3. Check that param length is equal to the num args provided *)
       if List.length args != List.length meth.formals
         then
-          let msg = meth_arg_num_mismatch ^ meth_name ^ " (got " ^
-                    string_of_int (List.length args) ^ ", expected " ^ string_of_int (List.length meth.formals) ^ ")"
+          let msg = Printf.sprintf "%s %s (got %s, expected %s)"
+                meth_arg_num_mismatch  meth_name (string_of_int (List.length args)) (string_of_int (List.length meth.formals))
           in raise (MethodArgumentLengthMismatch(msg))
       else
       (* 4. Check that the arguments passed are of the expected type *)
         let args' =
           try List.map2 check_arg_type meth.formals args
           with ArgumentTypeMismatch(s) ->
-            let msg = "method " ^ meth_name ^ " received arg of unexpected type: " ^ s
+            let msg = Printf.sprintf "method %s received arg of unexpected type: %s" meth_name s
             in raise(ArgumentTypeMismatch(msg))
         in
         (* 5. Convert to function call; add the object as the first argument *)
@@ -273,7 +282,9 @@ let rec semant_expr expr env =
       match typ with
         (* 2. Check that the class of new instance actually exists - valid *)
         Obtype o -> (o, find_class o)
-      | _ -> raise (ObjectCreationInvalid(invalid_object_creation ^ string_of_expr ex))
+      | _ ->
+          let msg = Printf.sprintf "%s, found: %s" invalid_object_creation (string_of_expr ex)
+          in raise (ObjectCreationInvalid(msg))
     in
 
     (**************************************************************************)
@@ -331,8 +342,14 @@ let rec semant_expr expr env =
                 and rhs = (typ, e') in
                 (* Append the new expression to the growing list *)
                 (typ, SAssign(lhs, rhs)) :: acc
-              else raise (ObjectConstructorInvalid(object_constructor_types ^ string_of_expr expr ^ " in allocation of new " ^ cname))
-          | _ -> raise(ObjectConstructorInvalid(object_constructor_error ^ string_of_expr expr ^ " in allocation of new " ^ cname)))
+              else
+                let msg = Printf.sprintf "%s %s in allocation of new %s"
+                          object_constructor_types (string_of_expr expr) cname
+                in raise (ObjectConstructorInvalid(msg))
+          | _ ->
+            let msg = Printf.sprintf "%s %s in allocation of new %s"
+                    object_constructor_error (string_of_expr expr) cname
+            in raise(ObjectConstructorInvalid(msg)))
         in
       List.fold_left check_constructor_arg default_vars expr_list in
 
@@ -346,14 +363,16 @@ let rec semant_expr expr env =
       let obj_name =
         (match v with
           Id (id) -> id
-        | _ -> raise (InstanceVariableAccessInvalid("class access is performed on an object identified by a variable\n")))
+        | _ -> raise (InstanceVariableAccessInvalid(class_access_msg)))
       in
       let (typ, identifer) = semant_expr v env in
       (* 2. You can only "access" instance variables of type Obtype *)
       let cname =
         (match typ with
           Obtype o -> o
-        | _ -> raise (InstanceVariableAccessInvalid(invalid_instance_var_access ^ string_of_expr ex)))
+        | _ ->
+          let msg = Printf.sprintf "%s, found: %s" invalid_instance_var_access (string_of_expr ex)
+          in raise (InstanceVariableAccessInvalid(msg)))
       in
       (* 3. Check that the instance variable exists within the class *)
       let cls = find_class cname in
@@ -366,8 +385,9 @@ let rec semant_expr expr env =
         in
         (find_typ class_var cls.cvars, (SClassAccess(Obtype(cname), (typ, identifer), class_var)))
       else
-        let msg = obj_name ^ ", instance of class " ^ cname ^ ", has no member " ^ class_var in
-        raise (InstanceVariableNotFound(msg))
+        let msg = Printf.sprintf "%s, instance of class %s, has no member %s"
+                  obj_name cname class_var
+        in raise (InstanceVariableNotFound(msg))
 
   | ArrayAccess (array_id, e) as ex ->
       (* 1. Check that the array exists in the symbol table  *)
@@ -383,7 +403,9 @@ let rec semant_expr expr env =
       let (typ', e') = semant_expr e env in
       (match typ' with
         Int -> (typ, SArrayAccess (array_id, (typ', e')))
-      | _ -> (raise (InvalidArrayAccess(array_access_integer ^ "found index expression " ^ string_of_expr ex))))
+      | _ ->
+        let msg = Printf.sprintf "%s found index expression %s" array_access_integer (string_of_expr ex)
+        in raise (InvalidArrayAccess(msg)))
 
 (****************************************)
 (* Main function for checking semantics *)
@@ -396,8 +418,9 @@ let rec semant_stmt stmt env =
     let (t', e') = semant_expr e env in
       if t' == Bool then (t', e')
       else
-        let msg = op_type_mismatch_boolean ^ string_of_typ t' ^ string_of_expr e in
-        raise (ControlFlowIllegalArgument(msg))
+        let msg = Printf.sprintf "%s %s %s"
+          op_type_mismatch_boolean (string_of_typ t') (string_of_expr e)
+        in raise (ControlFlowIllegalArgument(msg))
   and
 
   (* for looping: checks that op is Increment or Decrement *)
@@ -413,8 +436,9 @@ let rec semant_stmt stmt env =
     let (t', e') = semant_expr e env in
       if t' == Int then (t', e')
       else
-        let msg = op_type_mismatch_int ^ (string_of_typ t') ^ string_of_expr e in
-        raise (ControlFlowIllegalArgument(msg))
+        let msg = Printf.sprintf "%s %s %s"
+          op_type_mismatch_int (string_of_typ t') (string_of_expr e)
+        in raise (ControlFlowIllegalArgument(msg))
   and
 
   (* for looping: second expr is optional or index assignment *)
@@ -433,8 +457,13 @@ let rec semant_stmt stmt env =
         SBinop(_, op, _) ->
           (match op with
             Less | Greater | Equal | Neq -> (t', e')
-          | _ -> raise (ControlFlowIllegalArgument(op_type_mismatch_loop_term ^ string_of_expr e )))
-      | _ -> raise (ControlFlowIllegalArgument(expr_type_mismatch ^ "expected binary operation in loop: " ^ string_of_expr e))
+          | _ ->
+            let msg = Printf.sprintf "%s %s" op_type_mismatch_loop_term (string_of_expr e)
+            in raise (ControlFlowIllegalArgument(msg)))
+      | _ ->
+        let msg = Printf.sprintf "%s expected binary operation in loop: %s"
+          expr_type_mismatch (string_of_expr e)
+        in raise (ControlFlowIllegalArgument(msg))
   in
 
   match stmt with
@@ -473,7 +502,10 @@ let rec semant_stmt stmt env =
     let typ = find_type_of_id env.symbols id in
     (match typ with
       Obtype _ | Arrtype _ -> SDealloc(typ, SId(id))
-    | _ -> raise (InvalidDealloc(invalid_deallocation_msg ^ id ^ " is of typ " ^ string_of_typ typ)))
+    | _ ->
+      let msg = Printf.sprintf "%s %s is of typ %s"
+        invalid_deallocation_msg id (string_of_typ typ)
+      in raise (InvalidDealloc(msg)))
 
   | ClassAssign (id, instance_var, e) ->
     (* 1. id must correspond to an ObjType *)
@@ -489,11 +521,13 @@ let rec semant_stmt stmt env =
         if List.mem (vtype, instance_var) cvars then
           SClassAssign(Obtype(cname), (typ, identifier), instance_var, (vtype, e'))
         else
-          let msg = invalid_cls_member_assign ^ string_of_typ typ ^ " to " ^ cname ^ "." ^ instance_var in
-          raise (InvalidClassMemberAssignment(msg))
+          let msg = Printf.sprintf "%s %s to %s.%s"
+                invalid_cls_member_assign (string_of_typ typ) cname instance_var
+          in raise (InvalidClassMemberAssignment(msg))
     | _ ->
-      let msg = member_assign_cls_only ^ (string_of_expr id) ^ " is of type " ^ string_of_typ typ in
-      raise (InvalidClassMemberAssignment(msg)))
+      let msg = Printf.sprintf "%s %s is of type %s"
+          member_assign_cls_only (string_of_expr id) (string_of_typ typ)
+      in raise (InvalidClassMemberAssignment(msg)))
 
   | ArrayAssign (id, idx_e, e) as s ->
     (* 1. make sure that the variable is an array type *)
@@ -604,7 +638,9 @@ let check_function_or_method func env =
         (* check assignment statement types *)
         let (typ', expr') = semant_expr expr env in
         if typ != typ'
-          then let msg = object_constructor_types ^ string_of_typ typ' ^ ", expected " ^ string_of_typ typ
+          then
+            let msg = Printf.sprintf "%s %s, expected %s"
+              object_constructor_types (string_of_typ typ') (string_of_typ typ)
             in raise (ObjectInstanceVariableInvalid(msg))
         else
           Hashtbl.add env.symbols name typ; (typ, name, (typ', expr')))
