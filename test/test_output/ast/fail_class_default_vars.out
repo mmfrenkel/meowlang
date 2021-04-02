@@ -1,0 +1,16 @@
+
+
+Main()
+{
+	class MOUSE Jerry;
+	free(Jerry);
+}
+
+Class MOUSE {
+
+	int treats = idontexist + candies;
+	int candies = 5;
+	int cookies = 2;
+
+
+}

@@ -2,7 +2,7 @@
 
 Main()
 {
-	class MOUSE jerry(2 + 1);
+	class MOUSE jerry(2 + 1, );
 	free(jerry);
 }
 

@@ -7,9 +7,7 @@ HAI ITZ ME FUNC Main,
 
     PSST dont use any of the default valuesre
     MAEK Jerry NEW MOUSE,
-        WIT treats IZ count_treats
-        AN cookies IZ count_cookies
-        AN candies IZ count_candies.
+        WIT treats IZ count_treats.
 
     count_treats IZ PURR Get_Num_Treats IN Jerry.
     PURR Meow WIT count_treats.

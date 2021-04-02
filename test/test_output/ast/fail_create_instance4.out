@@ -2,7 +2,7 @@
 
 Main()
 {
-	class MOUSE jerry(cookies = "this is a string");
+	class MOUSE jerry(cookies = "this is a string", );
 	free(jerry);
 }
 
