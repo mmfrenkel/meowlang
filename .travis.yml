@@ -12,8 +12,8 @@ addons:
     - m4
     - pkg-config
     - make
-    - llvm-8.0
-    - llvm-8.0-dev
+    - llvm
+    - llvm-dev
 
 before_script:
   - opam init -y
