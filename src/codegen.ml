@@ -144,9 +144,7 @@ let build_function fdecl =
           (* Used in assigning variables; not used in assigning class members *)
             SId(var) ->
               ignore(L.build_store rhs (lookup_variable var env) builder); rhs
-          (* Handle this class access PLUS Assignment case -- this could be merged with ClassAssign, if time allows *)
           | SClassAccess(A.Obtype(cname), ((_, SId(_)) as v), inst_v) ->
-              (* print_string ("assign: " ^ inst_v ^ " in " ^ cname ^ " "  ^ name ^ "\n"); *)
               let index = lookup_index cname inst_v
               and load_tmp = expr builder v env in
               let lhs = L.build_struct_gep load_tmp index "tmp" builder in
@@ -228,8 +226,7 @@ let build_function fdecl =
           to be calculatable against each other, must build a separate symbol table *)
           let constructor_vars:(string, L.llvalue) Hashtbl.t = Hashtbl.create 10 in
           (* add all local entries... *)
-          let _ = Hashtbl.iter (fun k v -> Hashtbl.add constructor_vars k v) local_variables
-          in
+          let _ = Hashtbl.iter (fun k v -> Hashtbl.add constructor_vars k v) local_variables in
           let build_constructor v (typ, e) =
             (* add it to a "constructor" symbol table *)
             (match e with
@@ -238,8 +235,7 @@ let build_function fdecl =
                 (expr builder (typ, e) constructor_vars) :: v (* build it! *)
               | _ -> raise (NotYetSupported("codegen: expected class constructor pattern not yet supported\n")))
           in
-          ignore(List.fold_left build_constructor [] constructor_exprs);
-          rhs
+          ignore(List.fold_left build_constructor [] constructor_exprs); rhs
          )
         | _ -> raise (ObjectCreationInvalid("codegen: cannot create instance of anything but Obtype")))
 
