@@ -343,11 +343,11 @@ let rec semant_expr expr env =
                 (* Append the new expression to the growing list *)
                 (typ, SAssign(lhs, rhs)) :: acc
               else
-                let msg = Printf.sprintf "%s %s in allocation of new %s"
+                let msg = Printf.sprintf "%s, found: %s in allocation of new %s"
                           object_constructor_types (string_of_expr expr) cname
                 in raise (ObjectConstructorInvalid(msg))
           | _ ->
-            let msg = Printf.sprintf "%s %s in allocation of new %s"
+            let msg = Printf.sprintf "%s, found: %s in allocation of new %s"
                     object_constructor_error (string_of_expr expr) cname
             in raise(ObjectConstructorInvalid(msg)))
         in
