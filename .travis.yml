@@ -1,6 +1,5 @@
-branches:
-  only:
-  - master
+# Structure/Contents of file inspired by: https://github.com/jaredweiss/JaTeste/blob/master/.travis.yml
+language: c
 
 addons:
   apt:
@@ -8,21 +7,20 @@ addons:
     - avsm
     - ubuntu-toolchain-r-test
     - llvm-toolchain-precise
-    - llvm-toolchain-precise-3.8
     packages:
     - opam
     - m4
     - pkg-config
     - make
-    - llvm-10
-    - llvm-10-dev
+    - llvm-9
+    - llvm-9-dev
 
 before_script:
   - opam init -y
   - eval $(opam config env)
   - opam install ocamlfind -y
-  - opam install llvm.10.0.0 -y
-  - export PATH=/usr/lib/llvm-10.0.0/bin:$PATH
+  - opam install llvm.9.0.0 -y
+  - export PATH=/usr/lib/llvm-9.0.0/bin:$PATH
 
 script:
   - make
