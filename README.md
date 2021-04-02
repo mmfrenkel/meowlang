@@ -38,7 +38,12 @@ $ test/test_single_program.sh <name-of-file>.meow
 
 ### ii. Regression Test Suite
 
-You can run regression tests for the project with the following command:
+You can run all regression tests for the project with the following command:
+```
+$ ./test/test_all.sh
+```
+
+To run a regression test group (i.e., ast/semantic/full pipeline) individually:
 ```
 $ ./test/run_regression_tests.sh [run-type] [files]
 ```
