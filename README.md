@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.com/mmfrenkel/meowlang.svg?branch=main)](https://travis-ci.com/mmfrenkel/meowlang)
-
+[![Build Status](https://travis-ci.com/mmfrenkel/meowlang.svg?token=A82yQjjqXq4xHFY2Wdxo&branch=main)](https://travis-ci.com/mmfrenkel/meowlang)
 
 # meowlang
 
