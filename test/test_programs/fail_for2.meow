@@ -1,11 +1,10 @@
 HAI ITZ ME FUNC Main,
 
-    ITZ ME NUMBR index.
-    ITZ ME NUMBR count IZ 20.
+    ITZ ME NUMBR index IZ 10.
     
-    PSST uninitialized index variable index
-    IM IN YR LOOP index NERFIN AN BIGGR index THAN 10 HAI
-      count IZ PRODUKT OF 5 AN 1.
+    PSST undeclared identifier count
+    IM IN YR LOOP index NERFIN index IZ SUM OF 10 AN count AN BIGGR index THAN 10 HAI
+      index IZ PRODUKT OF 5 AN 1.
     KBYE
 
 KBYE
