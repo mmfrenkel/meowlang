@@ -1,0 +1,11 @@
+HAI ITZ ME FUNC Main,
+
+    ITZ ME NUMBR index IZ 15.
+    ITZ ME NUMBR count IZ 0.
+
+    PSST loop termination is not a binary operation of <, <=, =>, or >
+    IM IN YR LOOP index UPPIN AN CAT index AN 2 HAI
+      count IZ SUM OF 10 AN 1.
+    KBYE
+
+KBYE

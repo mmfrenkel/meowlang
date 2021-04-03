@@ -1,0 +1,11 @@
+HAI ITZ ME FUNC Main,
+
+    ITZ ME NUMBR index.
+    ITZ ME NUMBR count IZ 20.
+    
+    PSST uninitialized index variable index
+    IM IN YR LOOP index NERFIN AN BIGGR index THAN 10 HAI
+      count IZ 5 AN 1
+    KBYE
+
+KBYE

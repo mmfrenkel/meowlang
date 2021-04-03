@@ -1,0 +1,18 @@
+HAI ITZ ME FUNC Main,
+
+    ITZ ME NUMBR index IZ 10.
+    ITZ ME NUMBR count IZ 20.
+    
+    PSST Infinite loop; OK
+    IM IN YR LOOP index NERFIN count IZ 10 AN BIGGR index THAN 10 HAI
+      index IZ 5 AN 1.
+    KBYE
+
+    ITZ ME YARN condition.
+
+    PSST index variable condition is not an integer
+    IM IN YR LOOP condition UPPIN AN SMALLR condition THAN 10 HAI
+      index IZ SUM OF 10 AN 1.
+    KBYE
+
+KBYE
