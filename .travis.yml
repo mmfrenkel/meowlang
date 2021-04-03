@@ -22,4 +22,4 @@ before_script:
   - export PATH=/usr/lib/llvm-3.8/bin:$PATH
   
 script:
-  - make
+  - make build_and_test
