@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.com/mmfrenkel/meowlang.svg?branch=main)](https://travis-ci.com/mmfrenkel/meowlang)
+
+
 # meowlang
 
 ## I. Compile:
