@@ -195,6 +195,16 @@ let build_function fdecl =
           | A.And     -> L.build_and
           | _         -> raise (NotYetSupported("found binary operation not supported for two boolean values"))
         ) lhs rhs "binop_bool_tmp" builder
+        
+
+    (* Unary operation for one boolean *)    
+    | SUnop(op, ((A.Bool, _) as e1)) ->
+      let rhs = expr builder e1 env in
+	       (match op with
+          | A.Not                  -> L.build_not
+          | _                      -> raise (NotYetSupported("found unary operation not supported"))
+          ) rhs "unop_tmp" builder
+
 
     (* Call to built in printf function *)
     | SFunctionCall ("Meow", [arg]) ->
