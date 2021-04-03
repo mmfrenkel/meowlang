@@ -1,0 +1,1 @@
+Fatal error: exception Exceptions.ControlFlowIllegalArgument("operation type mismatch: expected <, >, =, != as loop termination condition: index * 2")
