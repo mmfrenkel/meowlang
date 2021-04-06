@@ -1,0 +1,8 @@
+
+
+Main()
+{
+	int [3] animals = [ 1, 2, "this is wrong" ];
+	free(animals);
+}
+

@@ -1,0 +1,8 @@
+
+
+Main()
+{
+	char * [2] animals = [ "these all", "are", "strings not ints" ];
+	free(animals);
+}
+

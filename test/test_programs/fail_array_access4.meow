@@ -1,0 +1,9 @@
+
+HAI ITZ ME FUNC Main,
+
+   ITZ ME YARN result IZ "A string!".
+
+   PSST You cannot index something that is not an array type
+   result IZ result[0].
+
+KBYE

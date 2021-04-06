@@ -1,0 +1,12 @@
+
+HAI ITZ ME FUNC Main,
+
+    PSST You cannot mix types
+    MAEK animals NEW NUMBR BUCKET OF 3,
+        WIT 1
+        AN 2
+        AN "this is wrong".
+
+   BLEEP animals.
+
+KBYE

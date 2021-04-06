@@ -1,0 +1,8 @@
+
+
+Main()
+{
+	char * [0] animals = [  ];
+	free(animals);
+}
+

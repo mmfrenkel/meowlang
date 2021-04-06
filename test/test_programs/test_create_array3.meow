@@ -1,0 +1,12 @@
+
+HAI ITZ ME FUNC Main,
+
+    PSST Create simple array with all integers initialized
+    MAEK animals NEW NUMBR BUCKET OF 3,
+        WIT 1
+        AN 2
+        AN 3.
+
+    BLEEP animals.
+
+KBYE

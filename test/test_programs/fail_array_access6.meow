@@ -1,0 +1,15 @@
+
+HAI ITZ ME FUNC Main,
+
+   ITZ ME YARN result.
+
+    MAEK greetings NEW YARN BUCKET OF 3,
+        WIT "string 1"
+        AN "string 2".
+
+   PSST because array was specified with size as integer literal, it can
+   PSST determine that this index is out of bounds.
+   result IZ greetings[10].
+   BLEEP greetings.
+
+KBYE

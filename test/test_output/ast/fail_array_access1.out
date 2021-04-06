@@ -1,0 +1,11 @@
+
+
+Main()
+{
+	char * index = "index?";
+	char * result;
+	char * [3] greetings = [ "string 1", "string 2" ];
+	result = greetings[index];
+	free(greetings);
+}
+

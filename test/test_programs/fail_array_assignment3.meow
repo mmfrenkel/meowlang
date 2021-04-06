@@ -1,0 +1,16 @@
+GIMME hello?
+
+HAI ITZ ME FUNC Main,
+
+   ITZ ME YARN value IZ "value".
+   ITZ ME NUMBR index IZ QUOSHUNT OF 10 AN 3.
+
+    MAEK greetings NEW YARN BUCKET OF 3,
+        WIT "string 1"
+        AN "string 2".
+
+   PSST setting the variable at this index of wrong type
+   greetings[0] IZ index.
+   BLEEP greetings.
+KBYE
+

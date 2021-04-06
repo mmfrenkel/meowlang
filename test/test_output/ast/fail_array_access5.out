@@ -1,0 +1,8 @@
+
+
+Main()
+{
+	int result = 100;
+	result = result[0];
+}
+

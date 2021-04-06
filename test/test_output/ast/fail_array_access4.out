@@ -1,0 +1,8 @@
+
+
+Main()
+{
+	char * result = "A string!";
+	result = result[0];
+}
+
