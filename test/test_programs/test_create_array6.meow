@@ -9,6 +9,7 @@ HAI ITZ ME FUNC Main,
         WIT str1
         AN str2.
 
+    PURR Meow WIT exclamations[0].
     BLEEP exclamations.
 
 KBYE

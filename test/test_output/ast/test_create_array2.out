@@ -1,0 +1,12 @@
+
+
+int Main()
+{
+	char * [3] animals = [ "Cats", "Dogs", "More Dogs" ];
+	printf("%X\n", animals[0]);
+	printf("%X\n", animals[1]);
+	printf("%X\n", animals[2]);
+	free(animals);
+	return 0;
+}
+

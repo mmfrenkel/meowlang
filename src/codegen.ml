@@ -39,22 +39,22 @@ let context    = L.global_context ()
 let the_module = L.create_module context "Meowlang"
 
 (* Easier to not have to rewrite these types*)
-let i32_t     = L.i32_type    context
 let i1_t      = L.i1_type     context
+let i8_t      = L.i8_type     context
+let i32_t     = L.i32_type    context
 let float_t   = L.double_type context
 let void_t    = L.void_type   context
-let str_t     = L.pointer_type  (L.i8_type  context)
+let str_t     = L.pointer_type i8_t
 
 (* Finds the LLVM type corresponding to the Meowlang type *)
-let ltype_of_typ = function
-    A.Int       -> i32_t
-  | A.Bool      -> i1_t
-  | A.Float     -> float_t
-  | A.Void      -> void_t
-  | A.String    -> str_t
-  | A.Obtype(c) -> L.pointer_type (find_struct_by_cls c)
-  | _ -> raise (NotYetSupported("complex types not yet supported"))
-  (* | A.Arrtype(sz, typ) -> L.array_type (ltype_of_typ typ) sz *)
+let rec ltype_of_typ = function
+    A.Int           -> i32_t
+  | A.Bool          -> i1_t
+  | A.Float         -> float_t
+  | A.Void          -> void_t
+  | A.String        -> str_t
+  | A.Obtype(c)     -> L.pointer_type (find_struct_by_cls c)
+  | A.Arrtype(_, t) -> L.pointer_type (ltype_of_typ t)
 
 (* Creates a function prototype *)
 let create_func_prototype fdecl =
@@ -141,17 +141,21 @@ let build_function fdecl =
 
     | SAssign ((_, lhs), e)   ->
         let rhs = expr builder e env in
-        (match lhs with
+        let lhs =
+          match lhs with
           (* Used in assigning variables; not used in assigning class members *)
-            SId(var) ->
-              ignore(L.build_store rhs (lookup_variable var env) builder); rhs
+            SId(var) -> lookup_variable var env
           | SClassAccess(A.Obtype(cname), ((_, SId(_)) as v), inst_v) ->
               let index = lookup_index cname inst_v
               and load_tmp = expr builder v env in
-              let lhs = L.build_struct_gep load_tmp index "tmp" builder in
-              ignore(L.build_store rhs lhs builder); rhs
-          | _ ->
-            raise (NotYetSupported("codegen: assignment not supported for anything but class instance vars and regular variables")))
+              L.build_struct_gep load_tmp index "tmp" builder
+          | SArrayAccess(v, e) ->
+              let index_args = [|expr builder e env|] in
+              let arr = L.build_load (lookup_variable v env) "arr_ptr" builder in
+              L.build_gep arr index_args "element_ptr" builder
+
+          | _ -> raise (NotYetSupported("codegen: assignment op not yet supported"))
+        in ignore(L.build_store rhs lhs builder); rhs
 
     (* Binary operation between two integers *)
     | SBinop(((A.Int, _) as e1), op, ((A.Int, _) as e2)) ->
@@ -248,6 +252,30 @@ let build_function fdecl =
         let deref = L.build_struct_gep tmp_value index "tmp" builder in
         L.build_load deref "dr" builder
 
+    | SNewArray (v, i_typ, n, setup_exprs) ->
+        (* add new variable to local vars; a pointer to malloc'd item *)
+        add_local (A.Arrtype(n, i_typ), v, None) env builder;
+        (* determine value of n *)
+        let n_val =
+          match n with
+            A.ILiteralArraySize i  -> L.const_int i32_t i
+          | A.VariableArraySize id -> expr builder (A.Int, SId(id)) env
+        and ar_typ = ltype_of_typ i_typ
+        in
+        let rhs = L.build_array_malloc ar_typ n_val "create_heap_array" builder
+        and lhs = lookup_variable v env in
+        ignore(L.build_store rhs lhs builder);
+
+        (* now do the setup expressions, where the array contents are assigned *)
+        (* this is like a constructor for a new array *)
+        ignore(List.map (fun e -> expr builder e env) (List.rev setup_exprs)); rhs
+
+    | SArrayAccess (v, e) ->
+        let index_args = [|expr builder e env|]
+        and arr = L.build_load (lookup_variable v env) "arr_ptr" builder in
+        let gep = L.build_gep arr index_args "element_ptr" builder in
+        L.build_load gep "array_entry" builder
+
     | _ -> raise (NotYetSupported("found expr or functions not yet supported"))
   in
 
@@ -273,6 +301,7 @@ let build_function fdecl =
             (* Build return statement *)
           | _ -> L.build_ret (expr builder e local_variables) builder
       ); builder
+
     | SIf (predicate, then_stmt, else_stmt) ->
         let bool_val = expr builder predicate local_variables in
         let merge_bb = L.append_block context "merge" the_function in
@@ -314,10 +343,19 @@ let build_function fdecl =
   
     | SClassAssign (A.Obtype(cname), v, inst_v, e) ->
         let rhs = expr builder e local_variables
-        and index = lookup_index cname inst_v
-        and load_tmp = expr builder v local_variables in
-        let lhs = L.build_struct_gep load_tmp index "tmp" builder in
+        and lhs =
+          let index = lookup_index cname inst_v
+          and load_tmp = expr builder v local_variables in
+          L.build_struct_gep load_tmp index "tmp" builder
+        in
         ignore(L.build_store rhs lhs builder); builder
+
+    | SArrayAssign (v, idx_e, (t, assign_e)) ->
+        (* Utilize code already created to handle assignment expressions *)
+        let converted_expr =
+          (t, SAssign((t, SArrayAccess(v, idx_e)), (t, assign_e)))
+        in
+        ignore(expr builder converted_expr local_variables); builder
 
     | SDealloc (v) ->
         let tmp_value = expr builder v local_variables in

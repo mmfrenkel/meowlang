@@ -1,0 +1,10 @@
+include "hello"
+
+Main()
+{
+	int idx = 0;
+	int [3] cool_array = [ 1, 2, 3 ];
+	cool_array[idx] = 2;
+	printf("%X\n", cool_array[idx]);
+}
+
