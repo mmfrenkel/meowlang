@@ -301,7 +301,7 @@ let build_function fdecl =
           (L.builder_at_end context body_bb)
           (* create the SBinop expr for incrementing and decrementing *)
           (* append the increment/decrement operation to the end of the loop body *)
-          (SBlock [loop_body ; SExpr(Int, SBinop(index, inc_decrement, (Int, SILiteral 1)))])
+          (SBlock [loop_body ; SExpr(A.Int, SBinop(index, inc_decrement, (A.Int, SILiteral 1)))])
         )
           (L.build_br pred_bb);
 
