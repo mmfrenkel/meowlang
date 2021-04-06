@@ -13,8 +13,6 @@ HAI ITZ ME FUNC Main,
         count IZ 20.
         IM IN YR LOOP count NERFIN AN BIGGR count THAN 10 HAI
             condition IZ "count is still more than 10".
-            condition IZ CAT condition AN "count is".
-            condition IZ CAT condition AN count.
         KBYE
         
         PSST Initialize index and then increment

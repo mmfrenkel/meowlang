@@ -137,6 +137,7 @@ let build_function fdecl =
     | SFliteral l        -> L.const_float_of_string float_t l
     | SStringLit s       -> L.build_global_stringptr s "str" builder
     | SId var            -> L.build_load (lookup_variable var env) var builder
+    | SNoexpr            -> L.const_int i32_t 0
 
     | SAssign ((_, lhs), e)   ->
         let rhs = expr builder e env in
@@ -157,14 +158,16 @@ let build_function fdecl =
         let lhs = expr builder e1 env
         and rhs = expr builder e2 env in
           (match op with
-              A.Add     -> L.build_add
-            | A.Sub     -> L.build_sub
-            | A.Mult    -> L.build_mul
-            | A.Div     -> L.build_sdiv
-            | A.Equal   -> L.build_icmp L.Icmp.Eq
-            | A.Neq     -> L.build_icmp L.Icmp.Ne
-            | A.Less    -> L.build_icmp L.Icmp.Slt
-            | A.Greater -> L.build_icmp L.Icmp.Sgt
+              A.Add       -> L.build_add
+            | A.Sub       -> L.build_sub
+            | A.Mult      -> L.build_mul
+            | A.Div       -> L.build_sdiv
+            | A.Equal     -> L.build_icmp L.Icmp.Eq
+            | A.Neq       -> L.build_icmp L.Icmp.Ne
+            | A.Less      -> L.build_icmp L.Icmp.Slt
+            | A.Greater   -> L.build_icmp L.Icmp.Sgt
+            | A.Increment -> L.build_add
+            | A.Decrement -> L.build_sub
             | _         -> raise (NotYetSupported("found binary operation not supported for two integers"))
           ) lhs rhs "binop_int_tmp" builder
 
@@ -286,6 +289,32 @@ let build_function fdecl =
         ignore(L.build_cond_br bool_val then_bb else_bb builder);
         L.builder_at_end context merge_bb
 
+    | SFor (inc_decrement, index, opt_index_assignment, termination_comparison, loop_body) ->
+        (* perform the index assignment if it exists *)
+        ignore(expr builder opt_index_assignment local_variables);
+
+        let pred_bb = L.append_block context "for" the_function in
+        ignore(L.build_br pred_bb builder);
+
+        (* let body_bb = L.append_block context "while_body" the_function in
+        add_terminal (stmt (L.builder_at_end context body_bb) body)
+          (L.build_br pred_bb); *)
+        let body_bb = L.append_block context "for_body" the_function in
+        add_terminal (stmt
+          (L.builder_at_end context body_bb)
+          (* append the increment/decrement operation to the end of the loop body *)
+          (SBlock [loop_body ; SExpr(Int, SBinop(index, inc_decrement, (Int, SILiteral 1)))])
+        )
+          (L.build_br pred_bb);
+
+        let pred_builder = L.builder_at_end context pred_bb in
+        (* let bool_val = expr pred_builder predicate in *)
+        let bool_val = expr pred_builder termination_comparison local_variables in
+
+        let merge_bb = L.append_block context "merge" the_function in
+        ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
+        L.builder_at_end context merge_bb
+  
     | SClassAssign (A.Obtype(cname), v, inst_v, e) ->
         let rhs = expr builder e local_variables
         and index = lookup_index cname inst_v
