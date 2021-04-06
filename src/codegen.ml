@@ -296,19 +296,16 @@ let build_function fdecl =
         let pred_bb = L.append_block context "for" the_function in
         ignore(L.build_br pred_bb builder);
 
-        (* let body_bb = L.append_block context "while_body" the_function in
-        add_terminal (stmt (L.builder_at_end context body_bb) body)
-          (L.build_br pred_bb); *)
         let body_bb = L.append_block context "for_body" the_function in
         add_terminal (stmt
           (L.builder_at_end context body_bb)
+          (* create the SBinop expr for incrementing and decrementing *)
           (* append the increment/decrement operation to the end of the loop body *)
           (SBlock [loop_body ; SExpr(Int, SBinop(index, inc_decrement, (Int, SILiteral 1)))])
         )
           (L.build_br pred_bb);
 
         let pred_builder = L.builder_at_end context pred_bb in
-        (* let bool_val = expr pred_builder predicate in *)
         let bool_val = expr pred_builder termination_comparison local_variables in
 
         let merge_bb = L.append_block context "merge" the_function in
