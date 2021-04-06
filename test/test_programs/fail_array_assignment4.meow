@@ -1,0 +1,8 @@
+HAI ITZ ME FUNC Main,
+
+   ITZ ME YARN value IZ "value".
+
+   PSST you cannot do an index assignment on something other than arrays
+   value[0] IZ "new value".
+
+KBYE

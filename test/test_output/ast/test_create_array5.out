@@ -1,0 +1,8 @@
+
+
+Main()
+{
+	char * [3] animals = [ "Cats", "Dogs" ];
+	free(animals);
+}
+

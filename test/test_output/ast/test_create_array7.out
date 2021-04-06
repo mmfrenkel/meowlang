@@ -1,0 +1,8 @@
+
+
+Main()
+{
+	bool [10] empty_array = [  ];
+	free(empty_array);
+}
+
