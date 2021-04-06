@@ -75,11 +75,12 @@ formal_list:
   | formal_list COMMA typ ID { ($3,$4) :: $1  }
 
 typ:
-    INT     { Int         }
-  | BOOL    { Bool        }
-  | FLOAT   { Float       }
-  | STRING  { String      }
-  | ID      { Obtype ($1) }
+    INT                      { Int                                }
+  | BOOL                     { Bool                               }
+  | FLOAT                    { Float                              }
+  | STRING                   { String                             }
+  | ID                       { Obtype ($1)                        }
+  | ARRAY CONTAINS typ       { Arrtype (ILiteralArraySize(0), $3) }
 
 vdecls:
     /* nothing */             { []       }

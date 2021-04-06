@@ -8,6 +8,8 @@ HAI ITZ ME FUNC Main,
         WIT "Cats"
         AN "Dogs".
 
+    PURR Meow WIT animals[0].
+    PURR Meow WIT animals[1].
     BLEEP animals.
 
 KBYE

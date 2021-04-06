@@ -1,0 +1,14 @@
+
+
+Main()
+{
+	char * str1 = "whoooopie!";
+	char * str2 = "yiiippeee!";
+	char * str3 = "yayy";
+	int index = 1;
+	char * [3] exclamations = [ str1, str2 ];
+	exclamations[index] = str3;
+	printf("%X\n", exclamations[index]);
+	free(exclamations);
+}
+
