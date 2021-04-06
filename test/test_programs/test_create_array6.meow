@@ -1,0 +1,14 @@
+
+HAI ITZ ME FUNC Main,
+
+    ITZ ME YARN str1 IZ "whoooopie!".
+    ITZ ME YARN str2 IZ "yiiippeee!".
+
+    PSST Create simple array with elements that are variables
+    MAEK exclamations NEW YARN BUCKET OF 3,
+        WIT str1
+        AN str2.
+
+    BLEEP exclamations.
+
+KBYE

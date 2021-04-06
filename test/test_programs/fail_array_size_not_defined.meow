@@ -1,0 +1,12 @@
+
+HAI ITZ ME FUNC Main,
+
+    PSST size variable is not yet defined
+    MAEK animals NEW NUMBR BUCKET OF size,
+        WIT "these all"
+        AN "are"
+        AN "strings not ints".
+
+   BLEEP animals.
+
+KBYE

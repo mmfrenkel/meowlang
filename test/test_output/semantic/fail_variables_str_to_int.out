@@ -1,2 +1,1 @@
-Fatal error: exception Exceptions.VariableAssignmentError("variables can only be assigned to items of the expected type: expected int, got char * here: count = "hi"
-")
+Fatal error: exception Exceptions.VariableAssignmentError("variables can only be assigned to items of the expected type. expected int, got char * here: count = "hi"")

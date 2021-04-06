@@ -1,0 +1,19 @@
+
+HAI ITZ ME FUNC Main,
+
+    ITZ ME NUMBR value1 IZ 10.
+    ITZ ME NUMBR value2 IZ 11.
+    ITZ ME NUMBR value3 IZ 12.
+    ITZ ME NUMBR index IZ 2.
+
+    PSST Create simple array with elements that are variables
+    MAEK exclamations NEW NUMBR BUCKET OF 3,
+        WIT value1
+        AN value2.
+
+    exclamations[index] IZ value3.
+
+    PURR Meow WIT exclamations[index].
+    BLEEP exclamations.
+
+KBYE
