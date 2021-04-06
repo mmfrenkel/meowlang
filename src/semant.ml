@@ -402,7 +402,7 @@ let rec semant_expr expr env =
                   else (sz, arr_typ)
               | _ -> (sz, arr_typ))
         | _ ->
-          let msg = Printf.sprintf "%s attempting index on '%s' of type %s"
+          let msg = Printf.sprintf "%s; attempting index on '%s' of type %s"
                     array_access_array_only array_id (string_of_typ typ)
           in raise (InvalidArrayAccess(msg))
       in
@@ -558,7 +558,9 @@ let rec semant_stmt stmt env =
           let msg = Printf.sprintf "%s found index expression '%s' of type %s"
                       array_access_integer (string_of_expr idx_e) (string_of_typ idx_typ)
             in raise (InvalidArrayAssignment(msg)))
-      | _ -> raise (InvalidArrayAssignment(array_access_array_only ^ id ^ " is not an array")))
+      | _ ->
+        let msg = Printf.sprintf "%s; %s is not an array" array_access_array_only id
+        in raise (InvalidArrayAssignment(msg)))
 
 
 (****************************************)
