@@ -16,7 +16,6 @@ HAI ITZ ME FUNC Main,
             condition IZ "count is still more than 10".
             PSST condition IZ CAT condition AN "count is".
             PSST condition IZ CAT condition AN count.
-
         KBYE
         
         PSST Initialize index and then increment
