@@ -1,3 +1,4 @@
+#!/bin/bash
 # Use this file to perform regression tests on the meowlang compiler.
 # This file is designed to be used from the project root directory and run as:
 # ./test/run_regression_tests.sh [run_type]

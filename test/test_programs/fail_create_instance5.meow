@@ -1,0 +1,12 @@
+HAI ITZ ME FUNC Main,
+    PSST If assigning instance variables, they must exist in class definition
+    MAEK jerry NEW MOUSE,
+        WIT test IZ "this is not a valid inst var".
+    BLEEP jerry.
+KBYE
+
+HAI ITZ ME CLASS MOUSE,
+
+    ITZ ME NUMBR cookies IZ 0.
+
+KBYE

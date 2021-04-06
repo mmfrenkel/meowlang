@@ -1,6 +1,10 @@
+
 HAI ITZ ME FUNC Main,
 
+    ITZ ME NUMBR count_treats.
     MAEK Jerry NEW MOUSE.
+    count_treats IZ PURR Get_Num_Treats IN Jerry.
+    PURR Meow WIT count_treats.
     BLEEP Jerry.
 
 KBYE
@@ -12,7 +16,6 @@ HAI ITZ ME CLASS MOUSE,
     ITZ ME NUMBR treats IZ SUM OF cookies AN candies.
 
     HAI ITZ ME NUMBR FUNC Get_Num_Treats,
-        PSST This uses the SUM prefix operator
         GIVE treats.
     KBYE
 

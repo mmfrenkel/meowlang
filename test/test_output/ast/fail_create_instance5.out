@@ -1,0 +1,14 @@
+
+
+Main()
+{
+	class MOUSE jerry(test = "this is not a valid inst var", );
+	free(jerry);
+}
+
+Class MOUSE {
+
+	int cookies = 0;
+
+
+}

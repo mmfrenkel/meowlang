@@ -20,7 +20,7 @@ HAI ITZ ME CLASS MOUSE,
 
 KBYE
 
-HAI ITZ ME FUNC Main,
+HAI ITZ ME NUMBR FUNC Main,
 
     ITZ ME NUMBR jerrys_cookies.
     MAEK Jerry NEW MOUSE.   PSST no specification of cookies
@@ -32,5 +32,6 @@ HAI ITZ ME FUNC Main,
     jerrys_cookies IZ PURR Count_Cookies IN Jerry.
 
     BLEEP Jerry.
+    GIVE jerrys_cookies.
 
 KBYE
