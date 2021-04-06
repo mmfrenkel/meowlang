@@ -1,0 +1,10 @@
+
+
+Main()
+{
+	char * value1 = "hello";
+	char * value2 = "goodbye";
+	int [3] greetings = [ value1, value2 ];
+	free(greetings);
+}
+

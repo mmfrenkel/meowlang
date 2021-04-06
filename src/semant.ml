@@ -171,12 +171,12 @@ let rec semant_expr expr env =
       let _ =
         (match v with
           Id (id) -> id
-        | _ -> raise (VariableAssignmentError("assignment is performed on a variable\n")))
+        | _ -> raise (VariableAssignmentError("assignment is performed on a variable")))
       in
       let (var_typ, id) = semant_expr v env
       and (ret_type, e') = semant_expr e env in
       let err =
-        let msg = Printf.sprintf "%s expected %s, got %s here: %s\n"
+        let msg = Printf.sprintf "%s. expected %s, got %s here: %s"
               assignment_typ_mismatch (string_of_typ var_typ) (string_of_typ ret_type) (string_of_expr ex)
         in VariableAssignmentError(msg)
       in (check_matching_types var_typ ret_type err, SAssign((var_typ, id), (ret_type, e')))
@@ -249,10 +249,11 @@ let rec semant_expr expr env =
           ILiteralArraySize i ->
             (* 2. check integer literal against expr_list length *)
             let num_items = List.length expr_list in
-              if num_items > i
-                then raise (ExcessArrayInput(excess_array_item ^ string_of_int num_items))
-              else ();
-            Int
+              if num_items > i then
+                raise (ExcessArrayInput(excess_array_item ^ " " ^ string_of_int num_items))
+              else if i < 1 then
+                raise (InvalidArraySizeSpecified("size of array must be integer > 0"))
+              else (); Int
         | VariableArraySize s -> find_type_of_id env.symbols s
       in
       if array_size_typ != Int then
@@ -263,12 +264,13 @@ let rec semant_expr expr env =
         List.iter (
           fun (expr_typ, _) ->
             if expr_typ != arr_typ then
-              raise (InvalidArrayItem(invalid_array_item_msg ^ string_of_expr ex))
+              let msg = Printf.sprintf "%s, got: %s" invalid_array_item_msg (string_of_expr ex)
+              in raise (InvalidArrayItem(msg))
             else ()
         ) expr_list';
 
         (* make sure to add the allocated obj to symbol table so it can be referenced *)
-        Hashtbl.add env.symbols arr_name (Arrtype (arr_size, arr_typ));
+        Hashtbl.add env.symbols arr_name (Arrtype(arr_size, arr_typ));
         (Arrtype(arr_size, arr_typ), SNewArray(arr_name, arr_typ, arr_size, expr_list'))
 
   | NewInstance (obj_name, typ, expr_list) as ex ->
@@ -388,17 +390,29 @@ let rec semant_expr expr env =
       let typ = find_type_of_id env.symbols array_id in
 
       (* 2. You can only "access" instance variables of type Obtype *)
-      let _ =
+      let (_, contents_typ) =
         match typ with
-          Arrtype (sz, typ) -> (sz, typ)
-        | _ -> raise (InvalidArrayAccess(array_access_array_only ^ string_of_expr ex))
+          Arrtype (ILiteralArraySize(sz), arr_typ) ->
+            (match e with
+                ILiteral i ->
+                  if i >= sz then (* Test if array access is out of bounds *)
+                    let msg = Printf.sprintf "%s, using index %s in %s, an array of size %s"
+                              array_access_out_of_bounds (string_of_int i) array_id (string_of_int sz)
+                    in raise (InvalidArrayAccess(msg))
+                  else (sz, arr_typ)
+              | _ -> (sz, arr_typ))
+        | _ ->
+          let msg = Printf.sprintf "%s; attempting index on '%s' of type %s"
+                    array_access_array_only array_id (string_of_typ typ)
+          in raise (InvalidArrayAccess(msg))
       in
       (* 3. Check to make sure that the array is going to be indexed by an integer typ *)
       let (typ', e') = semant_expr e env in
       (match typ' with
-        Int -> (typ, SArrayAccess (array_id, (typ', e')))
+        Int -> (contents_typ, SArrayAccess ((array_id), (typ', e')))
       | _ ->
-        let msg = Printf.sprintf "%s found index expression %s" array_access_integer (string_of_expr ex)
+        let msg = Printf.sprintf "%s found index expression %s of type %s"
+                  array_access_integer (string_of_expr ex) (string_of_typ typ')
         in raise (InvalidArrayAccess(msg)))
 
 (****************************************)
@@ -523,7 +537,7 @@ let rec semant_stmt stmt env =
           member_assign_cls_only (string_of_expr id) (string_of_typ typ)
       in raise (InvalidClassMemberAssignment(msg)))
 
-  | ArrayAssign (id, idx_e, e) as s ->
+  | ArrayAssign (id, idx_e, e) ->
     (* 1. make sure that the variable is an array type *)
     let typ = find_type_of_id env.symbols id in
     (match typ with
@@ -534,12 +548,19 @@ let rec semant_stmt stmt env =
             Int ->
               (* 3. make sure that the expression type being assigned matches array content type *)
               let (exp_typ, e') = semant_expr e env in
-              if exp_typ = ty then
-                SArrayAssign(id, (idx_typ, idx_e'), (exp_typ, e'))
-              else
-                raise (InvalidArrayAssignment(invalid_array_item_msg ^ string_of_stmt s))
-          | _ -> raise (InvalidArrayAssignment(array_access_integer ^ string_of_stmt s)))
-      | _ -> raise (InvalidArrayAssignment(array_access_array_only ^ id ^ " is not an array")))
+                if exp_typ = ty then
+                  SArrayAssign(id, (idx_typ, idx_e'), (exp_typ, e'))
+                else
+                  let msg = Printf.sprintf "%s, found '%s' of type %s"
+                            invalid_array_item_msg (string_of_expr e) (string_of_typ exp_typ)
+                  in raise (InvalidArrayAssignment(msg))
+            | _ ->
+          let msg = Printf.sprintf "%s found index expression '%s' of type %s"
+                      array_access_integer (string_of_expr idx_e) (string_of_typ idx_typ)
+            in raise (InvalidArrayAssignment(msg)))
+      | _ ->
+        let msg = Printf.sprintf "%s; %s is not an array" array_access_array_only id
+        in raise (InvalidArrayAssignment(msg)))
 
 
 (****************************************)

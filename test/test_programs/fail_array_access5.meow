@@ -1,0 +1,9 @@
+
+HAI ITZ ME FUNC Main,
+
+   ITZ ME NUMBR result IZ 100.
+
+   PSST You cannot index something that is not an array type
+   result IZ result[0].
+
+KBYE

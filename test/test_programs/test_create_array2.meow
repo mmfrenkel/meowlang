@@ -1,0 +1,12 @@
+
+HAI ITZ ME FUNC Main,
+
+    PSST Create simple array with all elements initialized
+    MAEK animals NEW YARN BUCKET OF 3,
+        WIT "Cats"
+        AN "Dogs"
+        AN "More Dogs".
+
+    BLEEP animals.
+
+KBYE
