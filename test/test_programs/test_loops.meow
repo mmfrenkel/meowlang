@@ -12,7 +12,11 @@ HAI ITZ ME FUNC Main,
         PSST Decrementing with initialized index
         count IZ 20.
         IM IN YR LOOP count NERFIN AN BIGGR count THAN 10 HAI
+            condition IZ "is count still more than 10?".
             condition IZ "count is still more than 10".
+            PSST condition IZ CAT condition AN "count is".
+            PSST condition IZ CAT condition AN count.
+
         KBYE
         
         PSST Initialize index and then increment
