@@ -1,0 +1,32 @@
+
+
+int Main()
+{
+	int size = 2;
+	int idx = 1;
+	class PET Cat;
+	char * cat_name;
+	class PET Silvester(age = 4, type = "cat", name = "Silvester", );
+	class PET Tank(age = 2, type = "dog", name = "Tank", );
+	class PET [size] my_pets = [ Silvester, Tank ];
+	Cat = my_pets[0];
+	cat_name = Cat.Get_Name();
+	printf("%X\n", cat_name);
+	free(my_pets);
+	free(Silvester);
+	free(Tank);
+	return 0;
+}
+
+Class PET {
+
+	int age;
+	char * type;
+	char * name;
+
+	char * Get_Name()
+	{
+	return name;
+	}
+
+}

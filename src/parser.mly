@@ -75,12 +75,14 @@ formal_list:
   | formal_list COMMA typ ID { ($3,$4) :: $1  }
 
 typ:
-    INT                      { Int                                }
-  | BOOL                     { Bool                               }
-  | FLOAT                    { Float                              }
-  | STRING                   { String                             }
-  | ID                       { Obtype ($1)                        }
-  | ARRAY CONTAINS typ       { Arrtype (ILiteralArraySize(0), $3) }
+    INT                      { Int                                 }
+  | BOOL                     { Bool                                }
+  | FLOAT                    { Float                               }
+  | STRING                   { String                              }
+  | ID                       { Obtype ($1)                         }
+  /* This is to support arrays as arguments to functions; -1 is just a 'dummy' value,
+     since ocaml doesn't allow null for integer values */
+  | ARRAY CONTAINS typ       { Arrtype (ILiteralArraySize(-1), $3) }
 
 vdecls:
     /* nothing */             { []       }

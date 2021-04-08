@@ -1,0 +1,31 @@
+
+HAI ITZ ME CLASS ARRAY_PRINTER,
+
+    HAI ITZ ME FUNC Print_Str_Array_Element
+        WIT BUCKET OF YARN expressions
+        AN NUMBR index,
+
+        PURR Meow WIT "The best type of pets are: ".
+        PURR Meow WIT expressions[index].
+    KBYE
+
+KBYE
+
+HAI ITZ ME NUMBR FUNC Main,
+
+    ITZ ME NUMBR size IZ 2.
+    ITZ ME NUMBR idx IZ 1.
+
+    PSST Make an array of strings
+    MAEK animals NEW YARN BUCKET OF size,
+        WIT "Cats"
+        AN "Dogs".
+
+    PSST Make a printer instance an print element at index 'idx'
+    MAEK printer NEW ARRAY_PRINTER.
+    PURR Print_Str_Array_Element IN printer WIT animals AN idx.
+
+    BLEEP animals.
+    GIVE 0.
+
+KBYE

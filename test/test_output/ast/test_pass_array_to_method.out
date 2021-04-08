@@ -1,0 +1,23 @@
+
+
+int Main()
+{
+	int size = 2;
+	int idx = 1;
+	char * [size] animals = [ "Cats", "Dogs" ];
+	class ARRAY_PRINTER printer;
+	printer.Print_Str_Array_Element(animals, idx);
+	free(animals);
+	return 0;
+}
+
+Class ARRAY_PRINTER {
+
+
+	Print_Str_Array_Element(char * [] expressions, int index)
+	{
+	printf("%X\n", "The best type of pets are: ");
+		printf("%X\n", expressions[index]);
+	}
+
+}

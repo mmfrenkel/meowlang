@@ -1,0 +1,1 @@
+Fatal error: exception Exceptions.InvalidArraySizeSpecified("arrays sizes must be integer literals or variables only:int [star] cool_array = [ 1, 2, 3 ]")

@@ -1,1 +1,1 @@
-Fatal error: exception Exceptions.InvalidArrayItem("array elements must be of specified type for the array, got: int [3] greetings = [ value1, value2 ]")
+Fatal error: exception Exceptions.InvalidArrayItem("array elements must be of specified type for the array, expected: int, got: char * in int [3] greetings = [ value1, value2 ]")

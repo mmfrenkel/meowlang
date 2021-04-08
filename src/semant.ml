@@ -117,8 +117,18 @@ let rec semant_expr expr env =
   let check_arg_type formal_param arg_expr =
     let (actual_type, arg_expr') = semant_expr arg_expr env
     and expected_type = fst formal_param in
-    if actual_type = expected_type then (actual_type, arg_expr')
-    else raise (ArgumentTypeMismatch("" ^ string_of_expr arg_expr))
+    let msg = Printf.sprintf "%s, expected typ %s, but got %s"
+        (string_of_expr (arg_expr)) (string_of_typ expected_type) (string_of_typ actual_type)
+    in
+    match expected_type with
+      Arrtype(_, typ_e) ->
+        (match actual_type with
+          Arrtype(_, typ_a) when typ_e = typ_a -> (actual_type, arg_expr')
+        | _ -> raise (ArgumentTypeMismatch(msg)))
+    | _ ->
+        if actual_type = expected_type then
+          (actual_type, arg_expr')
+        else raise (ArgumentTypeMismatch(msg))
   in
 
   match expr with
@@ -135,13 +145,13 @@ let rec semant_expr expr env =
       let same_type = typ1 = typ2 in
       let end_typ = match op with
           Add | Sub | Mult | Div when same_type && typ1 = Int -> Int
-        | Add | Sub | Mult | Div when (typ1 = Float || typ1 = Int) && (typ2 = Float || typ2 = Int) -> Float (* This is casting from float to int *)
-        | Equal | Neq     when same_type -> Bool
-        | Less | Greater  when same_type && (typ1 = Float || typ1 = Int) && (typ2 = Float || typ2 = Int) -> Bool
-        | And | Or        when same_type && typ1 = Bool -> Bool
-        | Concat          when (typ1 = String && (typ2 = String || typ2 == Int || typ2 == Float)) ||
-                                (typ2 = String && (typ1 == Int || typ1 == Float)) -> String
-        | _               ->
+        | Add | Sub | Mult | Div when (typ1 = Float || typ1 = Int) && (typ2 = Float || typ2 = Int) -> Float
+        | Equal | Neq  when same_type -> Bool
+        | Less | Greater when same_type && (typ1 = Float || typ1 = Int) && (typ2 = Float || typ2 = Int) -> Bool
+        | And | Or when same_type && typ1 = Bool -> Bool
+        | Concat when (typ1 = String && (typ2 = String || typ2 == Int || typ2 == Float)) ||
+                      (typ2 = String && (typ1 == Int || typ1 == Float)) -> String
+        | _  ->
           let msg = Printf.sprintf "unexpected types in binary op (%s and %s): %s"
                 (string_of_typ typ1)  (string_of_typ typ2) (string_of_expr ex)
           in raise (IllegalBinaryOp(msg))
@@ -225,7 +235,8 @@ let rec semant_expr expr env =
       (* 3. Check that param length is equal to the num args provided *)
       if List.length args != List.length meth.formals then
         let msg = Printf.sprintf "%s %s (got %s, expected %s)"
-              meth_arg_num_mismatch  meth_name (string_of_int (List.length args)) (string_of_int (List.length meth.formals))
+              meth_arg_num_mismatch  meth_name (string_of_int (List.length args))
+              (string_of_int (List.length meth.formals))
         in raise (MethodArgumentLengthMismatch(msg))
       else
       (* 4. Check that the arguments passed are of the expected type *)
@@ -264,11 +275,15 @@ let rec semant_expr expr env =
         (* This is also a good opportunity to "massage" these array expressions into   *)
         (* assignment statements after the array is allocated *)
         and massage_array_args idx (expr_typ, expr) =
-          if expr_typ != arr_typ then
-            let msg = Printf.sprintf "%s, got: %s" invalid_array_item_msg (string_of_expr ex)
-            in raise (InvalidArrayItem(msg))
-          else
+          let msg = Printf.sprintf "%s, expected: %s, got: %s in %s"
+            invalid_array_item_msg (string_of_typ arr_typ) (string_of_typ expr_typ) (string_of_expr ex)
+          and result =
             (expr_typ, SAssign((arr_typ, SArrayAccess(arr_name, (Int, SILiteral(idx)))), (expr_typ, expr)))
+          in
+          match expr_typ with
+            Obtype(_) when expr_typ == arr_typ -> result
+          | _ when expr_typ = arr_typ -> result
+          | _ -> raise (InvalidArrayItem(msg))
         in
         let array_constructor = List.mapi massage_array_args (List.rev expr_list') in
 
@@ -361,17 +376,17 @@ let rec semant_expr expr env =
       (* 1. Check that the object exists in the symbol table  *)
       let obj_name =
         (match v with
-          Id (id) -> id
-        | _ -> raise (InstanceVariableAccessInvalid(class_access_msg)))
+            Id (id) -> id
+          | _ -> raise (InstanceVariableAccessInvalid(class_access_msg)))
       in
       let (typ, identifer) = semant_expr v env in
       (* 2. You can only "access" instance variables of type Obtype *)
       let cname =
         (match typ with
-          Obtype o -> o
-        | _ ->
-          let msg = Printf.sprintf "%s, found: %s" invalid_instance_var_access (string_of_expr ex)
-          in raise (InstanceVariableAccessInvalid(msg)))
+            Obtype o -> o
+          | _ ->
+            let msg = Printf.sprintf "%s, found: %s" invalid_instance_var_access (string_of_expr ex)
+            in raise (InstanceVariableAccessInvalid(msg)))
       in
       (* 3. Check that the instance variable exists within the class *)
       let cls = find_class cname in
@@ -379,8 +394,8 @@ let rec semant_expr expr env =
       if List.mem class_var cvars then
         let rec find_typ n vars =
           match vars with
-              [] -> raise (InternalError("unexpectedly could not determine type of class variable\n"))
-            | (typ, name, _) :: t -> if name = n then typ else find_typ n t
+            [] -> raise (InternalError("unexpectedly could not determine type of class variable\n"))
+          | (typ, name, _) :: t -> if name = n then typ else find_typ n t
         in
         (find_typ class_var cls.cvars, (SClassAccess(Obtype(cname), (typ, identifer), class_var)))
       else
@@ -392,23 +407,25 @@ let rec semant_expr expr env =
       (* 1. Check that the array exists in the symbol table  *)
       let typ = find_type_of_id env.symbols array_id in
 
-      (* 2. You can only "access" instance variables of type Obtype *)
+      (* 2. You can only have index access to items of type ArrType *)
       let (_, contents_typ) =
         match typ with
-          | Arrtype (ILiteralArraySize(sz), arr_typ) ->
-            (match e with
-                ILiteral i ->
-                  if i >= sz then (* Test if array access is out of bounds *)
-                    let msg = Printf.sprintf "%s, using index %s in %s, an array of size %s"
-                              array_access_out_of_bounds (string_of_int i) array_id (string_of_int sz)
-                    in raise (InvalidArrayAccess(msg))
-                  else (sz, arr_typ)
-              | _ -> (sz, arr_typ))
-          | Arrtype (VariableArraySize(_), arr_typ) -> (0, arr_typ) (* this 0 is to make the compiler happy *)
-          | _ ->
-            let msg = Printf.sprintf "%s; attempting index on '%s' of type %s"
-                      array_access_array_only array_id (string_of_typ typ)
-            in raise (InvalidArrayAccess(msg))
+        | Arrtype (ILiteralArraySize(sz), arr_typ) ->
+          (match e with
+              (* Test if array access is out of bounds; note this is only possible
+                 to do when the array hasn't been passed as a parameter, in which i < 0 *)
+              ILiteral i ->
+                if ( sz > 0 && i >= sz ) || i < 0 then
+                  let msg = Printf.sprintf "%s, using index %s in %s, an array of size %s"
+                            array_access_out_of_bounds (string_of_int i) array_id (string_of_int sz)
+                  in raise (InvalidArrayAccess(msg))
+                else (sz, arr_typ)
+            | _ -> (sz, arr_typ))
+        | Arrtype (VariableArraySize(_), arr_typ) -> (0, arr_typ) (* this 0 is to make the compiler happy *)
+        | _ ->
+          let msg = Printf.sprintf "%s; attempting index on '%s' of type %s"
+                    array_access_array_only array_id (string_of_typ typ)
+          in raise (InvalidArrayAccess(msg))
       in
       (* 3. Check to make sure that the array is going to be indexed by an integer typ *)
       let (typ', e') = semant_expr e env in
@@ -457,9 +474,11 @@ let rec semant_stmt stmt env =
   check_index_assignment e =
     let (t', e') = semant_expr e env in
     match e' with
-        SNoexpr -> (t', e')
-      | SAssign(_, _) -> (t', e')
-      | _ -> raise (ControlFlowIllegalArgument("index assignment expected in expression: " ^ string_of_expr e))
+      SNoexpr -> (t', e')
+    | SAssign(_, _) -> (t', e')
+    | _ ->
+      let msg = Printf.sprintf "index assignment expected in expression: %s" (string_of_expr e)
+      in raise (ControlFlowIllegalArgument(msg))
   and
 
   (* for looping: checks that loop termination is a binary operation of < or > *)
@@ -545,26 +564,26 @@ let rec semant_stmt stmt env =
     (* 1. make sure that the variable is an array type *)
     let typ = find_type_of_id env.symbols id in
     (match typ with
-        Arrtype (_, ty) ->
-          (* 2. make sure that the idx_e expression yields an integer *)
-          let (idx_typ, idx_e') = semant_expr idx_e env in
-          (match idx_typ with
-            Int ->
-              (* 3. make sure that the expression type being assigned matches array content type *)
-              let (exp_typ, e') = semant_expr e env in
-                if exp_typ = ty then
-                  SArrayAssign(id, (idx_typ, idx_e'), (exp_typ, e'))
-                else
-                  let msg = Printf.sprintf "%s, found '%s' of type %s"
-                            invalid_array_item_msg (string_of_expr e) (string_of_typ exp_typ)
-                  in raise (InvalidArrayAssignment(msg))
-            | _ ->
-              let msg = Printf.sprintf "%s found index expression '%s' of type %s"
-                      array_access_integer (string_of_expr idx_e) (string_of_typ idx_typ)
-              in raise (InvalidArrayAssignment(msg)))
-      | _ ->
-        let msg = Printf.sprintf "%s; %s is not an array" array_access_array_only id
-        in raise (InvalidArrayAssignment(msg)))
+      Arrtype (_, ty) ->
+        (* 2. make sure that the idx_e expression yields an integer *)
+        let (idx_typ, idx_e') = semant_expr idx_e env in
+        (match idx_typ with
+          Int ->
+            (* 3. make sure that the expression type being assigned matches array content type *)
+            let (exp_typ, e') = semant_expr e env in
+              if exp_typ = ty then
+                SArrayAssign(id, (idx_typ, idx_e'), (exp_typ, e'))
+              else
+                let msg = Printf.sprintf "%s, found '%s' of type %s"
+                          invalid_array_item_msg (string_of_expr e) (string_of_typ exp_typ)
+                in raise (InvalidArrayAssignment(msg))
+          | _ ->
+            let msg = Printf.sprintf "%s found index expression '%s' of type %s"
+                    array_access_integer (string_of_expr idx_e) (string_of_typ idx_typ)
+            in raise (InvalidArrayAssignment(msg)))
+    | _ ->
+      let msg = Printf.sprintf "%s; %s is not an array" array_access_array_only id
+      in raise (InvalidArrayAssignment(msg)))
 
 
 (****************************************)

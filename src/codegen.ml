@@ -60,7 +60,8 @@ let rec ltype_of_typ = function
 let create_func_prototype fdecl =
   let name =  fdecl.sfname
   and return_typ = ltype_of_typ fdecl.styp
-  and formal_types = Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.sformals)
+  and formal_types =
+    Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.sformals)
   in
   let ftype = L.function_type return_typ formal_types in
   L.define_function name ftype the_module, fdecl
@@ -86,7 +87,7 @@ let format (typ, _) =
   | A.Float  -> "%g\n"
   | A.String -> "%s\n"
   | A.Bool   -> "%d\n"
-  | _ -> raise (NotYetSupported("formatting for complex expr and functions not yet supported"))
+  | _ -> raise (NotYetSupported("formatting for type not yet supported"))
 
   let add_local (typ, local_name, _) env builder =
     let new_local = L.build_alloca (ltype_of_typ typ) local_name builder
@@ -121,7 +122,8 @@ let build_function fdecl =
 
   (* Clear existing locals and start over *)
   Hashtbl.clear local_variables;
-  ignore(List.fold_left2 add_formal [] fdecl.sformals (Array.to_list (L.params the_function)));
+  let params = (Array.to_list (L.params the_function)) in
+  ignore(List.fold_left2 add_formal [] fdecl.sformals params);
   List.iter (fun l -> add_local l local_variables builder) fdecl.slocals;
 
   (* Formatting expressions, for printf-ing *)
@@ -132,12 +134,12 @@ let build_function fdecl =
   (************************************************)
   let rec expr builder ((_, e) : sexpr) env =
     match e with
-      SILiteral i        -> L.const_int i32_t i
-    | SBoolLit b         -> L.const_int i1_t (if b then 1 else 0)
-    | SFliteral l        -> L.const_float_of_string float_t l
-    | SStringLit s       -> L.build_global_stringptr s "str" builder
-    | SId var            -> L.build_load (lookup_variable var env) var builder
-    | SNoexpr            -> L.const_int i32_t 0
+      SILiteral i  -> L.const_int i32_t i
+    | SBoolLit b   -> L.const_int i1_t (if b then 1 else 0)
+    | SFliteral l  -> L.const_float_of_string float_t l
+    | SStringLit s -> L.build_global_stringptr s "str" builder
+    | SId var      -> L.build_load (lookup_variable var env) var builder
+    | SNoexpr      -> L.const_int i32_t 0
 
     | SAssign ((_, lhs), e)   ->
         let rhs = expr builder e env in
@@ -162,17 +164,19 @@ let build_function fdecl =
         let lhs = expr builder e1 env
         and rhs = expr builder e2 env in
           (match op with
-              A.Add       -> L.build_add
-            | A.Sub       -> L.build_sub
-            | A.Mult      -> L.build_mul
-            | A.Div       -> L.build_sdiv
-            | A.Equal     -> L.build_icmp L.Icmp.Eq
-            | A.Neq       -> L.build_icmp L.Icmp.Ne
-            | A.Less      -> L.build_icmp L.Icmp.Slt
-            | A.Greater   -> L.build_icmp L.Icmp.Sgt
-            | A.Increment -> L.build_add
-            | A.Decrement -> L.build_sub
-            | _         -> raise (NotYetSupported("found binary operation not supported for two integers"))
+            A.Add       -> L.build_add
+          | A.Sub       -> L.build_sub
+          | A.Mult      -> L.build_mul
+          | A.Div       -> L.build_sdiv
+          | A.Equal     -> L.build_icmp L.Icmp.Eq
+          | A.Neq       -> L.build_icmp L.Icmp.Ne
+          | A.Less      -> L.build_icmp L.Icmp.Slt
+          | A.Greater   -> L.build_icmp L.Icmp.Sgt
+          | A.Increment -> L.build_add
+          | A.Decrement -> L.build_sub
+          | _         ->
+            let msg = "found binary operation not supported for two integers"
+            in raise (NotYetSupported(msg))
           ) lhs rhs "binop_int_tmp" builder
 
     (* Binary operation between one or more floats *)
@@ -182,15 +186,17 @@ let build_function fdecl =
       let lhs = expr builder e1 env
       and rhs = expr builder e2 env in
         (match op with
-            A.Add     -> L.build_fadd
-          | A.Sub     -> L.build_fsub
-          | A.Mult    -> L.build_fmul
-          | A.Div     -> L.build_fdiv
-          | A.Equal   -> L.build_fcmp L.Fcmp.Oeq
-          | A.Neq     -> L.build_fcmp L.Fcmp.One
-          | A.Less    -> L.build_fcmp L.Fcmp.Olt
-          | A.Greater -> L.build_fcmp L.Fcmp.Ogt
-          | _         -> raise (NotYetSupported("found binary operation not supported for one or more floats"))
+          A.Add     -> L.build_fadd
+        | A.Sub     -> L.build_fsub
+        | A.Mult    -> L.build_fmul
+        | A.Div     -> L.build_fdiv
+        | A.Equal   -> L.build_fcmp L.Fcmp.Oeq
+        | A.Neq     -> L.build_fcmp L.Fcmp.One
+        | A.Less    -> L.build_fcmp L.Fcmp.Olt
+        | A.Greater -> L.build_fcmp L.Fcmp.Ogt
+        | _         ->
+          let msg = "found binary operation not supported for one or more floats"
+        in raise (NotYetSupported(msg))
         ) lhs rhs "binop_float_tmp" builder
 
     (* Binary operation for two booleans *)
@@ -200,7 +206,9 @@ let build_function fdecl =
         (match op with
             A.Or      -> L.build_or
           | A.And     -> L.build_and
-          | _         -> raise (NotYetSupported("found binary operation not supported for two boolean values"))
+          | _         ->
+            let msg = "found binary operation not supported for two boolean values"
+            in raise (NotYetSupported(msg))
         ) lhs rhs "binop_bool_tmp" builder
 
     (* Call to built in printf function *)
@@ -240,7 +248,9 @@ let build_function fdecl =
                 SAssign((_, SClassAccess(_, (_, _), id)), _) ->
                 ignore(add_local (typ, id, e) constructor_vars builder);
                 (expr builder (typ, e) constructor_vars) :: v (* build it! *)
-              | _ -> raise (NotYetSupported("codegen: expected class constructor pattern not yet supported\n")))
+              | _ ->
+                let msg = "codegen: class constructor pattern not yet supported"
+                in raise (NotYetSupported(msg)))
           in
           ignore(List.fold_left build_constructor [] constructor_exprs); rhs
          )
@@ -296,10 +306,10 @@ let build_function fdecl =
     | SExpr e     -> ignore(expr builder e local_variables); builder
     | SReturn e   -> ignore(
         match fdecl.styp with
-            (* Special "return nothing" instr *)
-            A.Void -> L.build_ret_void builder
-            (* Build return statement *)
-          | _ -> L.build_ret (expr builder e local_variables) builder
+          (* Special "return nothing" instr *)
+          A.Void -> L.build_ret_void builder
+          (* Build return statement *)
+        | _ -> L.build_ret (expr builder e local_variables) builder
       ); builder
 
     | SIf (predicate, then_stmt, else_stmt) ->
@@ -340,7 +350,7 @@ let build_function fdecl =
         let merge_bb = L.append_block context "merge" the_function in
         ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
         L.builder_at_end context merge_bb
-  
+
     | SClassAssign (A.Obtype(cname), v, inst_v, e) ->
         let rhs = expr builder e local_variables
         and lhs =
