@@ -1,0 +1,12 @@
+GIMME hello?
+
+HAI ITZ ME YARN FUNC create_message WIT YARN name,
+
+    ITZ ME NUMBR cookies IZ 0.
+
+    PSST Its not possible to define a function within a function
+    PSST This is only possible for classes
+    HAI ITZ ME NUMBR FUNC Count_Cookies,
+        GIVE cookies.
+    KBYE
+KBYE

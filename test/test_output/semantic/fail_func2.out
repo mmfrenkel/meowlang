@@ -1,0 +1,1 @@
+Fatal error: exception Exceptions.ReturnFromVoidFunction("attempting to return from a void function; see function Main")

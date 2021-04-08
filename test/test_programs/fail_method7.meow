@@ -1,0 +1,19 @@
+HAI ITZ ME FUNC Main,
+
+    ITZ ME NUMBR jerrys_cookies.
+    MAEK Jerry NEW MOUSE.
+
+    BLEEP Jerry.
+
+KBYE
+
+HAI ITZ ME CLASS MOUSE,
+
+    ITZ ME NUMBR cookies IZ 0.
+
+    PSST this method returns the wrong type
+    HAI ITZ ME YARN FUNC Count_Cookies,
+        GIVE cookies.
+    KBYE
+
+KBYE

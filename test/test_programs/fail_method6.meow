@@ -1,0 +1,17 @@
+
+HAI ITZ ME NUMBR FUNC Main,
+
+    ITZ ME NUMBR size IZ 2.
+    ITZ ME YARN cat_name.
+
+    MAEK animals NEW YARN BUCKET OF size,
+        WIT "Cats"
+        AN "Dogs".
+
+    PSST integers have no methods
+    cat_name IZ PURR Get_Name IN size.
+
+    BLEEP animals.
+    GIVE 0.
+
+KBYE
