@@ -12,7 +12,6 @@ and sx =
   | SUnop of uop * sexpr
   | SAssign of sexpr * sexpr
   | SFunctionCall of string * sexpr list
-  | SMethodCall of string * string * sexpr list
   | SNoexpr
   | SNewInstance of string * typ * sexpr list
   | SClassAccess of typ * sexpr * string

@@ -9,9 +9,6 @@ int Main()
 	class PET Silvester(age = 4, type = "cat", name = "Silvester", );
 	class PET Tank(age = 2, type = "dog", name = "Tank", );
 	class PET [size] my_pets = [ Silvester, Tank ];
-	Cat = my_pets[0];
-	cat_name = Cat.Get_Name();
-	printf("%X\n", cat_name);
 	free(my_pets);
 	free(Silvester);
 	free(Tank);

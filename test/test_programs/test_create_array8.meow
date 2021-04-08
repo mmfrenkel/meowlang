@@ -35,11 +35,6 @@ HAI ITZ ME NUMBR FUNC Main,
         WIT Silvester
         AN Tank.
 
-    PSST Make a printer instance an print element at index 'idx'
-    Cat IZ my_pets[0].
-    cat_name IZ PURR Get_Name IN Cat.
-    PURR Meow WIT cat_name.
-
     BLEEP my_pets.
     BLEEP Silvester.
     BLEEP Tank.

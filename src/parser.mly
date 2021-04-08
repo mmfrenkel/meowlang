@@ -137,12 +137,12 @@ expr:
   | ID LBRACKET expr RBRACKET { ArrayAccess($1, $3)    }
 
  function_call:
-    CALL ID                          { FunctionCall($2, [])       }
-  | CALL ID IN ID                    { MethodCall($4, $2, [])     }
-  | CALL ID IN HERE                  { MethodCall("this", $2, []) }
-  | CALL ID LPAREN args_opt          { FunctionCall($2, $4)       }
-  | CALL ID IN ID LPAREN args_opt    { MethodCall($4, $2, $6)     }
-  | CALL ID IN HERE LPAREN args_opt  { MethodCall("this", $2, $6) }
+    CALL ID                          { FunctionCall($2, [])           }
+  | CALL ID IN expr                  { MethodCall($4, $2, [])         }
+  | CALL ID IN HERE                  { MethodCall(Id("this"), $2, []) }
+  | CALL ID LPAREN args_opt          { FunctionCall($2, $4)           }
+  | CALL ID IN ID LPAREN args_opt    { MethodCall(Id($4), $2, $6)     }
+  | CALL ID IN HERE LPAREN args_opt  { MethodCall(Id("this"), $2, $6) }
 
 expr_opt:
   /* nothing */               { Noexpr }
@@ -158,9 +158,9 @@ args_list:
 /* Array Specification */
 
 array_decl:
-    MAKE ID NEW typ ARRAY CONTAINS array_size_typ RPAREN LPAREN args_opt  { NewArray($2, $4, $7, $10)                  }
-  | MAKE ID NEW typ ARRAY CONTAINS array_size_typ                         { NewArray($2, $4, $7, [])                   }
-  | MAKE ID NEW typ ARRAY                                                 { NewArray($2, $4, ILiteralArraySize(0), []) }
+    MAKE ID NEW typ ARRAY CONTAINS array_size_typ RPAREN LPAREN args_opt { NewArray($2, $4, $7, $10)                  }
+  | MAKE ID NEW typ ARRAY CONTAINS array_size_typ                        { NewArray($2, $4, $7, [])                   }
+  | MAKE ID NEW typ ARRAY                                                { NewArray($2, $4, ILiteralArraySize(0), []) }
 
 array_size_typ:
     ILIT                      { ILiteralArraySize($1) }
@@ -185,8 +185,8 @@ methods:
  /* Class Instantiation */
 
 c_instance:
-    MAKE ID NEW typ                    { NewInstance($2, $4, []) }
-  | MAKE ID NEW typ RPAREN class_opt   { NewInstance($2, $4, $6) }
+    MAKE ID NEW typ                  { NewInstance($2, $4, []) }
+  | MAKE ID NEW typ RPAREN class_opt { NewInstance($2, $4, $6) }
 
 class_opt:
     /* nothing */             { [] }

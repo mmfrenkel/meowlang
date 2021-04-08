@@ -14,6 +14,8 @@ exception MissingMainFunction of string
 exception FunctionNotFound of string
 exception FunctionArgumentLengthMismatch of string
 exception ArgumentTypeMismatch of string
+exception ReturnFromVoidFunction of string
+exception ReturnTypeInvalid of string
 
 (* Object Exceptions *)
 exception ClassNotFound of string
@@ -77,3 +79,6 @@ let object_constructor_error    = "to assign instance variables on object creati
 let object_constructor_types    = "you may only assign instance variables that are defined within the class and that are of the correct type"
 let use_of_this_outside_class   = "use of HERE ('this') keyword can only be used inside of a class to refer to its own methods/variables"
 let class_access_msg            = "class access is performed on an object identified by a variable"
+let method_call_expr            = "attempting to call method on invalid expression; must be variable representing an object type or an indexed array of objects"
+let return_from_void_func       = "attempting to return from a void function"
+let return_type_invalid         = "attempting to return value that doesn't match function return type"
