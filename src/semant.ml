@@ -105,8 +105,17 @@ let add_built_ins existing_funcs =
     formals = [(String, "x")];
     locals = [];
     body = []
-  } in
-  printf :: existing_funcs
+  }
+  and custom_scanf = {
+    typ = Int;
+    fname = "Scan";
+    formals = [(String, "x")];
+    locals = [];
+    body = []
+  }
+  in
+  let e_funs = printf :: existing_funcs in
+  custom_scanf :: e_funs
 
 (* return boolean value to represent if return type is expected for a function *)
 let has_return_value func =
@@ -211,9 +220,17 @@ let rec semant_expr expr env =
         (match fname with
         (* this is a work around for handling the built in print function, which can accept multiple types *)
         | "Meow" ->
-            (match args with
-            | arg :: []  -> [semant_expr arg env]
-            | _ -> raise (FunctionArgumentLengthMismatch("built in string function takes 1 argument only\n")))
+          (match args with
+            arg :: []  -> [semant_expr arg env]
+          | _ -> raise (FunctionArgumentLengthMismatch("built in string function takes 1 argument only\n")))
+        | "Scan" ->
+          (match args with
+            arg :: []  ->
+            let (typ, arg') = semant_expr arg env in
+            (match arg with
+              Id(_) when typ = String -> [(typ, arg')]
+            | _ -> raise (ArgumentTypeMismatch(scan_error)))
+          | _ -> raise (FunctionArgumentLengthMismatch(scan_error)))
         | _ -> List.map2 check_arg_type func.formals args)
       in
       (func.typ, SFunctionCall(fname, args'))
@@ -556,7 +573,7 @@ let rec semant_stmt stmt env =
     in
     let typ = find_type_of_id env.symbols id in
     (match typ with
-      Obtype _ | Arrtype _ -> SDealloc(typ, SId(id))
+      Obtype _ | Arrtype _ | String -> SDealloc(typ, SId(id))
     | _ ->
       let msg = Printf.sprintf "%s %s is of typ %s"
         invalid_deallocation_msg id (string_of_typ typ)

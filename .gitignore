@@ -1,6 +1,7 @@
 # files/executables/intermediates from compilation steps
 *.cmi
 *.cmo
+*.o
 parser.ml
 parser.mli
 parser.output

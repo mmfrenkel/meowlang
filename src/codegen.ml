@@ -74,7 +74,6 @@ let codegen_struct cls =
 
   let var_name_list = List.map (fun (_, n, _) -> n) cls.scvars
   and inst_var_ltyps = List.map (fun (t, _, _) -> ltype_of_typ t) cls.scvars in
-
   List.iteri (
     fun idx name -> Hashtbl.add struct_field_idx (cls.scname ^ "." ^ name) idx
   ) var_name_list;
@@ -100,10 +99,13 @@ let build_function fdecl =
 
   (* Create the prototype for printf/Meow, a built-in function
      TODO: figure out how to not do this for each function *)
-  let printf_t : L.lltype =
-    L.var_arg_function_type i32_t [| str_t |] in
-  let printf_func : L.llvalue =
+  let printf_func =
+    let printf_t = L.var_arg_function_type i32_t [| str_t |] in
     L.declare_function "printf" printf_t the_module in
+
+  let scanf_func =
+    let scanf_t = L.function_type i32_t [| L.pointer_type str_t |] in
+    L.declare_function "custom_scanf" scanf_t the_module in
 
   let (the_function, _) = Hashtbl.find global_functions fdecl.sfname in
   let builder = L.builder_at_end context (L.entry_block the_function) in
@@ -214,6 +216,9 @@ let build_function fdecl =
     (* Call to built in printf function *)
     | SFunctionCall ("Meow", [arg]) ->
       L.build_call printf_func [| format_str (format arg) ; (expr builder arg env) |] "printf" builder
+
+    | SFunctionCall ("Scan", [(_, SId(arg))]) ->
+      L.build_call scanf_func [| (lookup_variable arg env) |] "custom_scanf" builder
 
     (* Call a user-defined function *)
     | SFunctionCall (fname, args) ->
