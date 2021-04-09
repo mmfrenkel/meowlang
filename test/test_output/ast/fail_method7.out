@@ -1,0 +1,19 @@
+
+
+Main()
+{
+	int jerrys_cookies;
+	class MOUSE Jerry;
+	free(Jerry);
+}
+
+Class MOUSE {
+
+	int cookies = 0;
+
+	char * Count_Cookies()
+	{
+	return cookies;
+	}
+
+}

@@ -1,0 +1,15 @@
+
+HAI ITZ ME FUNC Main,
+
+    PSST Create array using an expression as a size
+    ITZ ME NUMBR size IZ SUM OF 3 AN 5.
+
+    MAEK animals NEW YARN BUCKET OF size,
+        WIT "Cats"
+        AN "Dogs".
+
+    PURR Meow WIT animals[0].
+    PURR Meow WIT animals[1].
+    BLEEP animals.
+
+KBYE

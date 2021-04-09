@@ -1,0 +1,11 @@
+include "hello"
+
+Main()
+{
+	char * index = 0;
+	int value = 1;
+	char * [3] greetings = [ "string 1", "string 2" ];
+	greetings[index] = value;
+	free(greetings);
+}
+

@@ -1,0 +1,9 @@
+
+
+int Main()
+{
+	char * [3] simple_array = [  ];
+	free(simple_array);
+	return 0;
+}
+

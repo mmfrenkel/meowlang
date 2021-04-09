@@ -1,0 +1,1 @@
+Fatal error: exception Exceptions.InvalidArrayItem("array elements must be of specified type for the array, expected: int, got: char * in int [3] animals = [ 1, 2, "this is wrong" ]")

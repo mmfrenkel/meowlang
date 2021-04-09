@@ -1,0 +1,14 @@
+HAI ITZ ME FUNC Main,
+    PSST code block indicators missing - parsing error
+
+    ITZ ME YARN condition.
+
+    SAEM 3 AN 3
+    O RLY?
+    YA RLY
+        condition IZ "Waffles".
+        condition IZ CAT condition AN " and Pancakes".
+    NO WAI
+        condition IZ "Eggs".
+        condition IZ CAT condition AN " and Bacon".
+KBYE

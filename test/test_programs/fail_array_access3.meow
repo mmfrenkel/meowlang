@@ -1,0 +1,14 @@
+
+HAI ITZ ME FUNC Main,
+
+   ITZ ME YARN result.
+
+    PSST You cannot access elements with not an int variable or literal
+    MAEK greetings NEW YARN BUCKET OF 3,
+        WIT "string 1"
+        AN "string 2".
+
+   result IZ greetings["bad index!"].
+   BLEEP greetings.
+
+KBYE

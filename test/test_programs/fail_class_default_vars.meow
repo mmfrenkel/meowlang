@@ -1,0 +1,16 @@
+HAI ITZ ME FUNC Main,
+
+    MAEK Jerry NEW MOUSE.
+    BLEEP Jerry.
+
+KBYE
+
+HAI ITZ ME CLASS MOUSE,
+
+    ITZ ME NUMBR cookies IZ 2.
+    ITZ ME NUMBR candies IZ 5.
+
+    PSST defaults build from literals or other class variables
+    ITZ ME NUMBR treats IZ SUM OF idontexist AN candies.
+
+KBYE

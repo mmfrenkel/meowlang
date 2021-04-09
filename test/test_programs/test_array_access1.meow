@@ -1,0 +1,15 @@
+GIMME hello?
+
+HAI ITZ ME FUNC Main,
+
+	ITZ ME NUMBR idx IZ 0.
+
+	MAEK cool_array NEW NUMBR BUCKET OF 3,
+          	WIT 1 AN 2 AN 3.
+
+	PSST set new value in array
+	cool_array[idx] IZ 2.
+
+	PSST Print value at index 1
+	PURR Meow WIT cool_array[idx].
+KBYE

@@ -1,0 +1,17 @@
+HAI ITZ ME FUNC Main,
+
+    ITZ ME NUMBR index IZ 10.
+    ITZ ME NUMBR count IZ 20.
+    ITZ ME YARN condition.
+    
+    PSST Infinite loop OK
+    IM IN YR LOOP index NERFIN count IZ 10 AN BIGGR index THAN 10 HAI
+      index IZ PRODUKT OF 10 AN 1.
+    KBYE
+
+    PSST expected integer but got char * condition
+    IM IN YR LOOP condition UPPIN AN SMALLR index THAN 10 HAI
+      index IZ PRODUKT OF 10 AN 1.
+    KBYE
+
+KBYE

@@ -1,0 +1,25 @@
+# Structure/Contents of file inspired by: https://github.com/jaredweiss/JaTeste/blob/master/.travis.yml
+language: c
+
+addons:
+  apt:
+    sources:
+    - avsm
+    - ubuntu-toolchain-r-test
+    - llvm-toolchain-precise
+    packages:
+    - opam
+    - m4
+    - pkg-config
+    - make
+    - llvm-3.8
+
+before_script:
+  - opam init -y
+  - eval $(opam config env)
+  - opam install ocamlfind -y
+  - opam install llvm.3.8 -y
+  - export PATH=/usr/lib/llvm-3.8/bin:$PATH
+  
+script:
+  - make build_and_test

@@ -1,0 +1,11 @@
+
+
+Main()
+{
+	int size = 3 + 5;
+	char * [size] animals = [ "Cats", "Dogs" ];
+	printf("%X\n", animals[0]);
+	printf("%X\n", animals[1]);
+	free(animals);
+}
+

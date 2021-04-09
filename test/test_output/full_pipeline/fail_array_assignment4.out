@@ -1,0 +1,1 @@
+Fatal error: exception Exceptions.InvalidArrayAssignment("array indexing is only available for array types; value is not an array")

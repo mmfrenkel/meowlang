@@ -1,6 +1,6 @@
 
 
-Main()
+int Main()
 {
 	int jerrys_cookies;
 	class MOUSE Jerry;
@@ -9,6 +9,7 @@ Main()
 	Jerry.Give_Cookie(2);
 	jerrys_cookies = Jerry.Count_Cookies();
 	free(Jerry);
+	return jerrys_cookies;
 }
 
 int Rando()

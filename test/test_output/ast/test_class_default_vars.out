@@ -2,7 +2,10 @@
 
 Main()
 {
+	int count_treats;
 	class MOUSE Jerry;
+	count_treats = Jerry.Get_Num_Treats();
+	printf("%X\n", count_treats);
 	free(Jerry);
 }
 

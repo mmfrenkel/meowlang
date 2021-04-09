@@ -12,11 +12,10 @@ and sx =
   | SUnop of uop * sexpr
   | SAssign of sexpr * sexpr
   | SFunctionCall of string * sexpr list
-  | SMethodCall of string * string * sexpr list
-  | SNewArray of string * typ * array_size * sexpr list
   | SNoexpr
   | SNewInstance of string * typ * sexpr list
   | SClassAccess of typ * sexpr * string
+  | SNewArray of string * typ * array_size * sexpr list
   | SArrayAccess of string * sexpr
 
   type sbind_var = typ * string * sexpr

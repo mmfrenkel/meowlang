@@ -37,7 +37,10 @@ let rec string_of_typ = function
 | String -> "char *"
 | Void -> ""
 | Obtype(s) -> "class " ^s
-| Arrtype(size, typ) -> string_of_typ typ ^ " [" ^ string_of_array_size size ^ "]"
+| Arrtype(size, typ) ->
+    match size with
+      ILiteralArraySize i when i = -1 -> string_of_typ typ ^ " []"
+    | _ -> string_of_typ typ ^ " [" ^ string_of_array_size size ^ "]"
 
 let string_of_array_size = function
   ILiteralArraySize(l) -> string_of_int l
@@ -59,12 +62,12 @@ let rec string_of_expr = function
           "Meow" -> "printf" ^ "(\"%X\\n\", " ^ String.concat ", " (List.map string_of_expr el) ^ ")"
         | _      -> f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")")
   | MethodCall(ob, f, el) ->
-      ob ^ "." ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+    string_of_expr ob ^ "." ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | NewArray(i, typ, s, contents) ->
       string_of_typ typ ^ " [" ^ string_of_array_size s ^ "] " ^ i ^ " = [ " ^ String.concat ", " (List.map string_of_expr contents) ^ " ]"
   | Noexpr -> ""
   | NewInstance(var, c, []) -> string_of_typ c ^ " " ^ var
-  | NewInstance(var, c, exprs) -> string_of_typ c ^ " " ^ var ^ "(" ^ String.concat "" (List.map string_of_expr exprs) ^ ")"
+  | NewInstance(var, c, exprs) -> string_of_typ c ^ " " ^ var ^ "(" ^ String.concat "" (List.map (fun e -> string_of_expr e ^ ", ") exprs) ^ ")"
   | ClassAccess(ob, el) -> string_of_expr ob ^ "." ^ el
   | ArrayAccess(var, e) -> var ^ "[" ^ string_of_expr e ^ "]"
 

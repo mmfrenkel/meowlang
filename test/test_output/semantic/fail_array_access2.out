@@ -1,0 +1,1 @@
+Fatal error: exception Exceptions.InvalidArrayAccess("arrays can only be indexed with integer types (>= 0): found index expression greetings[index] of type float")

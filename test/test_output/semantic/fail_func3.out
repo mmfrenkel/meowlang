@@ -1,0 +1,1 @@
+Fatal error: exception Exceptions.ReturnTypeInvalid("attempting to return value that doesn't match function return type; expected: char *, got: int in function Main")

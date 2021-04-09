@@ -1,0 +1,1 @@
+Fatal error: exception Exceptions.ArgumentTypeMismatch("built in scan function takes only the id of a string as an argument")

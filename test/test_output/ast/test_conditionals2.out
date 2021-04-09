@@ -1,0 +1,12 @@
+
+
+Main()
+{
+	char * condition;
+	if (3 == 3)	{
+	if (1 < 4)
+	condition = "Pancakes";
+	}
+	else		condition = "Eggs";
+}
+

@@ -1,0 +1,12 @@
+
+
+Main()
+{
+	char * user_message;
+	char * another_message;
+	printf("%X\n", "Please tell me your favorite color: ");
+	Scan(user_message, another_message);
+	printf("%X\n", "Your favorite color is: ");
+	printf("%X\n", user_message);
+}
+

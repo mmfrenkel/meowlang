@@ -1,0 +1,11 @@
+include "hello"
+
+Main()
+{
+	char * value = "value";
+	float index = 10.0 / 3;
+	char * [3] greetings = [ "string 1", "string 2" ];
+	greetings[index] = value;
+	free(greetings);
+}
+

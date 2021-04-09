@@ -1,3 +1,4 @@
+#!/bin/bash
 # Use this file to perform regression tests on the meowlang compiler.
 # This file is designed to be used from the project root directory and run as:
 # ./test/run_regression_tests.sh [run_type]
@@ -33,7 +34,11 @@ Check() {
                 ./src/meowlang.native $run_type < $test_file &> $actual_output
         else
                 # testing full compilation requires help from test script
-                ./test/test_single_program.sh "$base_name.meow" &> $actual_output
+                if [[ "$test_file" == *"scan"* ]]; then
+                        echo "some value" | ./test/test_single_program.sh "$base_name.meow" &> $actual_output
+                else
+                        ./test/test_single_program.sh "$base_name.meow" &> $actual_output
+                fi
         fi
 
         # see if the result is what we expected

@@ -22,7 +22,7 @@ type expr =
   | Unop of uop * expr
   | Assign of expr * expr
   | FunctionCall of string * expr list
-  | MethodCall of string * string * expr list
+  | MethodCall of expr * string * expr list
   | NewArray of string * typ * array_size * expr list
   | Noexpr
   | NewInstance of string * typ * expr list

@@ -1,0 +1,8 @@
+
+
+Main()
+{
+	int [10] animals = [ i_am_not_defined, "are", "strings not ints" ];
+	free(animals);
+}
+

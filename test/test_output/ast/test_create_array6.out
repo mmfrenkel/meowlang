@@ -1,0 +1,11 @@
+
+
+Main()
+{
+	char * str1 = "whoooopie!";
+	char * str2 = "yiiippeee!";
+	char * [3] exclamations = [ str1, str2 ];
+	printf("%X\n", exclamations[0]);
+	free(exclamations);
+}
+

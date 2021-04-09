@@ -1,0 +1,8 @@
+
+HAI ITZ ME FUNC Main,
+
+        PSST Bucket size specified, not contents
+        MAEK empty_array NEW BOO BUCKET OF 10.
+        BLEEP empty_array.
+
+KBYE

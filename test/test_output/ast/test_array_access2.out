@@ -1,0 +1,13 @@
+
+
+Main()
+{
+	char * str1 = "whoooopie!";
+	char * str2 = "yiiippeee!";
+	char * recovered_str;
+	char * [3] exclamations = [ str1, str2 ];
+	recovered_str = exclamations[1];
+	printf("%X\n", recovered_str);
+	free(exclamations);
+}
+

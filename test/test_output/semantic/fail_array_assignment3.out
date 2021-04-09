@@ -1,0 +1,1 @@
+Fatal error: exception Exceptions.InvalidArrayAssignment("array elements must be of specified type for the array, found 'index' of type int")

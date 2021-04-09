@@ -1,0 +1,9 @@
+
+
+Main()
+{
+	int [3] numbers = [ 1, 2, 3 ];
+	printf("%X\n", numbers[2]);
+	free(numbers);
+}
+

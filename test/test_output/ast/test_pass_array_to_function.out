@@ -1,0 +1,17 @@
+
+
+Main()
+{
+	int [3] numbers = [ 1, 2, 3 ];
+	Print_First_In_Array(numbers);
+	free(numbers);
+}
+
+Print_First_In_Array(int [] numbers)
+{
+	printf("%X\n", "This is the first number in the array: ");
+	printf("%X\n", numbers[0]);
+	printf("%X\n", "This is the second number in the array: ");
+	printf("%X\n", numbers[1]);
+}
+

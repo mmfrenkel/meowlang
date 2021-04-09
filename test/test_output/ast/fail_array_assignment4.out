@@ -1,0 +1,8 @@
+
+
+Main()
+{
+	char * value = "value";
+	value[0] = "new value";
+}
+

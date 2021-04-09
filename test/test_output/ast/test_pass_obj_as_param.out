@@ -1,0 +1,34 @@
+
+
+Print_Cookies(class MOUSE mouse_guy)
+{
+	int cookies;
+	cookies = mouse_guy.Get_Num_Cookies();
+	printf("%X\n", "The mouse has: ");
+	printf("%X\n", cookies);
+}
+
+int Main()
+{
+	int jerrys_cookies = 0;
+	class MOUSE Jerry;
+	Jerry.Set_Num_Cookies(10);
+	Print_Cookies(Jerry);
+	free(Jerry);
+	return 0;
+}
+
+Class MOUSE {
+
+	int cookies;
+
+	int Get_Num_Cookies()
+	{
+	return cookies;
+	}
+	Set_Num_Cookies(int cookies_given)
+	{
+	cookies = cookies_given;
+	}
+
+}

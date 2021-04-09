@@ -1,0 +1,21 @@
+
+HAI ITZ ME FUNC Print_First_In_Array WIT BUCKET OF NUMBR numbers,
+
+    PURR Meow WIT "This is the first number in the array: ".
+    PURR Meow WIT numbers[0].
+    PURR Meow WIT "This is the second number in the array: ".
+    PURR Meow WIT numbers[1].
+
+KBYE
+
+HAI ITZ ME FUNC Main,
+
+    MAEK numbers NEW NUMBR BUCKET OF 3,
+        WIT 1
+        AN 2
+        AN 3.
+
+    PURR Print_First_In_Array WIT numbers.
+    BLEEP numbers.
+
+KBYE
