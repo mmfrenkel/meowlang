@@ -165,21 +165,21 @@ let build_function fdecl =
     | SBinop(((A.Int, _) as e1), op, ((A.Int, _) as e2)) ->
       let lhs = expr builder e1 env
       and rhs = expr builder e2 env in
-        (match op with
-          A.Add       -> L.build_add
-        | A.Sub       -> L.build_sub
-        | A.Mult      -> L.build_mul
-        | A.Div       -> L.build_sdiv
-        | A.Equal     -> L.build_icmp L.Icmp.Eq
-        | A.Neq       -> L.build_icmp L.Icmp.Ne
-        | A.Less      -> L.build_icmp L.Icmp.Slt
-        | A.Greater   -> L.build_icmp L.Icmp.Sgt
-        | A.Increment -> L.build_add
-        | A.Decrement -> L.build_sub
-        | _         ->
-          let msg = "found binary operation not supported for two integers"
-          in raise (NotYetSupported(msg))
-        ) lhs rhs "binop_int_tmp" builder
+      (match op with
+        A.Add       -> L.build_add
+      | A.Sub       -> L.build_sub
+      | A.Mult      -> L.build_mul
+      | A.Div       -> L.build_sdiv
+      | A.Equal     -> L.build_icmp L.Icmp.Eq
+      | A.Neq       -> L.build_icmp L.Icmp.Ne
+      | A.Less      -> L.build_icmp L.Icmp.Slt
+      | A.Greater   -> L.build_icmp L.Icmp.Sgt
+      | A.Increment -> L.build_add
+      | A.Decrement -> L.build_sub
+      | _         ->
+        let msg = "found binary operation not supported for two integers"
+        in raise (NotYetSupported(msg))
+      ) lhs rhs "binop_int_tmp" builder
 
     (* Binary operation between one or more floats *)
     | SBinop(((A.Float, _) as e1), op, ((A.Int, _) as e2))
@@ -187,31 +187,31 @@ let build_function fdecl =
     | SBinop(((A.Float, _) as e1), op, ((A.Float, _) as e2)) ->
       let lhs = expr builder e1 env
       and rhs = expr builder e2 env in
-        (match op with
-          A.Add     -> L.build_fadd
-        | A.Sub     -> L.build_fsub
-        | A.Mult    -> L.build_fmul
-        | A.Div     -> L.build_fdiv
-        | A.Equal   -> L.build_fcmp L.Fcmp.Oeq
-        | A.Neq     -> L.build_fcmp L.Fcmp.One
-        | A.Less    -> L.build_fcmp L.Fcmp.Olt
-        | A.Greater -> L.build_fcmp L.Fcmp.Ogt
-        | _         ->
-          let msg = "found binary operation not supported for one or more floats"
-        in raise (NotYetSupported(msg))
+      (match op with
+        A.Add     -> L.build_fadd
+      | A.Sub     -> L.build_fsub
+      | A.Mult    -> L.build_fmul
+      | A.Div     -> L.build_fdiv
+      | A.Equal   -> L.build_fcmp L.Fcmp.Oeq
+      | A.Neq     -> L.build_fcmp L.Fcmp.One
+      | A.Less    -> L.build_fcmp L.Fcmp.Olt
+      | A.Greater -> L.build_fcmp L.Fcmp.Ogt
+      | _         ->
+        let msg = "found binary operation not supported for one or more floats"
+      in raise (NotYetSupported(msg))
       ) lhs rhs "binop_float_tmp" builder
 
     (* Binary operation for two booleans *)
     | SBinop(((A.Bool, _) as e1), op, ((A.Bool, _) as e2)) ->
       let lhs = expr builder e1 env
       and rhs = expr builder e2 env in
-        (match op with
-            A.Or      -> L.build_or
-          | A.And     -> L.build_and
-          | _         ->
-            let msg = "found binary operation not supported for two boolean values"
-            in raise (NotYetSupported(msg))
-        ) lhs rhs "binop_bool_tmp" builder
+      (match op with
+          A.Or      -> L.build_or
+        | A.And     -> L.build_and
+        | _         ->
+          let msg = "found binary operation not supported for two boolean values"
+          in raise (NotYetSupported(msg))
+      ) lhs rhs "binop_bool_tmp" builder
 
     (* Call to built in printf function *)
     | SFunctionCall ("Meow", [arg]) ->
@@ -226,8 +226,8 @@ let build_function fdecl =
       let llargs = List.rev (List.map (fun a -> expr builder a env) (List.rev args))
       and result = (
         match fdecl.styp with
-            A.Void -> ""
-          | _ -> fname ^ "_result"
+          A.Void -> ""
+        | _ -> fname ^ "_result"
       ) in
       L.build_call fdef (Array.of_list llargs) result builder
 
@@ -310,11 +310,11 @@ let build_function fdecl =
       SBlock sl   -> List.fold_left stmt builder sl
     | SExpr e     -> ignore(expr builder e local_variables); builder
     | SReturn e   -> ignore(
-        match fdecl.styp with
-          (* Special "return nothing" instr *)
-          A.Void -> L.build_ret_void builder
-          (* Build return statement *)
-        | _ -> L.build_ret (expr builder e local_variables) builder
+      match fdecl.styp with
+        (* Special "return nothing" instr *)
+        A.Void -> L.build_ret_void builder
+        (* Build return statement *)
+      | _ -> L.build_ret (expr builder e local_variables) builder
       ); builder
 
     | SIf (predicate, then_stmt, else_stmt) ->

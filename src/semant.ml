@@ -139,12 +139,12 @@ let rec semant_expr expr env =
     in
     match expected_type with
       Arrtype(_, typ_e) ->
-        (match actual_type with
-          Arrtype(_, typ_a) when typ_e = typ_a -> (actual_type, arg_expr')
-        | _ -> raise (ArgumentTypeMismatch(msg)))
+      (match actual_type with
+        Arrtype(_, typ_a) when typ_e = typ_a -> (actual_type, arg_expr')
+      | _ -> raise (ArgumentTypeMismatch(msg)))
     | _ ->
-        if actual_type = expected_type then (actual_type, arg_expr')
-        else raise (ArgumentTypeMismatch(msg))
+      if actual_type = expected_type then (actual_type, arg_expr')
+      else raise (ArgumentTypeMismatch(msg))
   in
 
   match expr with
@@ -768,7 +768,7 @@ let lift_methods_to_global_space cls =
     {
       styp = m.styp;
       sfname = m_to_f_name cls.scname m.sfname;
-      sformals = (Obtype(cls.scname), String.lowercase_ascii (cls.scname ^ "*")) :: m.sformals;
+      sformals = (Obtype(cls.scname), mangled_obj_varname cls.scname) :: m.sformals;
       slocals  = m.slocals;
       sbody = m.sbody;
     }
@@ -797,7 +797,10 @@ let check (_, functions, classes) =
 
     (* 5. The combined functions represent the "lifted" class methods and usual functions *)
     let combined_functions =
-      List.fold_left (fun fs cls -> lift_methods_to_global_space cls @ fs) semant_funcs semant_classes
+      List.fold_left (
+        fun fs cls -> lift_methods_to_global_space cls @ fs
+      ) semant_funcs semant_classes
     in
     ([], combined_functions, semant_classes)
+
   else raise (MissingMainFunction (missing_main_func_msg))
