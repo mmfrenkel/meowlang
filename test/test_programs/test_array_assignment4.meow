@@ -1,0 +1,26 @@
+HAI ITZ ME BUCKET OF YARN FUNC Create_Array WIT YARN item1 AN YARN item2,
+
+   ITZ ME NUMBR count IZ 3.
+
+    MAEK string_array NEW BUCKET OF YARN HOLDS count,
+        WIT item1
+        AN item2.
+
+   GIVE string_array.
+KBYE
+
+HAI ITZ ME FUNC Main,
+
+   ITZ ME BUCKET OF YARN fruits.
+   ITZ ME YARN apple IZ "apples".
+   ITZ ME YARN pear IZ "pears".
+   ITZ ME YARN recovered_str.
+
+   PSST you cannot do an index assignment on something other than arrays
+   fruits IZ PURR Create_Array WIT apple AN pear.
+
+   recovered_str IZ fruits[1].
+   PURR Meow WIT recovered_str.
+   BLEEP fruits.
+
+KBYE

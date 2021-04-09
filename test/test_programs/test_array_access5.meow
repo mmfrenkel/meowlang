@@ -31,9 +31,13 @@ HAI ITZ ME NUMBR FUNC Main,
         AN age IZ 2.
 
     PSST Make an array of objects
-    MAEK my_pets NEW BUCKET OF PET HOLDS size,
-        WIT Silvester
-        AN Tank.
+    MAEK my_pets NEW BUCKET OF PET HOLDS size.
+
+    my_pets[0] IZ Silvester.
+
+    PSST Make a printer instance an print element at index 'idx'
+    cat_name IZ PURR Get_Name IN my_pets[0].
+    PURR Meow WIT cat_name.
 
     BLEEP my_pets.
     BLEEP Silvester.

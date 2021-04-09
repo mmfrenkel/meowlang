@@ -17,7 +17,7 @@ HAI ITZ ME NUMBR FUNC Main,
     ITZ ME NUMBR idx IZ 1.
 
     PSST Make an array of strings
-    MAEK animals NEW YARN BUCKET OF size,
+    MAEK animals NEW BUCKET OF YARN HOLDS size,
         WIT "Cats"
         AN "Dogs".
 

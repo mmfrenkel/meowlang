@@ -51,9 +51,10 @@ rule token = parse
 | "FUNC"          { FUNCTION }
 | "GIVE"          { RETURN }
 
-(* Array Indexing *)
+(* Arrays/Indexing *)
 | "["             { LBRACKET }
 | "]"             { RBRACKET }
+| "HOLDS"         { SIZE     }
 
 (* Operators *)
 | "SUM OF"        { PLUS }

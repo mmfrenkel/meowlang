@@ -1,0 +1,21 @@
+
+
+Main()
+{
+	char * [] fruits;
+	char * apple = "apples";
+	char * pear = "pears";
+	char * recovered_str;
+	fruits = Create_Array(apple, pear);
+	recovered_str = fruits[1];
+	printf("%X\n", recovered_str);
+	free(fruits);
+}
+
+char * [] Create_Array(char * item1, char * item2)
+{
+	int count = 3;
+	char * [count] string_array = [ item1, item2 ];
+	return string_array;
+}
+

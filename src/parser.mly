@@ -2,7 +2,7 @@
 open Ast
 %}
 
-%token RETURN MODULE IMPORT CALL FUNCTION DEF COMP CLASS NEW FREE MAKE HERE
+%token RETURN MODULE IMPORT CALL FUNCTION DEF COMP CLASS NEW FREE MAKE HERE SIZE
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN LBRACKET RBRACKET
 %token NOT EQ NEQ LT GT AND OR CONCAT CONTAINS IN
 %token IF THEN ELSE FOR INCREMENT DECREMENT INT BOOL FLOAT STRING ARRAY
@@ -16,6 +16,7 @@ open Ast
 
 %nonassoc NOELSE
 %nonassoc ELSE
+%nonassoc ARRAY
 %right ASSIGN
 %right CONCAT
 %right OR AND
@@ -158,9 +159,8 @@ args_list:
 /* Array Specification */
 
 array_decl:
-    MAKE ID NEW typ ARRAY CONTAINS array_size_typ RPAREN LPAREN args_opt { NewArray($2, $4, $7, $10)                  }
-  | MAKE ID NEW typ ARRAY CONTAINS array_size_typ                        { NewArray($2, $4, $7, [])                   }
-  | MAKE ID NEW typ ARRAY                                                { NewArray($2, $4, ILiteralArraySize(0), []) }
+    MAKE ID NEW ARRAY CONTAINS typ SIZE array_size_typ RPAREN LPAREN args_opt { NewArray($2, $6, $8, $11)}
+  | MAKE ID NEW ARRAY CONTAINS typ SIZE array_size_typ                        { NewArray($2, $6, $8, []) }
 
 array_size_typ:
     ILIT                      { ILiteralArraySize($1) }
