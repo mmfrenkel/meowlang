@@ -5,7 +5,7 @@ HAI ITZ ME NUMBR FUNC Main,
     ITZ ME NUMBR size IZ 2.
     ITZ ME YARN cat_name.
 
-    MAEK animals NEW YARN BUCKET OF size,
+    MAEK animals NEW BUCKET OF YARN HOLDS size,
         WIT "Cats"
         AN "Dogs".
 

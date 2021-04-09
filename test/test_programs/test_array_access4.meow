@@ -31,7 +31,7 @@ HAI ITZ ME NUMBR FUNC Main,
         AN age IZ 2.
 
     PSST Make an array of objects
-    MAEK my_pets NEW PET BUCKET OF size,
+    MAEK my_pets NEW BUCKET OF PET HOLDS size,
         WIT Silvester
         AN Tank.
 

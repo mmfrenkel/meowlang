@@ -4,7 +4,7 @@ HAI ITZ ME FUNC Main,
 
 	ITZ ME NUMBR idx IZ 0.
 
-	MAEK cool_array NEW NUMBR BUCKET OF 3,
+	MAEK cool_array NEW BUCKET OF NUMBR HOLDS 3,
           	WIT 1 AN 2 AN 3.
 
 	PSST set new value in array

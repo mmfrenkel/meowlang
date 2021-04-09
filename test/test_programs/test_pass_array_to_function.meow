@@ -10,7 +10,7 @@ KBYE
 
 HAI ITZ ME FUNC Main,
 
-    MAEK numbers NEW NUMBR BUCKET OF 3,
+    MAEK numbers NEW BUCKET OF NUMBR HOLDS 3,
         WIT 1
         AN 2
         AN 3.

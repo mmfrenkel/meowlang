@@ -51,7 +51,14 @@ let m_to_f_name cls_n m_n =
 
 (* Raise an exception if the given types are not the same *)
 let check_matching_types typ1 typ2 err =
-  if typ1 = typ2 then typ1 else raise err
+  (* with arrays we don't care if the sizes match; they're just implemented as pointers *)
+  match typ1 with
+    Arrtype(_, arr_typ_1) ->
+      (match typ2 with
+        Arrtype(_, arr_typ_2) when arr_typ_1 = arr_typ_2 -> typ1
+      | _ -> raise err)
+  | _ when typ1 = typ2 -> typ1
+  | _ -> raise err
 
 (* Helper function to check for duplicates of anything *)
 let find_duplicate items exception_msg =
@@ -137,14 +144,8 @@ let rec semant_expr expr env =
     let msg = Printf.sprintf "%s, expected typ %s, but got %s"
         (string_of_expr (arg_expr)) (string_of_typ expected_type) (string_of_typ actual_type)
     in
-    match expected_type with
-      Arrtype(_, typ_e) ->
-      (match actual_type with
-        Arrtype(_, typ_a) when typ_e = typ_a -> (actual_type, arg_expr')
-      | _ -> raise (ArgumentTypeMismatch(msg)))
-    | _ ->
-      if actual_type = expected_type then (actual_type, arg_expr')
-      else raise (ArgumentTypeMismatch(msg))
+    ignore(check_matching_types expected_type actual_type (ArgumentTypeMismatch(msg)));
+    (actual_type, arg_expr')
   in
 
   match expr with
@@ -534,12 +535,12 @@ let rec semant_stmt stmt env =
         let msg = Printf.sprintf "%s; see function %s" return_from_void_func env.function_name
         in raise (ReturnFromVoidFunction(msg))
     else
-      let (typ, e') = semant_expr e env in
-      if env.returns = typ then SReturn((typ, e'))
-      else
+        let (typ, e') = semant_expr e env in
         let msg = Printf.sprintf "%s; expected: %s, got: %s in function %s"
           return_type_invalid (string_of_typ env.returns) (string_of_typ typ) env.function_name
-        in raise (ReturnTypeInvalid(msg))
+        in
+        ignore(check_matching_types typ env.returns (ReturnTypeInvalid(msg)));
+        SReturn((typ, e'))
 
   | If (e, stmt1, stmt2) ->
     SIf(check_bool_expr e,
