@@ -105,10 +105,14 @@ stmt:
   | LBRACE stmt_list RBRACE                       { Block(List.rev $2)             }
   | array_decl SEMI                               { Expr($1)                       }
   | c_instance SEMI                               { Expr($1)                       }
-  | expr IF THEN stmt %prec NOELSE                { If($1, $4, Block([]))          }
-  | expr IF THEN stmt ELSE stmt                   { If($1, $4, $6)                 }
-  | FOR expr INCREMENT expr_opt COMMA expr stmt   { For(Increment, $2, $4, $6, $7) }
-  | FOR expr DECREMENT expr_opt COMMA expr stmt   { For(Decrement, $2, $4, $6, $7) }
+  | expr IF THEN LBRACE stmt_list RBRACE %prec NOELSE
+      { If($1, Block(List.rev $5), Block([]))          }
+  | expr IF THEN LBRACE stmt_list RBRACE ELSE LBRACE stmt_list RBRACE
+      { If($1, Block(List.rev $5), Block(List.rev $9)) }
+  | FOR expr INCREMENT expr_opt COMMA expr LBRACE stmt_list RBRACE
+      { For(Increment, $2, $4, $6, Block(List.rev $8)) }
+  | FOR expr DECREMENT expr_opt COMMA expr LBRACE stmt_list RBRACE
+      { For(Decrement, $2, $4, $6, Block(List.rev $8)) }
   | ID IN ID ASSIGN expr SEMI                     { ClassAssign(Id($3), $1, $5)    }
   | ID LBRACKET expr RBRACKET ASSIGN expr SEMI    { ArrayAssign($1, $3, $6)        }
   | FREE ID SEMI                                  { Dealloc(Id($2))                }
