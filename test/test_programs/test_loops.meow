@@ -1,4 +1,3 @@
-
 HAI ITZ ME FUNC Main,
 
         ITZ ME NUMBR count.
@@ -6,7 +5,7 @@ HAI ITZ ME FUNC Main,
         ITZ ME YARN condition.
         count IZ 0.
 
-        PSST Incrementing with initialized index
+        PSST Incrementing with initialized index        
         IM IN YR LOOP count UPPIN AN SMALLR count THAN 10
             condition IZ "count is still not 10".
 
@@ -18,7 +17,7 @@ HAI ITZ ME FUNC Main,
             PSST condition IZ CAT condition AN "count is".
             PSST condition IZ CAT condition AN count.
         KBYE
-
+        
         PSST Initialize index and then increment
         IM IN YR LOOP index NERFIN index IZ 15 AN BIGGR index THAN 10
             condition IZ "index is still more than 10".
