@@ -13,14 +13,11 @@ Main()
 	else		{
 	condition = "not same same";
 	}
-	if ("kittens" == "puppies")	{
-	condition = "this is not the correct answer. ";
-	condition = condition + "you have to pick a team";
+	if (10 == 10)	{
+	condition = "ten out of ten.";
 	}
 	else		{
-	condition = "clearly kittens are cuter";
-	condition = condition + "or are they?";
+	condition = "my ten is better than your ten.";
 	}
-	return condition;
 }
 
