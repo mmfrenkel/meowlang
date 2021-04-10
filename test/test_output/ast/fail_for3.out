@@ -1,0 +1,19 @@
+
+
+Main()
+{
+	int index = 10;
+	int count = 20;
+	char * condition;
+	for (count = 10 index-- index > 10) {
+			{
+	index = 10 * 1;
+	}
+	}
+	for ( condition++ index < 10) {
+			{
+	index = 10 * 1;
+	}
+	}
+}
+

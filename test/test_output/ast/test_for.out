@@ -7,7 +7,9 @@ Main()
 	char * condition;
 	count = 0;
 	for ( count++ count < 10) {
-			condition = "count is still not 10";
+			{
+	condition = "count is still not 10";
+	}
 	}
 	count = 20;
 	for ( count-- count > 10) {
@@ -17,7 +19,9 @@ Main()
 	}
 	}
 	for (index = 15 index-- index > 10) {
-			condition = "index is still more than 10";
+			{
+	condition = "index is still more than 10";
+	}
 	}
 }
 
