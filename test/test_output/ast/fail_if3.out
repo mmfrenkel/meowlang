@@ -5,8 +5,12 @@ Main()
 	char * condition;
 	if (3 == 3)	{
 	if ("Walnuts")
+	{
 	condition = "Pancakes";
 	}
-	else		condition = "Eggs";
+	}
+	else		{
+	condition = "Eggs";
+	}
 }
 

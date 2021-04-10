@@ -7,16 +7,19 @@ HAI ITZ ME FUNC Main,
         PSST IF THEN
         SMALLR 4 THAN 10
         O RLY? 
-        YA RLY
+        YA RLY HAI
             condition IZ "math is the only Truth".
+        KBYE
         
         PSST IF THEN ELSE
         SAEM 4 AN 4
         O RLY? 
-        YA RLY
+        YA RLY HAI
             condition IZ "same same".
-        NO WAI
+        KBYE
+        NO WAI HAI
             condition IZ "not same same".
+        KBYE
         
         PSST IF THEN ELSE with code blocks
         SAEM "kittens" AN "puppies"

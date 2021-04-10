@@ -5,8 +5,10 @@ HAI ITZ ME FUNC Main,
 
     SAEM 3 AN 3
     O RLY?
-    NO WAI 
+    NO WAI HAI
         condition IZ "Waffles".
-    YA RLY
+    KBYE
+    YA RLY HAI
         condition IZ "Eggs".
+    KBYE
 KBYE

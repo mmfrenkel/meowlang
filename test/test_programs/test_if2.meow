@@ -8,9 +8,12 @@ HAI ITZ ME FUNC Main,
     YA RLY HAI
         SMALLR 1 THAN 4
         O RLY?
-        YA RLY
+        YA RLY HAI
             condition IZ "Pancakes".
+        KBYE
     KBYE
-    NO WAI
+    NO WAI HAI
         condition IZ "Eggs".
+    KBYE
+
 KBYE
