@@ -1,0 +1,11 @@
+
+
+int Main()
+{
+	float value;
+	char * str = "2.234";
+	value = (float) str;
+	printf("%X\n", value + 2);
+	return 0;
+}
+

@@ -1,14 +1,10 @@
 
 HAI ITZ ME NUMBR FUNC Main,
 
-        PSST Creating some local variables
         ITZ ME NUMBR count IZ 2.
         ITZ ME NUMBAR float_count.
 
-        PSST Assigning local varibles values
         float_count IZ NUMBAR count.
-
-        PSST Test printing an integer
         PURR Meow WIT float_count.
 
         GIVE 0.

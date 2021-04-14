@@ -1,0 +1,31 @@
+
+HAI ITZ ME NUMBR FUNC Main,
+
+        PSST Creating some local variables
+        ITZ ME YARN value IZ "happy".
+
+        MAEK Jerry NEW MOUSE.
+
+        PSST Assigning local varibles values
+        Jerry IZ MOUSE value.
+
+        PSST Test printing an integer
+        PURR Meow WIT count.
+
+        GIVE 0.
+KBYE
+
+HAI ITZ ME CLASS MOUSE,
+
+    ITZ ME NUMBR cookies IZ 0.
+
+    HAI ITZ ME NUMBR FUNC Count_Cookies,
+        GIVE cookies.
+    KBYE
+
+    HAI ITZ ME FUNC Give_Cookie WIT NUMBR count_cookies,
+        PSST This uses the SUM prefix operator
+        cookies IZ SUM OF cookies AN count_cookies.
+    KBYE
+
+KBYE

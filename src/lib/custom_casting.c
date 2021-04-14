@@ -27,8 +27,23 @@ char *custom_itoa(int val)
 	if (sprintf(buffer, "%d", stored) != n_chars_in_val - 1) {
 		printf("could not cast int to string\n");
 		free(buffer);
-		return NULL;
+		exit(1);
 	}
 
+	return buffer;
+}
+
+char *custom_ftoa(double val)
+{
+	char *buffer;
+	int sz;
+
+	sz = asprintf(&buffer, "%f", val);
+
+	if (sz < 0) {
+		/* memory allocation unsuccessful */
+		printf("could not cast float to string\n");
+		exit(1);
+	}
 	return buffer;
 }

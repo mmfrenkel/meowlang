@@ -35,6 +35,11 @@ let lookup_index cls_name field_name =
   try Hashtbl.find struct_field_idx (cls_name ^ "." ^ field_name)
   with _ -> raise (InstanceVariableNotFound("codegen error: " ^ cls_name ^ "." ^ field_name))
 
+
+let create_built_in return_typ args n m =
+  let func_t = L.function_type return_typ args in
+  L.declare_function n func_t m
+
 let context    = L.global_context ()
 let the_module = L.create_module context "Meowlang"
 
@@ -98,25 +103,21 @@ let format (typ, _) =
 let build_function fdecl =
 
   (* Create the prototypes for build in functions (I/O and casting) *)
-  let printf_func =
+  let printf_func = (* variatic, so needs its own distinct builder *)
     let printf_t = L.var_arg_function_type i32_t [| str_t |] in
-    L.declare_function "printf" printf_t the_module in
+    L.declare_function "printf" printf_t the_module
 
-  let scanf_func =
-    let scanf_t = L.function_type i32_t [| L.pointer_type str_t |] in
-    L.declare_function "custom_scanf" scanf_t the_module in
+  and scanf_func = create_built_in i32_t [| L.pointer_type str_t |] "custom_scanf" the_module
 
-  let atoi_func =
-    let atoi_t = L.function_type i32_t [| str_t |] in
-    L.declare_function "atoi" atoi_t the_module in
+  and atoi_func = create_built_in i32_t [| str_t |] "atoi" the_module
 
-  let itoa_func =
-    let itoa_t = L.function_type str_t [| i32_t |] in
-    L.declare_function "custom_itoa" itoa_t the_module in
+  and atof_func = create_built_in float_t [| str_t |] "atof" the_module
 
-  let strcmp_func =
-    let strcmp_t = L.function_type i32_t [| str_t ; str_t |] in
-    L.declare_function "custom_strcmp" strcmp_t the_module in
+  and itoa_func = create_built_in str_t [| i32_t |] "custom_itoa" the_module
+
+  and ftoa_func = create_built_in str_t [| float_t |] "custom_ftoa" the_module
+
+  and strcmp_func = create_built_in  i32_t [| str_t ; str_t |] "custom_strcmp" the_module in
 
   let (the_function, _) = Hashtbl.find global_functions fdecl.sfname in
   let builder = L.builder_at_end context (L.entry_block the_function) in
@@ -160,10 +161,14 @@ let build_function fdecl =
       (match typ with
         A.Float when t = A.Int -> L.build_fptosi rhs llvm_typ "cast_v" builder
       | A.Int when t = A.Float -> L.build_uitofp rhs llvm_typ "cast_v" builder
+      | A.String when t = A.Float ->
+          L.build_call atof_func [| rhs |] "atof_call" builder
       | A.String when t = A.Int ->
           L.build_call atoi_func [| rhs |] "atoi_call" builder
       | A.Int when t = A.String ->
           L.build_call itoa_func [| rhs |] "itoa_call" builder
+      | A.Float when t = A.String ->
+          L.build_call ftoa_func [| rhs |] "ftoa_call" builder
       | _ -> raise (NotYetSupported("codegen: cast operation not yet supported")))
 
     | SAssign ((_, lhs), e)   ->

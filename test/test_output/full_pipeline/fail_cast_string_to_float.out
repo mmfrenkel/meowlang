@@ -1,1 +1,0 @@
-Fatal error: exception Exceptions.NotYetSupported("cast not currently supported from char * to float. See: (float) value")
