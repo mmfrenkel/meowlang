@@ -97,8 +97,7 @@ let format (typ, _) =
 (*********************************************************)
 let build_function fdecl =
 
-  (* Create the prototype for printf/Meow, a built-in function
-     TODO: figure out how to not do this for each function *)
+  (* Create the prototypes for build in functions (I/O and casting) *)
   let printf_func =
     let printf_t = L.var_arg_function_type i32_t [| str_t |] in
     L.declare_function "printf" printf_t the_module in
@@ -106,6 +105,14 @@ let build_function fdecl =
   let scanf_func =
     let scanf_t = L.function_type i32_t [| L.pointer_type str_t |] in
     L.declare_function "custom_scanf" scanf_t the_module in
+
+  let atoi_func =
+    let atoi_t = L.function_type i32_t [| str_t |] in
+    L.declare_function "atoi" atoi_t the_module in
+
+  let itoa_func =
+    let itoa_t = L.function_type str_t [| i32_t |] in
+    L.declare_function "custom_itoa" itoa_t the_module in
 
   let (the_function, _) = Hashtbl.find global_functions fdecl.sfname in
   let builder = L.builder_at_end context (L.entry_block the_function) in
@@ -149,6 +156,10 @@ let build_function fdecl =
       (match typ with
         A.Float when t = A.Int -> L.build_fptosi rhs llvm_typ "cast_v" builder
       | A.Int when t = A.Float -> L.build_uitofp rhs llvm_typ "cast_v" builder
+      | A.String when t = A.Int ->
+          L.build_call atoi_func [| rhs |] "atoi_call" builder
+      | A.Int when t = A.String ->
+          L.build_call itoa_func [| rhs |] "itoa_call" builder
       | _ -> raise (NotYetSupported("codegen: cast operation not yet supported")))
 
     | SAssign ((_, lhs), e)   ->

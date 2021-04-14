@@ -160,6 +160,8 @@ let rec semant_expr expr env =
     let _ = match typ with
       Int when typ1 = Float -> ()
     | Float when typ1 = Int -> ()
+    | Int when typ1 = String -> ()
+    | String when typ1 = Int -> ()
     | _ when typ = typ1 && (typ1 = Int || typ1 = Float) ->
         raise (CastUnnecessary("cast is redundant here: " ^ string_of_expr ex))
     | _  ->

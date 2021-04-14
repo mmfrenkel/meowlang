@@ -1,0 +1,15 @@
+
+HAI ITZ ME NUMBR FUNC Main,
+
+        PSST Creating some local variables
+        ITZ ME NUMBR count.
+        ITZ ME YARN value IZ "2".
+
+        PSST Assigning local varibles values
+        count IZ NUMBR value.
+
+        PSST Test printing an integer
+        PURR Meow WIT SUM OF count AN 2.
+
+        GIVE 0.
+KBYE

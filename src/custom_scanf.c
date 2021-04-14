@@ -21,7 +21,7 @@ int custom_scanf(char **buf_ptr)
 		buffer[n_characters] = c;
 		n_characters++;
 
-		/* if buffer is full realloc */
+		/* if buffer is full then realloc */
 		if (n_characters == size_of_buffer) {
 			size_of_buffer *= 2;
 			buffer = realloc(buffer, sizeof(char) * size_of_buffer);
@@ -31,6 +31,7 @@ int custom_scanf(char **buf_ptr)
 			}
 		}
 	}
+	buffer[n_characters] = '\0';
 	*buf_ptr = buffer;
 	return n_characters;
 }

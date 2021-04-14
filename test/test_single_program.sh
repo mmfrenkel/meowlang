@@ -19,7 +19,7 @@ $MEOWLANG < "$PROGRAM_PATH/$1" -c > "$name.ll"
 if [[ $? -eq 0 ]];
 then
         $LLC -relocation-model=pic "$name.ll" > "$name.s" &&
-        $CC -o "$name.exe" "$name.s" "./src/custom_scanf.o" &&
+        $CC -o "$name.exe" "$name.s" "./src/custom_scanf.o" "./src/custom_casting.o" &&
         "./$name.exe"
 fi
 
