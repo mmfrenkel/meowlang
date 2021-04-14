@@ -161,6 +161,10 @@ let build_function fdecl =
         | _ -> raise (NotYetSupported("codegen: assignment op not yet supported"))
       in ignore(L.build_store rhs lhs builder); rhs
 
+    | SUnop(_, ((_, _) as e)) ->
+      let e' = expr builder e env in
+      L.build_not e' "tmp" builder
+
     (* Binary operation between two integers *)
     | SBinop(((A.Int, _) as e1), op, ((A.Int, _) as e2)) ->
       let lhs = expr builder e1 env
@@ -182,11 +186,21 @@ let build_function fdecl =
       ) lhs rhs "binop_int_tmp" builder
 
     (* Binary operation between one or more floats *)
-    | SBinop(((A.Float, _) as e1), op, ((A.Int, _) as e2))
-    | SBinop(((A.Int, _) as e1), op, ((A.Float, _) as e2))
-    | SBinop(((A.Float, _) as e1), op, ((A.Float, _) as e2)) ->
-      let lhs = expr builder e1 env
-      and rhs = expr builder e2 env in
+    | SBinop(((A.Float as t), (_ as v1)), op, ((A.Int as o), (_ as v2)))
+    | SBinop(((A.Int as t), (_ as v1)), op, ((A.Float as o, (_ as v2))))
+    | SBinop(((A.Float as t), (_ as v1)), op, ((A.Float as o), (_ as v2))) ->
+      let build_cast v =
+        L.build_uitofp v float_t "cast_v" builder
+      in
+      let lhs =
+        let l = expr builder (A.Float, v1) env in
+        if t = A.Int then build_cast l
+        else l
+      and rhs =
+        let r = expr builder (A.Float, v2) env in
+        if o = A.Int then build_cast r
+        else r
+      in
       (match op with
         A.Add     -> L.build_fadd
       | A.Sub     -> L.build_fsub
@@ -206,9 +220,11 @@ let build_function fdecl =
       let lhs = expr builder e1 env
       and rhs = expr builder e2 env in
       (match op with
-          A.Or      -> L.build_or
-        | A.And     -> L.build_and
-        | _         ->
+          A.Or    -> L.build_or
+        | A.And   -> L.build_and
+        | A.Neq   -> L.build_icmp L.Icmp.Ne
+        | A.Equal -> L.build_icmp L.Icmp.Eq
+        | _      ->
           let msg = "found binary operation not supported for two boolean values"
           in raise (NotYetSupported(msg))
       ) lhs rhs "binop_bool_tmp" builder

@@ -1,0 +1,12 @@
+
+
+Main()
+{
+	int ten = 10;
+	int fifteen = 15;
+	printf("%X\n", ten < fifteen);
+	printf("%X\n", fifteen < ten);
+	printf("%X\n", fifteen > ten);
+	printf("%X\n", ten > fifteen);
+}
+

@@ -1,9 +1,8 @@
 HAI ITZ ME FUNC Main,
-    PSST Greater than
+    PSST Or can only occur between two boolean values
 
     ITZ ME NUMBR X IZ 2.
     ITZ ME YARN Y IZ "Hello".
-    BIGGR X THAN Y.
-
+    EITHER OF X AN Y.
 
 KBYE

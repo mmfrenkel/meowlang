@@ -1,0 +1,12 @@
+HAI ITZ ME FUNC Main,
+
+    ITZ ME NUMBR ten IZ 10.
+    ITZ ME NUMBR eleven IZ 11.
+    ITZ ME NUMBR ten_again IZ 10.
+
+    PURR Meow WIT DIFFRINT ten AN eleven.       PSST 1
+    PURR Meow WIT DIFFRINT ten AN ten_again.    PSST 0
+    PURR Meow WIT SAEM ten AN ten_again.        PSST 1
+    PURR Meow WIT SAEM ten AN eleven.           PSST 0
+
+KBYE

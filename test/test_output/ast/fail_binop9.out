@@ -1,0 +1,9 @@
+
+
+Main()
+{
+	char * X = "Candles";
+	char * Y = "Fires";
+	X && Y;
+}
+

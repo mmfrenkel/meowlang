@@ -77,10 +77,10 @@ rule token = parse
 | "NERFIN"        { DECREMENT }
 
 (* Flow Control *)
-| "O RLY?"               { IF       }
-| "YA RLY"               { THEN     }
-| "NO WAI"               { ELSE     }
-| "IM IN YR LOOP"        { FOR      }
+| "O RLY?"        { IF }
+| "YA RLY"        { THEN }
+| "NO WAI"        { ELSE }
+| "IM IN YR LOOP" { FOR }
 
 (* Data Types *)
 | "YARN"          { STRING }

@@ -1,0 +1,9 @@
+
+
+Main()
+{
+	int X = 2;
+	char * Y = "Hello";
+	X || Y;
+}
+

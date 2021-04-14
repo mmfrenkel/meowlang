@@ -99,12 +99,12 @@ stmt_list:
   | stmt_list stmt            { $2 :: $1  }
 
 stmt:
-    expr SEMI                                     { Expr($1)                       }
-  | function_call SEMI                            { Expr($1)                       }
-  | RETURN expr SEMI                              { Return($2)                     }
-  | LBRACE stmt_list RBRACE                       { Block(List.rev $2)             }
-  | array_decl SEMI                               { Expr($1)                       }
-  | c_instance SEMI                               { Expr($1)                       }
+    expr SEMI                                     { Expr($1)           }
+  | function_call SEMI                            { Expr($1)           }
+  | RETURN expr SEMI                              { Return($2)         }
+  | LBRACE stmt_list RBRACE                       { Block(List.rev $2) }
+  | array_decl SEMI                               { Expr($1)           }
+  | c_instance SEMI                               { Expr($1)           }
   | expr IF THEN LBRACE stmt_list RBRACE %prec NOELSE
       { If($1, Block(List.rev $5), Block([]))          }
   | expr IF THEN LBRACE stmt_list RBRACE ELSE LBRACE stmt_list RBRACE
@@ -113,10 +113,10 @@ stmt:
       { For(Increment, $2, $4, $6, Block(List.rev $8)) }
   | FOR expr DECREMENT expr_opt COMMA expr LBRACE stmt_list RBRACE
       { For(Decrement, $2, $4, $6, Block(List.rev $8)) }
-  | ID IN ID ASSIGN expr SEMI                     { ClassAssign(Id($3), $1, $5)    }
-  | ID LBRACKET expr RBRACKET ASSIGN expr SEMI    { ArrayAssign($1, $3, $6)        }
-  | FREE ID SEMI                                  { Dealloc(Id($2))                }
-  | ID ASSIGN function_call SEMI                  { Expr(Assign(Id($1), $3))       }
+  | ID IN ID ASSIGN expr SEMI                     { ClassAssign(Id($3), $1, $5)}
+  | ID LBRACKET expr RBRACKET ASSIGN expr SEMI    { ArrayAssign($1, $3, $6)    }
+  | FREE ID SEMI                                  { Dealloc(Id($2))            }
+  | ID ASSIGN function_call SEMI                  { Expr(Assign(Id($1), $3))   }
 
 expr:
     ILIT                      { ILiteral($1)           }

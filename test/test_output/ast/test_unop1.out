@@ -1,0 +1,10 @@
+
+
+Main()
+{
+	bool yes = true;
+	bool no = false;
+	printf("%X\n", !yes);
+	printf("%X\n", !no);
+}
+

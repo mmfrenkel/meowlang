@@ -1,0 +1,9 @@
+
+
+Main()
+{
+	bool X = true;
+	char * Y = "Hello";
+	X + Y;
+}
+

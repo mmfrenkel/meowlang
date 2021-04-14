@@ -1,0 +1,12 @@
+HAI ITZ ME FUNC Main,
+
+    ITZ ME BOO yes IZ AYE.
+    ITZ ME BOO yah_huh IZ AYE.
+    ITZ ME BOO no IZ NAY.
+
+    PURR Meow WIT DIFFRINT yes AN no.      PSST 1
+    PURR Meow WIT DIFFRINT yes AN yah_huh. PSST 0
+    PURR Meow WIT SAEM yes AN yah_huh.     PSST 1
+    PURR Meow WIT SAEM yes AN no.          PSST 0
+
+KBYE

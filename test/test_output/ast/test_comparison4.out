@@ -1,0 +1,13 @@
+
+
+Main()
+{
+	int ten = 10;
+	int eleven = 11;
+	float ten_again = 10.0;
+	printf("%X\n", ten != eleven);
+	printf("%X\n", ten != ten_again);
+	printf("%X\n", ten == ten_again);
+	printf("%X\n", ten == eleven);
+}
+

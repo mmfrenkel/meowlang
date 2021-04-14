@@ -161,10 +161,11 @@ let rec semant_expr expr env =
     and (typ2, e2') = semant_expr e2 env in
     let same_type = typ1 = typ2 in
     let end_typ = match op with
-        Add | Sub | Mult | Div when same_type && typ1 = Int -> Int
+        Add | Sub | Mult | Div | Increment | Decrement when same_type && typ1 = Int -> Int
       | Add | Sub | Mult | Div when (typ1 = Float || typ1 = Int) && (typ2 = Float || typ2 = Int) -> Float
-      | Equal | Neq  when same_type -> Bool
-      | Less | Greater when same_type && (typ1 = Float || typ1 = Int) && (typ2 = Float || typ2 = Int) -> Bool
+      | Equal | Neq when same_type -> Bool
+      | Equal | Neq when (typ1 = Float || typ1 = Int) && (typ2 = Float || typ2 = Int) -> Bool
+      | Less | Greater when (typ1 = Float || typ1 = Int) && (typ2 = Float || typ2 = Int) -> Bool
       | And | Or when same_type && typ1 = Bool -> Bool
       | Concat when (typ1 = String && (typ2 = String || typ2 == Int || typ2 == Float)) ||
                     (typ2 = String && (typ1 == Int || typ1 == Float)) -> String

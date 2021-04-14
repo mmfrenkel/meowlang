@@ -1,0 +1,9 @@
+
+
+Main()
+{
+	bool boolean = true;
+	int value = 2;
+	value != boolean;
+}
+
