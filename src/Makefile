@@ -12,11 +12,11 @@ clean :
 	ocamlbuild -clean
 	rm -rf ocamlllvm *.diff parser.output custom_scanf.o custom_casting.o custom_strcmp.o
 
-custom_scanf.o : custom_scanf.c
-	cc -c custom_scanf.c
+custom_scanf.o : ./lib/custom_scanf.c
+	cc -c ./lib/custom_scanf.c
 
-custom_casting.o : custom_casting.c
-	cc -c custom_casting.c
+custom_casting.o : ./lib/custom_casting.c
+	cc -c ./lib/custom_casting.c
 
-custom_strcmp.o : custom_strcmp.c
-	cc -c custom_strcmp.c
+custom_strcmp.o : ./lib/custom_strcmp.c
+	cc -c ./lib/custom_strcmp.c
