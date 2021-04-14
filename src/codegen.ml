@@ -1,6 +1,6 @@
 (******************************************************************************)
 (* Code generation: translate takes a semantically checked AST and produces   *)
-(* LLVM IR. Note: This code significantly inspired by codegen.ml of the       *)
+(* LLVM IR. Note: This code inspired by codegen.ml of the                     *)
 (* MicroC Compiler by S Edwards (PLT, Spring 2021)                            *)
 (******************************************************************************)
 module L = Llvm
@@ -102,21 +102,17 @@ let format (typ, _) =
 (*********************************************************)
 let build_function fdecl =
 
-  (* Create the prototypes for build in functions (I/O and casting) *)
+  (*  First create the prototypes for build in functions (I/O and casting) *)
+
   let printf_func = (* variatic, so needs its own distinct builder *)
     let printf_t = L.var_arg_function_type i32_t [| str_t |] in
     L.declare_function "printf" printf_t the_module
 
   and scanf_func = create_built_in i32_t [| L.pointer_type str_t |] "custom_scanf" the_module
-
   and atoi_func = create_built_in i32_t [| str_t |] "atoi" the_module
-
   and atof_func = create_built_in float_t [| str_t |] "atof" the_module
-
   and itoa_func = create_built_in str_t [| i32_t |] "custom_itoa" the_module
-
   and ftoa_func = create_built_in str_t [| float_t |] "custom_ftoa" the_module
-
   and strcmp_func = create_built_in  i32_t [| str_t ; str_t |] "custom_strcmp" the_module in
 
   let (the_function, _) = Hashtbl.find global_functions fdecl.sfname in
@@ -389,12 +385,13 @@ let build_function fdecl =
       let pred_bb = L.append_block context "for" the_function in
       ignore(L.build_br pred_bb builder);
 
-      let body_bb = L.append_block context "for_body" the_function in
+      let body_bb = L.append_block context "for_body" the_function
+      (* create the SBinop expr for incrementing and decrementing *)
+      and binop = (A.Int, SBinop(index, inc_decrement, (A.Int, SILiteral 1))) in
       add_terminal (stmt
         (L.builder_at_end context body_bb)
-        (* create the SBinop expr for incrementing and decrementing *)
         (* append assigning index inc/decrement to the end of the loop body *)
-        (SBlock [loop_body ; SExpr(A.Int, SAssign(index, (A.Int, SBinop(index, inc_decrement, (A.Int, SILiteral 1)))))])
+        (SBlock [loop_body ; SExpr(A.Int, SAssign(index, binop))])
       )
         (L.build_br pred_bb);
 
