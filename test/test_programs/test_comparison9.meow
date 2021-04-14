@@ -1,0 +1,10 @@
+HAI ITZ ME FUNC Main,
+
+    ITZ ME YARN val IZ "this is a string".
+    ITZ ME YARN dup_val IZ "this is a string".
+    ITZ ME YARN not_dup IZ "is something different".
+
+    PURR Meow WIT SAEM val AN dup_val.   PSST 1
+    PURR Meow WIT SAEM val AN not_dup.   PSST 0
+
+KBYE

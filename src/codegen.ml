@@ -114,6 +114,10 @@ let build_function fdecl =
     let itoa_t = L.function_type str_t [| i32_t |] in
     L.declare_function "custom_itoa" itoa_t the_module in
 
+  let strcmp_func =
+    let strcmp_t = L.function_type i32_t [| str_t ; str_t |] in
+    L.declare_function "custom_strcmp" strcmp_t the_module in
+
   let (the_function, _) = Hashtbl.find global_functions fdecl.sfname in
   let builder = L.builder_at_end context (L.entry_block the_function) in
 
@@ -203,6 +207,11 @@ let build_function fdecl =
         let msg = "found binary operation not supported for two integers"
         in raise (NotYetSupported(msg))
       ) lhs rhs "binop_int_tmp" builder
+
+    | SBinop(((A.String, _) as e1), A.Equal, ((A.String, _) as e2)) ->
+      let lhs = expr builder e1 env
+      and rhs = expr builder e2 env in
+      L.build_call strcmp_func [| lhs ; rhs |] "stcmp_call" builder
 
     (* Binary operation between one or more floats *)
     | SBinop(((A.Float as t), (_ as v1)), op, ((A.Int as o), (_ as v2)))

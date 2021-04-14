@@ -1,0 +1,11 @@
+
+
+Main()
+{
+	char * val = "this is a string";
+	char * dup_val = "this is a string";
+	char * not_dup = "is something different";
+	printf("%X\n", val == dup_val);
+	printf("%X\n", val == not_dup);
+}
+
