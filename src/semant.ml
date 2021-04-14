@@ -155,6 +155,19 @@ let rec semant_expr expr env =
   | StringLit s -> (String, SStringLit s)
   | Noexpr      -> (Void, SNoexpr)
 
+  | Cast(typ, e) as ex ->
+    let (typ1, e') = semant_expr e env in
+    let _ = match typ with
+      Int when typ1 = Float -> ()
+    | Float when typ1 = Int -> ()
+    | _ when typ = typ1 && (typ1 = Int || typ1 = Float) ->
+        raise (CastUnnecessary("cast is redundant here: " ^ string_of_expr ex))
+    | _  ->
+      let msg =  Printf.sprintf "cast not currently supported from %s to %s. See: %s"
+                (string_of_typ typ1) (string_of_typ typ) (string_of_expr ex)
+      in raise(NotYetSupported(msg))
+    in (typ, SCast(typ, (typ1, e')))
+
   | Binop (e1, op, e2) as ex ->
     (* Binary operations work with operands of the same type *)
     let (typ1, e1') = semant_expr e1 env

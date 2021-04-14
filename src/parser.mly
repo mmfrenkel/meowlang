@@ -119,27 +119,28 @@ stmt:
   | ID ASSIGN function_call SEMI                  { Expr(Assign(Id($1), $3))   }
 
 expr:
-    ILIT                      { ILiteral($1)           }
-  | FLIT                      { Fliteral($1)           }
-  | BLIT                      { BoolLit($1)            }
-  | SLIT                      { StringLit($1)          }
-  | ID                        { Id($1)                 }
-  | ID ASSIGN expr            { Assign(Id($1), $3)     }
-  | PLUS expr COMMA expr      { Binop($2, Add,   $4)   }
-  | MINUS expr COMMA expr     { Binop($2, Sub,   $4)   }
-  | TIMES expr COMMA expr     { Binop($2, Mult,  $4)   }
-  | DIVIDE expr COMMA expr    { Binop($2, Div,   $4)   }
-  | EQ expr COMMA expr        { Binop($2, Equal, $4)   }
-  | NEQ expr COMMA expr       { Binop($2, Neq,   $4)   }
-  | LT expr COMP expr         { Binop($2, Less,  $4)   }
-  | GT expr COMP expr         { Binop($2, Greater, $4) }
-  | AND expr COMMA expr       { Binop($2, And,   $4)   }
-  | OR expr COMMA expr        { Binop($2, Or,    $4)   }
-  | NOT expr                  { Unop(Not, $2)          }
-  | LPAREN expr RPAREN        { $2                     }
-  | CONCAT expr COMMA expr    { Binop($2, Concat, $4)  }
-  | ID IN ID                  { ClassAccess(Id($3), $1)}
-  | ID LBRACKET expr RBRACKET { ArrayAccess($1, $3)    }
+    ILIT                      { ILiteral($1)                }
+  | FLIT                      { Fliteral($1)                }
+  | BLIT                      { BoolLit($1)                 }
+  | SLIT                      { StringLit($1)               }
+  | ID                        { Id($1)                      }
+  | ID ASSIGN typ expr        { Assign(Id($1), Cast($3, $4))}
+  | ID ASSIGN expr            { Assign(Id($1), $3)          }
+  | PLUS expr COMMA expr      { Binop($2, Add,   $4)        }
+  | MINUS expr COMMA expr     { Binop($2, Sub,   $4)        }
+  | TIMES expr COMMA expr     { Binop($2, Mult,  $4)        }
+  | DIVIDE expr COMMA expr    { Binop($2, Div,   $4)        }
+  | EQ expr COMMA expr        { Binop($2, Equal, $4)        }
+  | NEQ expr COMMA expr       { Binop($2, Neq,   $4)        }
+  | LT expr COMP expr         { Binop($2, Less,  $4)        }
+  | GT expr COMP expr         { Binop($2, Greater, $4)      }
+  | AND expr COMMA expr       { Binop($2, And,   $4)        }
+  | OR expr COMMA expr        { Binop($2, Or,    $4)        }
+  | NOT expr                  { Unop(Not, $2)               }
+  | LPAREN expr RPAREN        { $2                          }
+  | CONCAT expr COMMA expr    { Binop($2, Concat, $4)       }
+  | ID IN ID                  { ClassAccess(Id($3), $1)     }
+  | ID LBRACKET expr RBRACKET { ArrayAccess($1, $3)         }
 
  function_call:
     CALL ID                          { FunctionCall($2, [])           }

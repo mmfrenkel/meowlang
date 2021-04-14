@@ -143,6 +143,14 @@ let build_function fdecl =
     | SId var      -> L.build_load (lookup_variable var env) var builder
     | SNoexpr      -> L.const_int i32_t 0
 
+    | SCast(t, (typ, e))  ->
+      let rhs = expr builder (typ, e) env
+      and llvm_typ = ltype_of_typ t in
+      (match typ with
+        A.Float when t = A.Int -> L.build_fptosi rhs llvm_typ "cast_v" builder
+      | A.Int when t = A.Float -> L.build_uitofp rhs llvm_typ "cast_v" builder
+      | _ -> raise (NotYetSupported("codegen: cast operation not yet supported")))
+
     | SAssign ((_, lhs), e)   ->
       let rhs = expr builder e env in
       let lhs =
@@ -193,13 +201,13 @@ let build_function fdecl =
         L.build_uitofp v float_t "cast_v" builder
       in
       let lhs =
-        let l = expr builder (A.Float, v1) env in
-        if t = A.Int then build_cast l
-        else l
+        let tmp_l = expr builder (A.Float, v1) env in
+        if t = A.Int then build_cast tmp_l
+        else tmp_l
       and rhs =
-        let r = expr builder (A.Float, v2) env in
-        if o = A.Int then build_cast r
-        else r
+        let tmp_r = expr builder (A.Float, v2) env in
+        if o = A.Int then build_cast tmp_r
+        else tmp_r
       in
       (match op with
         A.Add     -> L.build_fadd

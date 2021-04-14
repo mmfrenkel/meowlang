@@ -1,0 +1,11 @@
+
+
+int Main()
+{
+	float value = 2.0;
+	float float_val;
+	float_val = (float) value;
+	printf("%X\n", float_val);
+	return 0;
+}
+

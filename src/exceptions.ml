@@ -8,6 +8,7 @@ exception IllegalBinaryOp of string
 exception IllegalUnaryOp of string
 exception VariableAssignmentError of string
 exception ControlFlowIllegalArgument of string
+exception CastUnnecessary of string
 
 (* Function Exceptions *)
 exception MissingMainFunction of string

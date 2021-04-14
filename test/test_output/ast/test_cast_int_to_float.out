@@ -1,0 +1,11 @@
+
+
+int Main()
+{
+	int count = 2;
+	float float_count;
+	float_count = (float) count;
+	printf("%X\n", float_count);
+	return 0;
+}
+

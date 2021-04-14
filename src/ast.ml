@@ -18,6 +18,7 @@ type expr =
   | BoolLit of bool
   | StringLit of string
   | Id of string
+  | Cast of typ * expr
   | Binop of expr * op * expr
   | Unop of uop * expr
   | Assign of expr * expr
