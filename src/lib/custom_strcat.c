@@ -5,9 +5,6 @@
 
 char *custom_strcat(char *lhs, char *rhs)
 {
-  printf("%s", lhs);
-  printf("%s", rhs);
-
   /* the size of the concatenated string */
   int size_of_buffer = strlen(lhs) + strlen(rhs) + 1;
 
@@ -23,7 +20,17 @@ char *custom_strcat(char *lhs, char *rhs)
   memcpy(buffer+strlen(lhs), rhs, strlen(rhs)+1);
   /* null terminate the buffer */
 	buffer[strlen(buffer) + 1]= '\0';
-  printf("%s", buffer);
-  return '\0'; // buffer gets printed correctly at this point
+  // return "\0"; // buffer gets printed correctly at this point
   return buffer; // segfault at this point
+}
+
+int main(void)
+{
+  char *hello = "hello ";
+  char *goodbye = "goodbye ";
+  char *hg = custom_strcat(hello, goodbye);
+  char *gh = custom_strcat(goodbye, hello);
+  printf("%s", hg);
+  printf("%s", gh);
+  return 0;
 }
