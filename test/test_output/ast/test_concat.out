@@ -1,0 +1,12 @@
+
+
+Main()
+{
+	char * val = "string1. ";
+	char * dup_val = "string2.";
+	char * concatenated_str;
+	concatenated_str = val + dup_val;
+	printf("%X\n", concatenated_str);
+	free(concatenated_str);
+}
+

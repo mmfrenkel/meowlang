@@ -113,8 +113,8 @@ let build_function fdecl =
   and atof_func = create_built_in float_t [| str_t |] "atof" the_module
   and itoa_func = create_built_in str_t [| i32_t |] "custom_itoa" the_module
   and ftoa_func = create_built_in str_t [| float_t |] "custom_ftoa" the_module
-  and strcmp_func = create_built_in  i32_t [| str_t ; str_t |] "custom_strcmp" the_module
-  and strcat_func = create_built_in  i32_t [| str_t ; str_t |] "custom_strcat" the_module in
+  and strcmp_func = create_built_in i32_t [| str_t ; str_t |] "custom_strcmp" the_module
+  and strcat_func = create_built_in str_t [| str_t ; str_t |] "custom_strcat" the_module in
 
   let (the_function, _) = Hashtbl.find global_functions fdecl.sfname in
   let builder = L.builder_at_end context (L.entry_block the_function) in
@@ -209,7 +209,7 @@ let build_function fdecl =
         let msg = "found binary operation not supported for two integers"
         in raise (NotYetSupported(msg))
       ) lhs rhs "binop_int_tmp" builder
-    
+
     | SBinop(((A.String, _) as e1), A.Concat, ((A.String, _) as e2)) ->
       let lhs = expr builder e1 env
       and rhs = expr builder e2 env in
