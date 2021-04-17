@@ -20,17 +20,5 @@ char *custom_strcat(char *lhs, char *rhs)
   memcpy(buffer+strlen(lhs), rhs, strlen(rhs));
   /* null terminate the buffer */
 	buffer[strlen(lhs) + strlen(rhs)]= '\0';
-  // return "\0"; // buffer gets printed correctly at this point
-  return buffer; // segfault at this point
+  return buffer;
 }
-
-// int main(void)
-// {
-//   char *hello = "hello ";
-//   char *goodbye = "goodbye ";
-//   char *hg = custom_strcat(hello, goodbye);
-//   char *gh = custom_strcat(goodbye, hello);
-//   printf("%s", hg);
-//   printf("%s", gh);
-//   return 0;
-// }
