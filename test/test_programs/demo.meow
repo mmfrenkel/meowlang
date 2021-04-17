@@ -61,10 +61,20 @@ HAI ITZ ME FUNC Main,
     PURR Scan WIT pet_allow.
     pet_allow_num IZ NUMBR pet_allow.
 
-    SAEM pet_give_num AN pet_allow_num
+    SMALLR pet_give_num THAN pet_allow_num
     O RLY?
     YA RLY HAI
-        PURR Meow WIT allow_2.
+        PURR Meow WIT allow_1.
+    KBYE
+    NO WAI HAI
+        SAEM pet_give_num AN pet_allow_num
+        O RLY?
+        YA RLY HAI
+            PURR Meow WIT allow_2.
+        KBYE
+        NO WAI HAI
+            PURR Meow WIT allow_3.
+        KBYE
     KBYE
 
     PURR Meow WIT end.
