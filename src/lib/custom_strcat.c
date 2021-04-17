@@ -20,7 +20,7 @@ char *custom_strcat(char *lhs, char *rhs)
 	}
 
   memcpy(buffer, lhs, strlen(lhs));
-  memcpy(buffer+strlen(rhs), rhs, strlen(rhs)+1);
+  memcpy(buffer+strlen(lhs), rhs, strlen(rhs)+1);
   /* null terminate the buffer */
 	buffer[strlen(buffer) + 1]= '\0';
   printf("%s", buffer);
