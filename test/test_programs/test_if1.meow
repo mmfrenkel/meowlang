@@ -1,0 +1,34 @@
+HAI ITZ ME FUNC Main,
+
+        PSST Test if-then-else
+
+        ITZ ME YARN condition.
+
+        PSST IF THEN
+        SMALLR 4 THAN 10
+        O RLY? 
+        YA RLY HAI
+            condition IZ "math is the only Truth".
+        KBYE
+        
+        PSST IF THEN ELSE
+        SAEM 4 AN 4
+        O RLY? 
+        YA RLY HAI
+            condition IZ "same same".
+        KBYE
+        NO WAI HAI
+            condition IZ "not same same".
+        KBYE
+        
+        PSST IF THEN ELSE with code blocks
+        SAEM 10 AN 10
+        O RLY? 
+        YA RLY HAI
+            condition IZ "ten out of ten.".
+        KBYE
+        NO WAI HAI
+            condition IZ "my ten is better than your ten.".
+        KBYE
+
+KBYE

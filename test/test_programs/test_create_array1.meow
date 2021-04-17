@@ -2,7 +2,7 @@
 HAI ITZ ME NUMBR FUNC Main,
 
     PSST Create simple array
-    MAEK simple_array NEW YARN BUCKET OF 3.
+    MAEK simple_array NEW BUCKET OF YARN HOLDS 3.
     BLEEP simple_array.
     GIVE 0.
 

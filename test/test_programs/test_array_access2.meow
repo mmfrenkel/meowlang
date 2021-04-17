@@ -6,7 +6,7 @@ HAI ITZ ME FUNC Main,
     ITZ ME YARN recovered_str.
 
     PSST Create simple array with elements that are variables
-    MAEK exclamations NEW YARN BUCKET OF 3,
+    MAEK exclamations NEW BUCKET OF YARN HOLDS 3,
         WIT str1
         AN str2.
 

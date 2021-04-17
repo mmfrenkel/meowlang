@@ -1,0 +1,8 @@
+
+
+Main()
+{
+	int num = 2;
+	!num;
+}
+

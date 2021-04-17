@@ -1,0 +1,15 @@
+
+HAI ITZ ME NUMBR FUNC Main,
+
+        PSST Creating some local variables
+        ITZ ME NUMBAR value IZ 2.0.
+        ITZ ME NUMBAR float_val.
+
+        PSST Assigning local varibles values
+        float_val IZ NUMBAR value.
+
+        PSST Test printing an integer
+        PURR Meow WIT float_val.
+
+        GIVE 0.
+KBYE

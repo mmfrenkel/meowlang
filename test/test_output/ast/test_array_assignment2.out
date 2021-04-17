@@ -6,9 +6,9 @@ Main()
 	int value2 = 11;
 	int value3 = 12;
 	int index = 2;
-	int [3] exclamations = [ value1, value2 ];
-	exclamations[index] = value3;
-	printf("%X\n", exclamations[index]);
-	free(exclamations);
+	int [3] values = [ value1, value2 ];
+	values[index] = value3;
+	printf("%X\n", values[index]);
+	free(values);
 }
 

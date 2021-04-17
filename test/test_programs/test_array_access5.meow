@@ -1,0 +1,47 @@
+
+HAI ITZ ME CLASS PET,
+
+    ITZ ME YARN name.
+    ITZ ME YARN type.
+    ITZ ME NUMBR age.
+
+    HAI ITZ ME YARN FUNC Get_Name,
+        GIVE name.
+    KBYE
+
+KBYE
+
+
+HAI ITZ ME NUMBR FUNC Main,
+
+    ITZ ME NUMBR size IZ 2.
+    ITZ ME NUMBR idx IZ 1.
+    ITZ ME PET Cat.
+    ITZ ME YARN cat_name.
+
+    PSST Make some pets
+    MAEK Silvester NEW PET,
+        WIT name IZ "Silvester"
+        AN type IZ "cat"
+        AN age IZ 4.
+
+    MAEK Tank NEW PET,
+        WIT name IZ "Tank"
+        AN type IZ "dog"
+        AN age IZ 2.
+
+    PSST Make an array of objects
+    MAEK my_pets NEW BUCKET OF PET HOLDS size.
+
+    my_pets[0] IZ Silvester.
+
+    PSST Make a printer instance an print element at index 'idx'
+    cat_name IZ PURR Get_Name IN my_pets[0].
+    PURR Meow WIT cat_name.
+
+    BLEEP my_pets.
+    BLEEP Silvester.
+    BLEEP Tank.
+    GIVE 0.
+
+KBYE

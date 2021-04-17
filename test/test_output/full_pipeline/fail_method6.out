@@ -1,0 +1,1 @@
+Fatal error: exception Exceptions.InvalidMethodCall("methods can only be called on objects: found int instead of Objtype in size.Get_Name()")

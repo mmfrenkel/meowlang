@@ -1,0 +1,19 @@
+HAI ITZ ME FUNC Main,
+    PSST if statement inside if statement
+
+    ITZ ME YARN condition.
+
+    SAEM 3 AN 3
+    O RLY?
+    YA RLY HAI
+        SMALLR 1 THAN 4
+        O RLY?
+        YA RLY HAI
+            condition IZ "Pancakes".
+        KBYE
+    KBYE
+    NO WAI HAI
+        condition IZ "Eggs".
+    KBYE
+
+KBYE

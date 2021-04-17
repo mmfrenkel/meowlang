@@ -1,0 +1,11 @@
+
+
+int Main()
+{
+	int count;
+	char * value = "2";
+	count = (int) value;
+	printf("%X\n", count + 2);
+	return 0;
+}
+

@@ -5,7 +5,7 @@ HAI ITZ ME FUNC Main,
    ITZ ME YARN value IZ "value".
    ITZ ME NUMBR index IZ QUOSHUNT OF 10 AN 3.
 
-    MAEK greetings NEW YARN BUCKET OF 3,
+    MAEK greetings NEW BUCKET OF YARN HOLDS 3,
         WIT "string 1"
         AN "string 2".
 

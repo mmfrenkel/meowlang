@@ -8,9 +8,11 @@ HAI ITZ ME FUNC Main,
     YA RLY HAI
         "Walnuts"
         O RLY?
-        YA RLY
+        YA RLY HAI
             condition IZ "Pancakes".
+        KBYE
     KBYE
-    NO WAI
+    NO WAI HAI
         condition IZ "Eggs".
+    KBYE
 KBYE

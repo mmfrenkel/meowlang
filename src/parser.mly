@@ -2,7 +2,7 @@
 open Ast
 %}
 
-%token RETURN MODULE IMPORT CALL FUNCTION DEF COMP CLASS NEW FREE MAKE HERE
+%token RETURN MODULE IMPORT CALL FUNCTION DEF COMP CLASS NEW FREE MAKE HERE SIZE
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN LBRACKET RBRACKET
 %token NOT EQ NEQ LT GT AND OR CONCAT CONTAINS IN
 %token IF THEN ELSE FOR INCREMENT DECREMENT INT BOOL FLOAT STRING ARRAY
@@ -16,6 +16,7 @@ open Ast
 
 %nonassoc NOELSE
 %nonassoc ELSE
+%nonassoc ARRAY
 %right ASSIGN
 %right CONCAT
 %right OR AND
@@ -98,43 +99,48 @@ stmt_list:
   | stmt_list stmt            { $2 :: $1  }
 
 stmt:
-    expr SEMI                                     { Expr($1)                       }
-  | function_call SEMI                            { Expr($1)                       }
-  | RETURN expr SEMI                              { Return($2)                     }
-  | LBRACE stmt_list RBRACE                       { Block(List.rev $2)             }
-  | array_decl SEMI                               { Expr($1)                       }
-  | c_instance SEMI                               { Expr($1)                       }
-  | expr IF THEN stmt %prec NOELSE                { If($1, $4, Block([]))          }
-  | expr IF THEN stmt ELSE stmt                   { If($1, $4, $6)                 }
-  | FOR expr INCREMENT expr_opt COMMA expr stmt   { For(Increment, $2, $4, $6, $7) }
-  | FOR expr DECREMENT expr_opt COMMA expr stmt   { For(Decrement, $2, $4, $6, $7) }
-  | ID IN ID ASSIGN expr SEMI                     { ClassAssign(Id($3), $1, $5)    }
-  | ID LBRACKET expr RBRACKET ASSIGN expr SEMI    { ArrayAssign($1, $3, $6)        }
-  | FREE ID SEMI                                  { Dealloc(Id($2))                }
-  | ID ASSIGN function_call SEMI                  { Expr(Assign(Id($1), $3))       }
+    expr SEMI                                     { Expr($1)           }
+  | function_call SEMI                            { Expr($1)           }
+  | RETURN expr SEMI                              { Return($2)         }
+  | LBRACE stmt_list RBRACE                       { Block(List.rev $2) }
+  | array_decl SEMI                               { Expr($1)           }
+  | c_instance SEMI                               { Expr($1)           }
+  | expr IF THEN LBRACE stmt_list RBRACE %prec NOELSE
+      { If($1, Block(List.rev $5), Block([]))          }
+  | expr IF THEN LBRACE stmt_list RBRACE ELSE LBRACE stmt_list RBRACE
+      { If($1, Block(List.rev $5), Block(List.rev $9)) }
+  | FOR expr INCREMENT expr_opt COMMA expr LBRACE stmt_list RBRACE
+      { For(Increment, $2, $4, $6, Block(List.rev $8)) }
+  | FOR expr DECREMENT expr_opt COMMA expr LBRACE stmt_list RBRACE
+      { For(Decrement, $2, $4, $6, Block(List.rev $8)) }
+  | ID IN ID ASSIGN expr SEMI                     { ClassAssign(Id($3), $1, $5)}
+  | ID LBRACKET expr RBRACKET ASSIGN expr SEMI    { ArrayAssign($1, $3, $6)    }
+  | FREE ID SEMI                                  { Dealloc(Id($2))            }
+  | ID ASSIGN function_call SEMI                  { Expr(Assign(Id($1), $3))   }
 
 expr:
-    ILIT                      { ILiteral($1)           }
-  | FLIT                      { Fliteral($1)           }
-  | BLIT                      { BoolLit($1)            }
-  | SLIT                      { StringLit($1)          }
-  | ID                        { Id($1)                 }
-  | ID ASSIGN expr            { Assign(Id($1), $3)     }
-  | PLUS expr COMMA expr      { Binop($2, Add,   $4)   }
-  | MINUS expr COMMA expr     { Binop($2, Sub,   $4)   }
-  | TIMES expr COMMA expr     { Binop($2, Mult,  $4)   }
-  | DIVIDE expr COMMA expr    { Binop($2, Div,   $4)   }
-  | EQ expr COMMA expr        { Binop($2, Equal, $4)   }
-  | NEQ expr COMMA expr       { Binop($2, Neq,   $4)   }
-  | LT expr COMP expr         { Binop($2, Less,  $4)   }
-  | GT expr COMP expr         { Binop($2, Greater, $4) }
-  | AND expr COMMA expr       { Binop($2, And,   $4)   }
-  | OR expr COMMA expr        { Binop($2, Or,    $4)   }
-  | NOT expr                  { Unop(Not, $2)          }
-  | LPAREN expr RPAREN        { $2                     }
-  | CONCAT expr COMMA expr    { Binop($2, Concat, $4)  }
-  | ID IN ID                  { ClassAccess(Id($3), $1)}
-  | ID LBRACKET expr RBRACKET { ArrayAccess($1, $3)    }
+    ILIT                      { ILiteral($1)                }
+  | FLIT                      { Fliteral($1)                }
+  | BLIT                      { BoolLit($1)                 }
+  | SLIT                      { StringLit($1)               }
+  | ID                        { Id($1)                      }
+  | ID ASSIGN typ expr        { Assign(Id($1), Cast($3, $4))}
+  | ID ASSIGN expr            { Assign(Id($1), $3)          }
+  | PLUS expr COMMA expr      { Binop($2, Add,   $4)        }
+  | MINUS expr COMMA expr     { Binop($2, Sub,   $4)        }
+  | TIMES expr COMMA expr     { Binop($2, Mult,  $4)        }
+  | DIVIDE expr COMMA expr    { Binop($2, Div,   $4)        }
+  | EQ expr COMMA expr        { Binop($2, Equal, $4)        }
+  | NEQ expr COMMA expr       { Binop($2, Neq,   $4)        }
+  | LT expr COMP expr         { Binop($2, Less,  $4)        }
+  | GT expr COMP expr         { Binop($2, Greater, $4)      }
+  | AND expr COMMA expr       { Binop($2, And,   $4)        }
+  | OR expr COMMA expr        { Binop($2, Or,    $4)        }
+  | NOT expr                  { Unop(Not, $2)               }
+  | LPAREN expr RPAREN        { $2                          }
+  | CONCAT expr COMMA expr    { Binop($2, Concat, $4)       }
+  | ID IN ID                  { ClassAccess(Id($3), $1)     }
+  | ID LBRACKET expr RBRACKET { ArrayAccess($1, $3)         }
 
  function_call:
     CALL ID                          { FunctionCall($2, [])           }
@@ -158,9 +164,8 @@ args_list:
 /* Array Specification */
 
 array_decl:
-    MAKE ID NEW typ ARRAY CONTAINS array_size_typ RPAREN LPAREN args_opt { NewArray($2, $4, $7, $10)                  }
-  | MAKE ID NEW typ ARRAY CONTAINS array_size_typ                        { NewArray($2, $4, $7, [])                   }
-  | MAKE ID NEW typ ARRAY                                                { NewArray($2, $4, ILiteralArraySize(0), []) }
+    MAKE ID NEW ARRAY CONTAINS typ SIZE array_size_typ RPAREN LPAREN args_opt { NewArray($2, $6, $8, $11)}
+  | MAKE ID NEW ARRAY CONTAINS typ SIZE array_size_typ                        { NewArray($2, $6, $8, []) }
 
 array_size_typ:
     ILIT                      { ILiteralArraySize($1) }

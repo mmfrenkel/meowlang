@@ -51,9 +51,10 @@ rule token = parse
 | "FUNC"          { FUNCTION }
 | "GIVE"          { RETURN }
 
-(* Array Indexing *)
+(* Arrays/Indexing *)
 | "["             { LBRACKET }
 | "]"             { RBRACKET }
+| "HOLDS"         { SIZE     }
 
 (* Operators *)
 | "SUM OF"        { PLUS }
@@ -76,10 +77,10 @@ rule token = parse
 | "NERFIN"        { DECREMENT }
 
 (* Flow Control *)
-| "O RLY?"               { IF       }
-| "YA RLY"               { THEN     }
-| "NO WAI"               { ELSE     }
-| "IM IN YR LOOP"        { FOR      }
+| "O RLY?"        { IF }
+| "YA RLY"        { THEN }
+| "NO WAI"        { ELSE }
+| "IM IN YR LOOP" { FOR }
 
 (* Data Types *)
 | "YARN"          { STRING }

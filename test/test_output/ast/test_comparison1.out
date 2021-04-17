@@ -1,0 +1,13 @@
+
+
+Main()
+{
+	bool yes = true;
+	bool yah_huh = true;
+	bool no = false;
+	printf("%X\n", yes != no);
+	printf("%X\n", yes != yah_huh);
+	printf("%X\n", yes == yah_huh);
+	printf("%X\n", yes == no);
+}
+

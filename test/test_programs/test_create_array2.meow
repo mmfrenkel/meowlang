@@ -2,7 +2,7 @@
 HAI ITZ ME NUMBR FUNC Main,
 
     PSST Create simple array with all elements initialized
-    MAEK animals NEW YARN BUCKET OF 3,
+    MAEK animals NEW BUCKET OF YARN HOLDS 3,
         WIT "Cats"
         AN "Dogs"
         AN "More Dogs".

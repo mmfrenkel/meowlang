@@ -1,6 +1,6 @@
 (******************************************************************************)
 (* Code generation: translate takes a semantically checked AST and produces   *)
-(* LLVM IR. Note: This code significantly inspired by codegen.ml of the       *)
+(* LLVM IR. Note: This code inspired by codegen.ml of the                     *)
 (* MicroC Compiler by S Edwards (PLT, Spring 2021)                            *)
 (******************************************************************************)
 module L = Llvm
@@ -34,6 +34,11 @@ let lookup_function func_name =
 let lookup_index cls_name field_name =
   try Hashtbl.find struct_field_idx (cls_name ^ "." ^ field_name)
   with _ -> raise (InstanceVariableNotFound("codegen error: " ^ cls_name ^ "." ^ field_name))
+
+
+let create_built_in return_typ args n m =
+  let func_t = L.function_type return_typ args in
+  L.declare_function n func_t m
 
 let context    = L.global_context ()
 let the_module = L.create_module context "Meowlang"
@@ -97,15 +102,19 @@ let format (typ, _) =
 (*********************************************************)
 let build_function fdecl =
 
-  (* Create the prototype for printf/Meow, a built-in function
-     TODO: figure out how to not do this for each function *)
-  let printf_func =
-    let printf_t = L.var_arg_function_type i32_t [| str_t |] in
-    L.declare_function "printf" printf_t the_module in
+  (*  First create the prototypes for build in functions (I/O and casting) *)
 
-  let scanf_func =
-    let scanf_t = L.function_type i32_t [| L.pointer_type str_t |] in
-    L.declare_function "custom_scanf" scanf_t the_module in
+  let printf_func = (* variatic, so needs its own distinct builder *)
+    let printf_t = L.var_arg_function_type i32_t [| str_t |] in
+    L.declare_function "printf" printf_t the_module
+
+  and scanf_func = create_built_in i32_t [| L.pointer_type str_t |] "custom_scanf" the_module
+  and atoi_func = create_built_in i32_t [| str_t |] "atoi" the_module
+  and atof_func = create_built_in float_t [| str_t |] "atof" the_module
+  and itoa_func = create_built_in str_t [| i32_t |] "custom_itoa" the_module
+  and ftoa_func = create_built_in str_t [| float_t |] "custom_ftoa" the_module
+  and strcmp_func = create_built_in i32_t [| str_t ; str_t |] "custom_strcmp" the_module
+  and strcat_func = create_built_in str_t [| str_t ; str_t |] "custom_strcat" the_module in
 
   let (the_function, _) = Hashtbl.find global_functions fdecl.sfname in
   let builder = L.builder_at_end context (L.entry_block the_function) in
@@ -143,6 +152,22 @@ let build_function fdecl =
     | SId var      -> L.build_load (lookup_variable var env) var builder
     | SNoexpr      -> L.const_int i32_t 0
 
+    | SCast(t, (typ, e))  ->
+      let rhs = expr builder (typ, e) env
+      and llvm_typ = ltype_of_typ t in
+      (match typ with
+        A.Float when t = A.Int -> L.build_fptosi rhs llvm_typ "cast_v" builder
+      | A.Int when t = A.Float -> L.build_uitofp rhs llvm_typ "cast_v" builder
+      | A.String when t = A.Float ->
+          L.build_call atof_func [| rhs |] "atof_call" builder
+      | A.String when t = A.Int ->
+          L.build_call atoi_func [| rhs |] "atoi_call" builder
+      | A.Int when t = A.String ->
+          L.build_call itoa_func [| rhs |] "itoa_call" builder
+      | A.Float when t = A.String ->
+          L.build_call ftoa_func [| rhs |] "ftoa_call" builder
+      | _ -> raise (NotYetSupported("codegen: cast operation not yet supported")))
+
     | SAssign ((_, lhs), e)   ->
       let rhs = expr builder e env in
       let lhs =
@@ -160,6 +185,10 @@ let build_function fdecl =
 
         | _ -> raise (NotYetSupported("codegen: assignment op not yet supported"))
       in ignore(L.build_store rhs lhs builder); rhs
+
+    | SUnop(_, ((_, _) as e)) ->
+      let e' = expr builder e env in
+      L.build_not e' "tmp" builder
 
     (* Binary operation between two integers *)
     | SBinop(((A.Int, _) as e1), op, ((A.Int, _) as e2)) ->
@@ -181,12 +210,32 @@ let build_function fdecl =
         in raise (NotYetSupported(msg))
       ) lhs rhs "binop_int_tmp" builder
 
-    (* Binary operation between one or more floats *)
-    | SBinop(((A.Float, _) as e1), op, ((A.Int, _) as e2))
-    | SBinop(((A.Int, _) as e1), op, ((A.Float, _) as e2))
-    | SBinop(((A.Float, _) as e1), op, ((A.Float, _) as e2)) ->
+    | SBinop(((A.String, _) as e1), A.Concat, ((A.String, _) as e2)) ->
       let lhs = expr builder e1 env
       and rhs = expr builder e2 env in
+      L.build_call strcat_func [| lhs ; rhs |] "strcat_call" builder
+
+    | SBinop(((A.String, _) as e1), A.Equal, ((A.String, _) as e2)) ->
+      let lhs = expr builder e1 env
+      and rhs = expr builder e2 env in
+      L.build_call strcmp_func [| lhs ; rhs |] "stcmp_call" builder
+
+    (* Binary operation between one or more floats *)
+    | SBinop(((A.Float as t), (_ as v1)), op, ((A.Int as o), (_ as v2)))
+    | SBinop(((A.Int as t), (_ as v1)), op, ((A.Float as o, (_ as v2))))
+    | SBinop(((A.Float as t), (_ as v1)), op, ((A.Float as o), (_ as v2))) ->
+      let build_cast v =
+        L.build_uitofp v float_t "cast_v" builder
+      in
+      let lhs =
+        let tmp_l = expr builder (A.Float, v1) env in
+        if t = A.Int then build_cast tmp_l
+        else tmp_l
+      and rhs =
+        let tmp_r = expr builder (A.Float, v2) env in
+        if o = A.Int then build_cast tmp_r
+        else tmp_r
+      in
       (match op with
         A.Add     -> L.build_fadd
       | A.Sub     -> L.build_fsub
@@ -206,9 +255,11 @@ let build_function fdecl =
       let lhs = expr builder e1 env
       and rhs = expr builder e2 env in
       (match op with
-          A.Or      -> L.build_or
-        | A.And     -> L.build_and
-        | _         ->
+          A.Or    -> L.build_or
+        | A.And   -> L.build_and
+        | A.Neq   -> L.build_icmp L.Icmp.Ne
+        | A.Equal -> L.build_icmp L.Icmp.Eq
+        | _      ->
           let msg = "found binary operation not supported for two boolean values"
           in raise (NotYetSupported(msg))
       ) lhs rhs "binop_bool_tmp" builder
@@ -340,12 +391,13 @@ let build_function fdecl =
       let pred_bb = L.append_block context "for" the_function in
       ignore(L.build_br pred_bb builder);
 
-      let body_bb = L.append_block context "for_body" the_function in
+      let body_bb = L.append_block context "for_body" the_function
+      (* create the SBinop expr for incrementing and decrementing *)
+      and binop = (A.Int, SBinop(index, inc_decrement, (A.Int, SILiteral 1))) in
       add_terminal (stmt
         (L.builder_at_end context body_bb)
-        (* create the SBinop expr for incrementing and decrementing *)
-        (* append the increment/decrement operation to the end of the loop body *)
-        (SBlock [loop_body ; SExpr(A.Int, SBinop(index, inc_decrement, (A.Int, SILiteral 1)))])
+        (* append assigning index inc/decrement to the end of the loop body *)
+        (SBlock [loop_body ; SExpr(A.Int, SAssign(index, binop))])
       )
         (L.build_br pred_bb);
 

@@ -5,7 +5,7 @@ HAI ITZ ME FUNC Main,
    ITZ ME YARN value2 IZ "goodbye".
 
     PSST You cannot mix types
-    MAEK greetings NEW NUMBR BUCKET OF 3,
+    MAEK greetings NEW BUCKET OF NUMBR HOLDS 3,
         WIT value1
         AN value2.
 

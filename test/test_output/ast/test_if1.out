@@ -1,0 +1,23 @@
+
+
+Main()
+{
+	char * condition;
+	if (4 < 10)
+	{
+	condition = "math is the only Truth";
+	}
+	if (4 == 4)	{
+	condition = "same same";
+	}
+	else		{
+	condition = "not same same";
+	}
+	if (10 == 10)	{
+	condition = "ten out of ten.";
+	}
+	else		{
+	condition = "my ten is better than your ten.";
+	}
+}
+

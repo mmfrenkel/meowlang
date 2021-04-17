@@ -1,0 +1,11 @@
+HAI ITZ ME FUNC Main,
+
+    ITZ ME NUMBR ten IZ 10.
+    ITZ ME NUMBR fifteen IZ 15.
+
+    PURR Meow WIT SMALLR ten THAN fifteen.    PSST 1
+    PURR Meow WIT SMALLR fifteen THAN ten.    PSST 0
+    PURR Meow WIT BIGGR fifteen THAN ten.     PSST 1
+    PURR Meow WIT BIGGR ten THAN fifteen.     PSST 0
+
+KBYE

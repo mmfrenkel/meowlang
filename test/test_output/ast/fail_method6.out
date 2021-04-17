@@ -1,0 +1,12 @@
+
+
+int Main()
+{
+	int size = 2;
+	char * cat_name;
+	char * [size] animals = [ "Cats", "Dogs" ];
+	cat_name = size.Get_Name();
+	free(animals);
+	return 0;
+}
+

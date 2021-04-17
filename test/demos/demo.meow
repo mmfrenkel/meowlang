@@ -1,0 +1,110 @@
+HAI ITZ ME FUNC Main,
+    PSST A demo of what meowlang can do, as a role-playing game.
+
+    ITZ ME YARN cat_name.
+    ITZ ME YARN color.
+    ITZ ME YARN num_cakes.
+    ITZ ME NUMBR count.
+    ITZ ME YARN select.
+    ITZ ME NUMBR select_num.
+    ITZ ME YARN pet_give.
+    ITZ ME NUMBR pet_give_num.
+    ITZ ME YARN pet_allow.
+    ITZ ME NUMBR pet_allow_num.
+    ITZ ME YARN chocolate_reply.
+    ITZ ME NUMBR chocolate_idx.
+
+    ITZ ME NUMBR index IZ 0.
+    ITZ ME YARN hello IZ "Hello there, ".
+    ITZ ME YARN cake IZ "You have such a pretty color. But unfortunately for your owner you like to steal food. 
+How many cakes do you want to eat from the fridge today?".
+    ITZ ME YARN eat IZ "om nom".
+    ITZ ME YARN select_place IZ "After eating cake you don’t feel so well. Maybe a change of scenery would do you some good.
+Type 1 to live in the wild or 2 to stay in the apartment.".
+    ITZ ME YARN select_1 IZ "You’ve found a pack of fellow felines to keep you company. However they soon grow annoyed of your domestic tendencies and kick you out. You have no choice but to return to the apartment.".
+    ITZ ME YARN select_2 IZ "You curl up against the fireplace and have a nice long nap. You wake up find your owner wanting to pet you. 
+How many pets does she give you?".
+    ITZ ME YARN pet_allow_question IZ "How many pets will you allow?".
+    ITZ ME YARN allow_1 IZ "You huff in annoyance as your human has failed to pay proper fealty to you.".
+    ITZ ME YARN allow_2 IZ "You purr with satisfaction.".
+    ITZ ME YARN allow_3 IZ "You scramble away as fast as you can to avoid the extra pets.".
+    ITZ ME YARN chocolate_msg IZ "Once you’ve been petted you leave your owner and go back to stealing food. You find that there is a box of chocolates on the counter containing 5 chocolates.
+Which chocolate do you want to eat? (Enter a number 0-4)".
+    ITZ ME YARN end IZ "You have decided that enough is enough for one day. You go back to sleep.
+THE END".
+
+    PURR Meow WIT "You are a cat living in an apartment with an adoring owner. What is your name?".
+    PURR Scan WIT cat_name.
+
+    PURR Meow WIT "What color is your fur?".
+    PURR Scan WIT color.
+
+    PURR Meow WIT hello.
+    PURR Meow WIT cat_name.
+    PURR Meow WIT cake.
+
+    PURR Scan WIT num_cakes.
+    count IZ NUMBR num_cakes.
+
+    IM IN YR LOOP index UPPIN AN SMALLR index THAN count HAI
+        PURR Meow WIT "om nom".
+    KBYE
+
+    PURR Meow WIT "BURP".
+    PURR Meow WIT select_place.
+    PURR Scan WIT select.
+
+    select_num IZ NUMBR select.
+    SAEM 1 AN select_num
+    O RLY?
+    YA RLY HAI
+        PURR Meow WIT select_1.
+    KBYE
+    
+    PURR Meow WIT select_2.
+    PURR Scan WIT pet_give.
+    pet_give_num IZ NUMBR pet_give.
+
+    PURR Meow WIT pet_allow_question.
+    PURR Scan WIT pet_allow.
+    pet_allow_num IZ NUMBR pet_allow.
+
+    SMALLR pet_give_num THAN pet_allow_num
+    O RLY?
+    YA RLY HAI
+        PURR Meow WIT allow_1.
+    KBYE
+    NO WAI HAI
+        SAEM pet_give_num AN pet_allow_num
+        O RLY?
+        YA RLY HAI
+            PURR Meow WIT allow_2.
+        KBYE
+        NO WAI HAI
+            PURR Meow WIT allow_3.
+        KBYE
+    KBYE
+
+    MAEK chocolate_box NEW BUCKET OF YARN HOLDS 5,
+        WIT "This chocolate gives off a horrible odor."
+        AN "You have found sea salt and caramel chocolate."
+        AN "This chocolate is milky and sweet."
+        AN "You have found white velvety chocolate."
+        AN "??? This does not look like chocolate.".
+    
+    PURR Meow WIT chocolate_msg.
+    PURR Scan WIT chocolate_reply.
+    chocolate_idx IZ NUMBR chocolate_reply.
+
+    PURR Meow WIT chocolate_box[chocolate_idx].
+    PURR Meow WIT end.
+
+    BLEEP cat_name.
+    BLEEP color.
+    BLEEP num_cakes.
+    BLEEP select.
+    BLEEP pet_give.
+    BLEEP pet_allow.
+    BLEEP chocolate_box.
+    BLEEP chocolate_reply.
+KBYE

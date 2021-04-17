@@ -1,0 +1,13 @@
+
+
+int Main()
+{
+	int count = 203423;
+	char * value;
+	printf("%X\n", count);
+	value = (char *) count;
+	printf("%X\n", value);
+	free(value);
+	return 0;
+}
+

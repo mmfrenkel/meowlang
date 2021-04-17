@@ -1,0 +1,1 @@
+Fatal error: exception Exceptions.NotYetSupported("cast not currently supported from class MOUSE to char *. See: (char *) Jerry")

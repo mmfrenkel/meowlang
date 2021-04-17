@@ -1,0 +1,25 @@
+
+
+int Main()
+{
+	char * value = "happy";
+	class MOUSE Jerry;
+	Jerry = (class MOUSE) value;
+	printf("%X\n", count);
+	return 0;
+}
+
+Class MOUSE {
+
+	int cookies = 0;
+
+	Give_Cookie(int count_cookies)
+	{
+	cookies = cookies + count_cookies;
+	}
+	int Count_Cookies()
+	{
+	return cookies;
+	}
+
+}

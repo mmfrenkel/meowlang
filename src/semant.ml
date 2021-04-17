@@ -51,7 +51,14 @@ let m_to_f_name cls_n m_n =
 
 (* Raise an exception if the given types are not the same *)
 let check_matching_types typ1 typ2 err =
-  if typ1 = typ2 then typ1 else raise err
+  (* with arrays we don't care if the sizes match; they're just implemented as pointers *)
+  match typ1 with
+    Arrtype(_, arr_typ_1) ->
+      (match typ2 with
+        Arrtype(_, arr_typ_2) when arr_typ_1 = arr_typ_2 -> typ1
+      | _ -> raise err)
+  | _ when typ1 = typ2 -> typ1
+  | _ -> raise err
 
 (* Helper function to check for duplicates of anything *)
 let find_duplicate items exception_msg =
@@ -137,14 +144,8 @@ let rec semant_expr expr env =
     let msg = Printf.sprintf "%s, expected typ %s, but got %s"
         (string_of_expr (arg_expr)) (string_of_typ expected_type) (string_of_typ actual_type)
     in
-    match expected_type with
-      Arrtype(_, typ_e) ->
-      (match actual_type with
-        Arrtype(_, typ_a) when typ_e = typ_a -> (actual_type, arg_expr')
-      | _ -> raise (ArgumentTypeMismatch(msg)))
-    | _ ->
-      if actual_type = expected_type then (actual_type, arg_expr')
-      else raise (ArgumentTypeMismatch(msg))
+    ignore(check_matching_types expected_type actual_type (ArgumentTypeMismatch(msg)));
+    (actual_type, arg_expr')
   in
 
   match expr with
@@ -154,16 +155,32 @@ let rec semant_expr expr env =
   | StringLit s -> (String, SStringLit s)
   | Noexpr      -> (Void, SNoexpr)
 
+  | Cast(typ, e) as ex ->
+    let (typ1, e') = semant_expr e env in
+    let _ =
+      match typ with
+        Int when (typ1 = Float || typ1 = String) -> ()
+      | Float when (typ1 = Int || typ1 = String) -> ()
+      | String when (typ1 = Int || typ1 = Float) -> ()
+      | _ when typ = typ1 && (typ1 = Int || typ1 = Float) ->
+          raise (CastUnnecessary("cast is redundant here: " ^ string_of_expr ex))
+      | _  ->
+        let msg =  Printf.sprintf "cast not currently supported from %s to %s. See: %s"
+                  (string_of_typ typ1) (string_of_typ typ) (string_of_expr ex)
+        in raise(NotYetSupported(msg))
+    in (typ, SCast(typ, (typ1, e')))
+
   | Binop (e1, op, e2) as ex ->
     (* Binary operations work with operands of the same type *)
     let (typ1, e1') = semant_expr e1 env
     and (typ2, e2') = semant_expr e2 env in
     let same_type = typ1 = typ2 in
     let end_typ = match op with
-        Add | Sub | Mult | Div when same_type && typ1 = Int -> Int
+        Add | Sub | Mult | Div | Increment | Decrement when same_type && typ1 = Int -> Int
       | Add | Sub | Mult | Div when (typ1 = Float || typ1 = Int) && (typ2 = Float || typ2 = Int) -> Float
-      | Equal | Neq  when same_type -> Bool
-      | Less | Greater when same_type && (typ1 = Float || typ1 = Int) && (typ2 = Float || typ2 = Int) -> Bool
+      | Equal | Neq when same_type && (typ1 = Float || typ1 = Int || typ1 = String || typ1 = Bool) -> Bool
+      | Equal | Neq when (typ1 = Float || typ1 = Int) && (typ2 = Float || typ2 = Int) -> Bool
+      | Less | Greater when (typ1 = Float || typ1 = Int) && (typ2 = Float || typ2 = Int) -> Bool
       | And | Or when same_type && typ1 = Bool -> Bool
       | Concat when (typ1 = String && (typ2 = String || typ2 == Int || typ2 == Float)) ||
                     (typ2 = String && (typ1 == Int || typ1 == Float)) -> String
@@ -534,12 +551,12 @@ let rec semant_stmt stmt env =
         let msg = Printf.sprintf "%s; see function %s" return_from_void_func env.function_name
         in raise (ReturnFromVoidFunction(msg))
     else
-      let (typ, e') = semant_expr e env in
-      if env.returns = typ then SReturn((typ, e'))
-      else
+        let (typ, e') = semant_expr e env in
         let msg = Printf.sprintf "%s; expected: %s, got: %s in function %s"
           return_type_invalid (string_of_typ env.returns) (string_of_typ typ) env.function_name
-        in raise (ReturnTypeInvalid(msg))
+        in
+        ignore(check_matching_types typ env.returns (ReturnTypeInvalid(msg)));
+        SReturn((typ, e'))
 
   | If (e, stmt1, stmt2) ->
     SIf(check_bool_expr e,

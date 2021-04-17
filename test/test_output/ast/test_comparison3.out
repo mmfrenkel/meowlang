@@ -1,0 +1,13 @@
+
+
+Main()
+{
+	float val = 10.2;
+	float different = 20.1;
+	float val_again = 10.2;
+	printf("%X\n", val != different);
+	printf("%X\n", val != val_again);
+	printf("%X\n", val == val_again);
+	printf("%X\n", val == different);
+}
+

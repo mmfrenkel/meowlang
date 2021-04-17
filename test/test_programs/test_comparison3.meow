@@ -1,0 +1,12 @@
+HAI ITZ ME FUNC Main,
+
+    ITZ ME NUMBAR val IZ 10.2.
+    ITZ ME NUMBAR different IZ 20.1.
+    ITZ ME NUMBAR val_again IZ 10.2.
+
+    PURR Meow WIT DIFFRINT val AN different.    PSST 1
+    PURR Meow WIT DIFFRINT val AN val_again.    PSST 0
+    PURR Meow WIT SAEM val AN val_again.        PSST 1
+    PURR Meow WIT SAEM val AN different.        PSST 0
+
+KBYE

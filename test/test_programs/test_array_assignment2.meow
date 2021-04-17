@@ -7,13 +7,13 @@ HAI ITZ ME FUNC Main,
     ITZ ME NUMBR index IZ 2.
 
     PSST Create simple array with elements that are variables
-    MAEK exclamations NEW NUMBR BUCKET OF 3,
+    MAEK values NEW BUCKET OF NUMBR HOLDS 3,
         WIT value1
         AN value2.
 
-    exclamations[index] IZ value3.
+    values[index] IZ value3.
 
-    PURR Meow WIT exclamations[index].
-    BLEEP exclamations.
+    PURR Meow WIT values[index].
+    BLEEP values.
 
 KBYE

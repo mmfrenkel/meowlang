@@ -2,7 +2,7 @@
 HAI ITZ ME FUNC Main,
 
     PSST You cannot mix types
-    MAEK animals NEW NUMBR BUCKET OF 3,
+    MAEK animals NEW BUCKET OF NUMBR HOLDS 3,
         WIT "these all"
         AN "are"
         AN "strings not ints".

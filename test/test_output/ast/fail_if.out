@@ -1,9 +1,0 @@
-
-
-Main()
-{
-	char * condition;
-	if ("Pancake")
-	condition = "Waffles";
-}
-
