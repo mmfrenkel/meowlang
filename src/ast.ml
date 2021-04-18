@@ -58,4 +58,5 @@ type class_decl = {
 }
 
 type program = import list * func_decl list * class_decl list
-type program_with_imports = func_decl list * class_decl list
+
+

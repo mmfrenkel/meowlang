@@ -3,13 +3,6 @@
 (* Expression/Statement  Exceptions *)
 exception DuplicateIdentifier of string
 exception IllegalAssignment
-<<<<<<< HEAD
-exception MissingMainFunction of string
-exception ImportNotFound of string
-exception ClassNotFound of string
-exception FunctionNotFound of string
-=======
->>>>>>> main
 exception VariableNotFound of string
 exception IllegalBinaryOp of string
 exception IllegalUnaryOp of string
@@ -50,24 +43,9 @@ exception InvalidArrayAssignment of string
 exception NotYetSupported of string
 exception InternalError of string
 
-<<<<<<< HEAD
-(* Message Templates for Exceptions *)
-let dup_import_msg = "duplicate import name: "
-let dup_func_msg = "duplicate function name, or conflict with built-in: "
-let dup_class_msg = "duplicate class name: "
-let dup_method_msg = "duplicate class method name: "
-let dup_formal_msg = "duplicate formal name :"
-let dup_local_var_msg = "duplicate local variable name :"
-let dup_form_local_msg = "duplicate identifers (formal and local) name : "
-let undeclared_msg = "undeclared identifier: "
-let assignment_typ_mismatch = "variables can only be assigned to items of the expected type: "
-let missing_main_func_msg = "all programs must have a 'Main' function"
-let func_arg_num_mismatch =  "expected different number of arguments for function: "
-let meth_arg_num_mismatch =  "expected different number of arguments for method: "
-
-let expr_type_mismatch = "expression type mismatch: " (* expected _ but got _ in expression _ *)
-=======
->>>>>>> main
+(* Import *)
+exception ImportNotFound of string 
+exception DuplicateImport of string
 
 (* Message Templates for Exceptions *)
 let dup_func_msg                = "duplicate function name, or conflict with built-in:"
@@ -78,6 +56,7 @@ let dup_formal_msg              = "duplicate formal name :"
 let dup_local_var_msg           = "duplicate local variable name :"
 let dup_form_local_msg          = "duplicate identifers (formal and local) name :"
 let dup_form_instance_msg       = "duplicate identifier (formal and local conflict with instance vars)"
+let dup_import_msg              = "duplicate import: "
 let undeclared_msg              = "undeclared identifier: "
 let assignment_typ_mismatch     = "variables can only be assigned to items of the expected type"
 let missing_main_func_msg       = "all programs must have a 'Main' function"
