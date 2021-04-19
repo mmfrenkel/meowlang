@@ -40,7 +40,7 @@ imports:
   | imports import           { $2 :: $1 }
 
 import:
-  MODULE ID IMPORT           { Module($2) }
+  MODULE ID IMPORT           { $2 }
 
 udf_udcs:
    /* nothing */             { ([], [])                 }

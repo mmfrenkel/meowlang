@@ -1,5 +1,8 @@
 # Include the llvm and llvm.analysis packages while compiling
-true: package(llvm), package(llvm.analysis)
+true: package(llvm), package(llvm.analysis), package(str)
 
 # Enable almost all compiler warnings
 true : warn(+a-4)
+
+# Enable use of Str (non-standard lib)
+true: use_str

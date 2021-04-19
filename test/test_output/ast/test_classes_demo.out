@@ -1,0 +1,39 @@
+
+
+Main()
+{
+	int jerrys_cookies;
+	char * message;
+	char * str_cookies;
+	class MOUSE Jerry;
+	printf("%X\n", "Setting Jerry's cookies count to 10!");
+	Jerry.Set_Num_Cookies(10);
+	printf("%X\n", "Incrementing Jerry's cookie count...");
+	Jerry.Incr_Cookies();
+	jerrys_cookies = Jerry.Get_Num_Cookies();
+	str_cookies = (char *) jerrys_cookies;
+	message = "Jerry now has " + str_cookies + " cookies!";
+	printf("%X\n", message);
+	free(Jerry);
+	free(str_cookies);
+}
+
+Class MOUSE {
+
+	int cookies;
+
+	Incr_Cookies()
+	{
+	int existing_cookies = this.Get_Num_Cookies();
+	cookies = existing_cookies + 1;
+	}
+	int Get_Num_Cookies()
+	{
+	return cookies;
+	}
+	Set_Num_Cookies(int cookies_given)
+	{
+	cookies = cookies_given;
+	}
+
+}
