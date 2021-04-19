@@ -10,7 +10,7 @@ type array_size =
 
 type typ = Int | Bool | Float | String | Void | Obtype of string | Arrtype of array_size * typ
 
-type import = Module of string
+type import = string
 
 type expr =
     ILiteral of int

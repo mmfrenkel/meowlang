@@ -1,0 +1,13 @@
+
+
+Say_Hello_World()
+{
+	printf("%X\n", "hello, world");
+}
+
+int Main()
+{
+	Say_Hello_World();
+	return 0;
+}
+

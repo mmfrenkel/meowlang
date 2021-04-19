@@ -5,76 +5,65 @@
   the ASTs of the import files appended
 *)
 open Exceptions
-open Ast
 
-(* Check that the file exists in an expected location *)
-let find_imports imports =
-  let find_import i =
-    match Sys.file_exists i (* this is just the working directory *)
-                          (* need to try also path according to LRM, or just change LRM *)
-    with
-    true -> ()
-  | false -> raise (ImportNotFound (undeclared_msg ^ i))
-  in
-    List.iter find_import imports
+let imported_asts:(string, Ast.program) Hashtbl.t = Hashtbl.create 10
+
+(* Check that the import exists; note that this only checks for files in the cwd *)
+let check_import_exists import =
+  if (Sys.file_exists import) then ()
+  else raise (ImportNotFound("Could not find import named: " ^ import))
 
 (* Check that import name is capitalized filename without the extension *)
 (* I.e. to import hello_world.meow: GIMME HELLO_WORLD? *)
-let check_import_names imports = 
-  let accepted_regex = Str.regexp "(?:_[A-Z]+)*" in
-    let check_name i =
-      match Str.string_match accepted_regex i 0 with
-        true -> ()
-      | false -> raise (ImportNotFound ( "illegal import name, example of expected: hello_world.meow imported as GIMME HELLO_WORLD?"))
-    in
-      List.iter check_name imports
+let valid_import_name import =
+  let accepted_regex = Str.regexp "['A-Z', '_']+" in
+  if Str.string_match accepted_regex import 0 then true else false
 
-(* Scan each import file, returns a list of lexbuf *)
-(* imports: list of filenames *)
-let scan_imports imports =
-    (* change this to open, scan, close in one List.map step *)
-    let channel_in fname = open_in fname in
-      let scan channel = Lexing.from_channel channel in
-        List.map scan (List.map channel_in imports)
-        
-(* Parse each scenned import, returns a list of AST programs *)
-(* lexbuf_imports: list of Lexing.lexbuf *)
-let generate_asts lexbuf_imports =
-  let parse_ast lexbuf = Parser.program Scanner.token lexbuf in
-    List.map parse_ast lexbuf_imports
+(* Convert string representing module into the module path *)
+let mangle_import_name import =
+  if valid_import_name import then
+    let cwd = Sys.getcwd () in
+    Printf.sprintf "%s/%s.meow" cwd (String.lowercase_ascii import)
+  else
+    let msg = "illegal import name " ^ import
+    in raise (ImportNotFound (msg))
 
-(* Add functions from imports to the list of functions *)
-(* existing_funcs: list of funcs *)
-(* import_asts: import list * func_decl list * class_decl list *)
-let add_import_functions existing_funcs import_asts =
-  let add_import_funcs existing_funcs import = List.map (fun (imports, func_decl, class_decl) -> func_decl :: existing_funcs ) import in
-    List.map add_import_funcs import_asts
+let import_ast import_path =
+  let channel_in = open_in import_path in
+  let lexbuf = Lexing.from_channel channel_in in
+  let ast = Parser.program Scanner.token lexbuf in
+  Hashtbl.add imported_asts import_path ast; ast
 
-(* Add classes from imports to the list of classes *)
-(* existing_classes: list of classes *)
-(* import_asts: import list * func_decl list * class_decl list *)
-let add_import_classes existing_classes import_asts =
-  let add_import_classes existing_classes import = List.map (fun (imports, func_decl, class_decl) -> class_decl :: existing_classes ) import in
-    List.map add_import_classes import_asts
+(* Pull in the import; this reads in the file, parses into AST
+   and adds the file to the *)
+let rec do_import import =
+  (* get the import as a path*)
+  let real_import_path = mangle_import_name import in
 
-(* imports: list of filename imports from importing program *)
-(* functions: list of func_decls *)
-(* classes: list of class_decls *)
-let add (imports, functions, classes) =
-  (* check that import file in expected location *)
-  find_imports imports;
-  (* check that the import file name is legal *)
-  check_import_names imports;
+  (* if we've already pulled in the import, stop recursion here *)
+  if Hashtbl.mem imported_asts real_import_path then ()
+  else
+    (* if it exists, get the ast; then recursively get other ASTs *)
+    check_import_exists real_import_path;
+    let new_ast = import_ast real_import_path in
+    match new_ast with
+      ([], _, _) -> ()
+    | (i :: [], _, _) -> do_import i
+    | (t, _, _) -> List.iter (fun i -> do_import i) t
 
-  (* scan each file: lexbuf = Lexing.from_channel each_import *)
-  let lexbuf_imports = scan_imports imports in
-    (* parse each file: import_ast = Parser.program Scanner.token lexbuf *)
-    let import_asts = generate_asts lexbuf_imports in 
-      (* add functions from each import_ast to functions except for import_ast main function *)
-      let functions' = add_import_functions functions import_asts in
-      (* add classes from each import_ast to classes *)
-      let classes' = add_import_classes classes import_asts in 
+(* Add import contents to functions and classes *)
+let add_imports (imports, functions, classes) =
+  (* populate hash table of asts that we need to import *)
+  List.iter do_import imports;
 
-      (* something like pattern matching to check if imports have imports? *)
-  
-  (functions', classes')
+  (* add all the new classes and functions to the list of existing ones *)
+  let functions' =
+    Hashtbl.fold (fun _ (_, funcs, _) acc ->
+      List.fold_left (fun acc func -> func :: acc) acc funcs
+  ) imported_asts functions
+  and classes' =
+    Hashtbl.fold (fun _ (_, _, cls_list) acc ->
+      List.fold_left (fun acc cls -> cls :: acc) acc cls_list
+  ) imported_asts classes
+  in
+  ([], functions', classes')

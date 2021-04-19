@@ -3,6 +3,9 @@
 # This file is designed to be used from the project root directory and run as:
 # ./test/run_regression_tests.sh [run_type]
 
+WORKING_DIR="./test/test_programs"
+COMPLIER="../../src/meowlang.native"
+
 # helper function to print usage if incorrect args are passed
 Usage() {
         echo "Usage ./test/run_regression_tests.sh [-a|-s|-c] [files]"
@@ -21,9 +24,9 @@ Check() {
         test_file=$1      # name of the test file to run
         should_pass=$2    # do we expect the test to pass?
 
-        base_name=$(basename $file .meow)                                        # e.g., "test_conditionals"
-        actual_output="$base_name.out"                                           # e.g., "test_conditionals.out"
-        expected_output="./test/test_output/$test_type_dir/$base_name.out"       # e.g., ./test/test_output/ast/test_conditions.out
+        base_name=$(basename $file .meow)                                    # e.g., "test_conditionals"
+        actual_output="$base_name.out"                                       # e.g., "test_conditionals.out"
+        expected_output="../test_output/$test_type_dir/$base_name.out"       # e.g., ./test/test_output/ast/test_conditions.out
 
         echo -e "\n*** Running $base_name ($test_type_dir) *** " | tee -a $global_log
 
@@ -31,14 +34,16 @@ Check() {
         if [ $run_type == "-a" ] || [ $run_type == "-s" ]
         then
                 # semantic and ast checks are simple to test
-                ./src/meowlang.native $run_type < $test_file &> $actual_output
+                $COMPLIER $run_type < $test_file &> $actual_output
         else
+                cd ../..
                 # testing full compilation requires help from test script
                 if [[ "$test_file" == *"scan"* ]]; then
-                        echo "some value" | ./test/test_single_program.sh "$base_name.meow" &> $actual_output
+                        echo "some value" | ./test/test_single_program.sh "$base_name.meow" &> ./test/test_programs/$actual_output
                 else
-                        ./test/test_single_program.sh "$base_name.meow" &> $actual_output
+                        ./test/test_single_program.sh "$base_name.meow" &> ./test/test_programs/$actual_output
                 fi
+                cd $WORKING_DIR
         fi
 
         # see if the result is what we expected
@@ -75,7 +80,9 @@ Check() {
 # ------------------- ENTRY POINT TO REGRESSION TESTS ----------------------- #
 
 n_tests_completed=0
-global_log="./test/global_log.out"
+global_log="../global_log.out"
+
+cd $WORKING_DIR
 
 if [[ $# -le 0 ]]
 then
@@ -111,28 +118,33 @@ fi
 
 # (1) Get test files to run regression tests on
 # if someone passes a specific file or list of files, just run those
+
 if [ $# -ge 2 ]
 then
         files=$@
 else
-        files=$(find ./test/test_programs -type f -name "*.meow")
+        files=$(find . -type f -name "*.meow")
 fi
 
 # remove old global log, if it still exists
 rm -f $global_log
 
-# (2) Run each file ("test-*.meow" means test should succeed)
+# (2) Run each file ("test-*.meow" means test should succeed; each "fail-*.meow should fail")
 for file in $files
 do
         case $file in
-	        *test*)
-	                Check $file $true ;;
-                *fail*)
-	                Check $file $false ;;
-	        *)
-	                echo "Unknown file type $file, skipping..." ;;
+	        ./test*)
+	                Check $file $true
+                        let n_tests_completed++
+                        ;;
+
+                ./fail*)
+	                Check $file $false
+                        let n_tests_completed++
+                        ;;
+                *)
+                        "\nSkipping accessory file $file..." ;;
         esac
-        let n_tests_completed++
 done
 
 echo -e "\n*** $n_tests_completed successful $test_type_dir tests completed! Good to go! ***" 2>&1 | tee -a $global_log
