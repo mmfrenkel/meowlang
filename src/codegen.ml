@@ -210,6 +210,7 @@ let build_function fdecl =
         in raise (NotYetSupported(msg))
       ) lhs rhs "binop_int_tmp" builder
 
+    (* String concatenation *)  
     | SBinop(((A.String, _) as e1), A.Concat, ((A.String, _) as e2)) ->
       let lhs = expr builder e1 env
       and rhs = expr builder e2 env in
@@ -225,6 +226,7 @@ let build_function fdecl =
       and rhs = expr builder e2 env in
       L.build_call strcat_func [| lhs ; rhs |] "strcat_call" builder
 
+    (* String comparison *)
     | SBinop(((A.String, _) as e1), A.Equal, ((A.String, _) as e2)) ->
       let lhs = expr builder e1 env
       and rhs = expr builder e2 env in
