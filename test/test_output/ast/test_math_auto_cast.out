@@ -1,0 +1,10 @@
+
+
+int Main()
+{
+	int count = 2;
+	float count2 = 2.3;
+	printf("%X\n", count * count2);
+	return 0;
+}
+
