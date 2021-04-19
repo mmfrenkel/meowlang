@@ -40,6 +40,7 @@ exception ExcessArrayInput of string
 exception InvalidArrayAssignment of string
 
 (* Other *)
+exception ImportNotFound of string
 exception NotYetSupported of string
 exception InternalError of string
 

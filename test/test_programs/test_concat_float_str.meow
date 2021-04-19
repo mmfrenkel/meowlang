@@ -1,0 +1,12 @@
+HAI ITZ ME FUNC Main,
+
+    ITZ ME YARN str IZ "this is a string. the following is a float: ".
+    ITZ ME NUMBAR flt IZ 2.0.
+    ITZ ME YARN concatenated_str.
+
+    concatenated_str IZ CAT str AN flt.
+    PURR Meow WIT concatenated_str.
+
+    BLEEP concatenated_str.
+
+KBYE

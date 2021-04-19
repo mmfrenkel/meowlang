@@ -1,0 +1,27 @@
+
+
+char * Get_User_Name()
+{
+	char * username;
+	printf("%X\n", "What is your name? ");
+	Scan(username);
+	return username;
+}
+
+Say_Hello()
+{
+	char * username;
+	char * message;
+	username = Get_User_Name();
+	message = "hello, " + username;
+	printf("%X\n", message);
+	free(message);
+	free(username);
+}
+
+int Main()
+{
+	Say_Hello();
+	return 0;
+}
+

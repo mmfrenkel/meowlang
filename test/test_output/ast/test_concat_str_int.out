@@ -1,0 +1,12 @@
+
+
+Main()
+{
+	char * str = "this is a string. the following is an int: ";
+	int int = 2;
+	char * concatenated_str;
+	concatenated_str = str + int;
+	printf("%X\n", concatenated_str);
+	free(concatenated_str);
+}
+

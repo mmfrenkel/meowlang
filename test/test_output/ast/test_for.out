@@ -3,6 +3,7 @@
 Main()
 {
 	int count;
+	char * count_str;
 	int index;
 	char * condition;
 	count = 0;
@@ -14,10 +15,14 @@ Main()
 	count = 20;
 	for ( count-- count > 10) {
 			{
-	condition = "is count still more than 10?";
-	condition = "count is still more than 10";
+	condition = "count is still more than 10. ";
+	count_str = (char *) count;
+	condition = condition + "count is: ";
+	condition = condition + count_str;
+	printf("%X\n", condition);
 	}
 	}
+	free(condition);
 	for (index = 15 index-- index > 10) {
 			{
 	condition = "index is still more than 10";

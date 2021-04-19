@@ -1,0 +1,11 @@
+HAI ITZ ME FUNC Main,
+
+        ITZ ME NUMBAR one IZ 1.0.
+        ITZ ME NUMBER two IZ 2.0.
+        ITZ ME YARN string.
+
+        PSST concat with two floats is not supported
+        string IZ CAT one AN two.
+
+        BLEEP string.
+KBYE

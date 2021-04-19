@@ -1,0 +1,45 @@
+
+HAI ITZ ME CLASS MOUSE,
+
+    ITZ ME NUMBR cookies.
+
+    HAI ITZ ME FUNC Set_Num_Cookies WIT NUMBR cookies_given,
+        cookies IZ cookies_given.
+    KBYE
+
+    HAI ITZ ME NUMBR FUNC Get_Num_Cookies,
+        GIVE cookies.
+    KBYE
+
+    HAI ITZ ME FUNC Incr_Cookies,
+        ITZ ME NUMBR existing_cookies IZ PURR Get_Num_Cookies IN HERE.
+        cookies IZ SUM OF existing_cookies AN 1.
+    KBYE
+
+KBYE
+
+HAI ITZ ME FUNC Main,
+
+    ITZ ME NUMBR jerrys_cookies IZ 0.
+    ITZ ME YARN message.
+    ITZ ME YARN str_cookies.
+    MAEK Jerry NEW MOUSE.
+
+    PSST Set the cookie count
+    PURR Meow WIT "Setting Jerry's cookies count to 10...".
+    PURR Set_Num_Cookies IN Jerry WIT 10.
+
+    PSST Call class method to increment cookies by 1
+    PURR Incr_Cookies IN Jerry.
+
+    PSST Use class method to get new number of cookies
+    jerrys_cookies IZ PURR Get_Num_Cookies IN Jerry.
+    str_cookies IZ YARN jerrys_cookies.
+
+    message IZ CONCAT "Incremented cookies by 1, now Jerry has: " AN str_cookies.
+    PURR Meow WIT jerrys_cookies.
+
+    BLEEP Jerry.
+    BLEEP str_cookies.
+
+KBYE

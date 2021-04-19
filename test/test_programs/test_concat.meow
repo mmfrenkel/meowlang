@@ -1,0 +1,12 @@
+HAI ITZ ME FUNC Main,
+
+    ITZ ME YARN val IZ "string1. ".
+    ITZ ME YARN dup_val IZ "string2.".
+    ITZ ME YARN concatenated_str.
+
+    concatenated_str IZ CAT val AN dup_val.
+    PURR Meow WIT concatenated_str.
+    
+    BLEEP concatenated_str.
+
+KBYE

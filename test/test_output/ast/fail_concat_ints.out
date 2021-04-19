@@ -1,0 +1,11 @@
+
+
+Main()
+{
+	int one = 1;
+	int two = 2;
+	char * string;
+	string = one + two;
+	free(string);
+}
+

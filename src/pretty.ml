@@ -21,7 +21,7 @@ let string_of_op = function
   | Decrement -> "--"
 
 let string_of_modules = function
-  Module(l) -> "include \"" ^ l ^ "\""
+  l -> "include \"" ^ l ^ "\""
 
 let string_of_uop = function
   Not -> "!"

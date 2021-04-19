@@ -1,0 +1,1 @@
+Fatal error: exception Exceptions.VariableAssignmentError("variables can only be assigned to items of the expected type. expected class NUMBER, got float here: two = 2.0")

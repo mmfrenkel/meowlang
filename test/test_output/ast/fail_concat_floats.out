@@ -1,0 +1,11 @@
+
+
+Main()
+{
+	float one = 1.0;
+	class NUMBER two = 2.0;
+	char * string;
+	string = one + two;
+	free(string);
+}
+
