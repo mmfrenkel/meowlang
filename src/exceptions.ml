@@ -40,12 +40,10 @@ exception ExcessArrayInput of string
 exception InvalidArrayAssignment of string
 
 (* Other *)
+exception ImportNotFound of string
 exception NotYetSupported of string
 exception InternalError of string
 
-(* Import *)
-exception ImportNotFound of string 
-exception DuplicateImport of string
 
 (* Message Templates for Exceptions *)
 let dup_func_msg                = "duplicate function name, or conflict with built-in:"
@@ -56,7 +54,6 @@ let dup_formal_msg              = "duplicate formal name :"
 let dup_local_var_msg           = "duplicate local variable name :"
 let dup_form_local_msg          = "duplicate identifers (formal and local) name :"
 let dup_form_instance_msg       = "duplicate identifier (formal and local conflict with instance vars)"
-let dup_import_msg              = "duplicate import: "
 let undeclared_msg              = "undeclared identifier: "
 let assignment_typ_mismatch     = "variables can only be assigned to items of the expected type"
 let missing_main_func_msg       = "all programs must have a 'Main' function"

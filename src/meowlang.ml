@@ -22,16 +22,16 @@ let _ =
     (* Perform action based on specification*)
     let lexbuf = Lexing.from_channel stdin in
     let ast = Parser.program Scanner.token lexbuf in
+    let ast_with_imports = Import.add_imports ast in
 
     match !action with
-          Ast -> print_string (string_of_program ast)
-        | _   -> let ast_with_imports = Import.add ast in
-                   let sast = Semant.check ast_with_imports in
-
-            match !action with
-              Ast     -> ()
-            | Sast    -> print_string "Semantic check succeded!\n"
-            | LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate sast))
-            | Compile -> let m = Codegen.translate sast in
-                Llvm_analysis.assert_valid_module m;
-                print_string (Llvm.string_of_llmodule m)
+      Ast -> print_string (string_of_program ast_with_imports)
+    | _   ->
+        let sast = Semant.check ast_with_imports in
+        match !action with
+          Ast     -> ()
+        | Sast    -> print_string "Semantic check succeded!\n"
+        | LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate sast))
+        | Compile -> let m = Codegen.translate sast in
+            Llvm_analysis.assert_valid_module m;
+            print_string (Llvm.string_of_llmodule m)
