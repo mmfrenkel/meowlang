@@ -215,6 +215,16 @@ let build_function fdecl =
       and rhs = expr builder e2 env in
       L.build_call strcat_func [| lhs ; rhs |] "strcat_call" builder
 
+    | SBinop(((A.String, _) as e1), A.Concat, ((_, _) as e2)) ->
+      let lhs = expr builder e1 env
+      and rhs = expr builder (A.String, SCast(A.String, e2)) env in
+      L.build_call strcat_func [| lhs ; rhs |] "strcat_call" builder
+
+    | SBinop(((_, _) as e1), A.Concat, ((A.String, _) as e2)) ->
+      let lhs = expr builder (A.String, SCast(A.String, e1)) env
+      and rhs = expr builder e2 env in
+      L.build_call strcat_func [| lhs ; rhs |] "strcat_call" builder
+
     | SBinop(((A.String, _) as e1), A.Equal, ((A.String, _) as e2)) ->
       let lhs = expr builder e1 env
       and rhs = expr builder e2 env in
