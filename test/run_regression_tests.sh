@@ -38,8 +38,12 @@ Check() {
         else
                 cd ../..
                 # testing full compilation requires help from test script
+                # note that these two tests require input from stdin (they ask questions)
+                # here is a work around to provide input so no human intervention is required
                 if [[ "$test_file" == *"scan"* ]]; then
                         echo "some value" | ./test/test_single_program.sh "$base_name.meow" &> ./test/test_programs/$actual_output
+                elif [[ "$test_file" == *"_imports.meow" ]]; then
+                        echo "tester" | ./test/test_single_program.sh "$base_name.meow" &> ./test/test_programs/$actual_output
                 else
                         ./test/test_single_program.sh "$base_name.meow" &> ./test/test_programs/$actual_output
                 fi

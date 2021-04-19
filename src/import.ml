@@ -22,8 +22,9 @@ let valid_import_name import =
 (* Convert string representing module into the module path *)
 let mangle_import_name import =
   if valid_import_name import then
-    let cwd = Sys.getcwd () in
-    Printf.sprintf "%s/%s.meow" cwd (String.lowercase_ascii import)
+    let cwd = Sys.getcwd ()
+    and adjusted_name = String.lowercase_ascii import in
+    Printf.sprintf "%s/%s.meow" cwd adjusted_name
   else
     let msg = "illegal import name " ^ import
     in raise (ImportNotFound (msg))
@@ -48,8 +49,7 @@ let rec do_import import =
     let new_ast = import_ast real_import_path in
     match new_ast with
       ([], _, _) -> ()
-    | (i :: [], _, _) -> do_import i
-    | (t, _, _) -> List.iter (fun i -> do_import i) t
+    | (import_list, _, _) -> List.iter do_import import_list
 
 (* Add import contents to functions and classes *)
 let add_imports (imports, functions, classes) =

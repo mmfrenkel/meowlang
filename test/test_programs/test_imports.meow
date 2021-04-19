@@ -1,9 +1,6 @@
 GIMME IMPORT_EXAMPLE?
 
 HAI ITZ ME NUMBR FUNC Main,
-
-        PSST Test printing an integer
-        PURR Say_Hello_World.
-
+        PURR Say_Hello.
         GIVE 0.
 KBYE

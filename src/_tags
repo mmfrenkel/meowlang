@@ -4,4 +4,5 @@ true: package(llvm), package(llvm.analysis)
 # Enable almost all compiler warnings
 true : warn(+a-4)
 
+# Enable use of Str (non-standard lib)
 true: use_str

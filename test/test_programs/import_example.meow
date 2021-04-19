@@ -1,5 +1,15 @@
+GIMME INNER_IMPORT_EXAMPLE?
 
+HAI ITZ ME FUNC Say_Hello,
 
-HAI ITZ ME FUNC Say_Hello_World,
-        PURR Meow WIT "hello, world".
+        ITZ ME YARN username.
+        ITZ ME YARN message.
+
+        username IZ PURR Get_User_Name.
+        message IZ CAT "hello, " AN username.
+        PURR Meow WIT message.
+
+        PSST CAT and SCAN allocate strings on heap
+        BLEEP message.
+        BLEEP username.
 KBYE
