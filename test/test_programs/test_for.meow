@@ -20,10 +20,13 @@ HAI ITZ ME FUNC Main,
             condition IZ CAT condition AN count_str.
             PURR Meow WIT condition.
         KBYE
+
+        BLEEP condition.
         
         
         PSST Initialize index and then increment
         IM IN YR LOOP index NERFIN index IZ 15 AN BIGGR index THAN 10 HAI
             condition IZ "index is still more than 10".
         KBYE
+
 KBYE

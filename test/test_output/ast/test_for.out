@@ -22,6 +22,7 @@ Main()
 	printf("%X\n", condition);
 	}
 	}
+	free(condition);
 	for (index = 15 index-- index > 10) {
 			{
 	condition = "index is still more than 10";
