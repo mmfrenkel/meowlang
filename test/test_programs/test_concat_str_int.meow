@@ -1,0 +1,10 @@
+HAI ITZ ME FUNC Main,
+
+    ITZ ME YARN str IZ "this is a string. the following is an int: ".
+    ITZ ME NUMBR int IZ 2.
+    ITZ ME YARN concatenated_str.
+
+    concatenated_str IZ CAT str AN int.
+    PURR Meow WIT concatenated_str.
+
+KBYE

@@ -1,0 +1,11 @@
+
+
+Main()
+{
+	char * str = "this is a string. the following is a float: ";
+	float flt = 2.0;
+	char * concatenated_str;
+	concatenated_str = str + flt;
+	printf("%X\n", concatenated_str);
+}
+
