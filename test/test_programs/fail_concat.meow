@@ -1,0 +1,8 @@
+HAI ITZ ME FUNC Main,
+
+        ITZ ME YARN string IZ "string.".
+        ITZ ME BOO true IZ AYE.
+
+        PSST concat with boolean not supported
+        string IZ CAT string AN true.
+KBYE

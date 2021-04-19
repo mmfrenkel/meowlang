@@ -1,0 +1,9 @@
+
+
+Main()
+{
+	char * string = "string.";
+	bool true = true;
+	string = string + true;
+}
+
