@@ -12,8 +12,8 @@ fi
 basename=$(basename $1 .meow)
 cd ./test/test_programs
 
-../../src/meowlang.native -a < $test_file &> ../test_output/ast/$basename.out
-../../src/meowlang.native -s < $test_file &> ../test_output/semantic/$basename.out
+../../src/meowlang.native -a -f $test_file &> ../test_output/ast/$basename.out
+../../src/meowlang.native -s -f $test_file &> ../test_output/semantic/$basename.out
 
 case $test_file in
         *test*)
@@ -21,7 +21,7 @@ case $test_file in
                 ./test/test_single_program.sh $test_file > ./test/test_output/full_pipeline/$basename.out
                 ;;
         *fail*)
-                $COMPILER < $test_file -c &> ../test_output/full_pipeline/$basename.out
+                $COMPILER -f $test_file -c &> ../test_output/full_pipeline/$basename.out
                 ;;
         *)
                 echo "Unknown file type $file, skipping..." ;;

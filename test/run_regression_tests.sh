@@ -34,7 +34,7 @@ Check() {
         if [ $run_type == "-a" ] || [ $run_type == "-s" ]
         then
                 # semantic and ast checks are simple to test
-                $COMPLIER $run_type < $test_file &> $actual_output
+                $COMPLIER $run_type -f $test_file &> $actual_output
         else
                 cd ../..
                 # testing full compilation requires help from test script

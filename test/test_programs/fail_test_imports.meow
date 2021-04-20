@@ -1,0 +1,11 @@
+GIMME IMPORT_EXAMPLE?
+GIMME IMPORT_COLORS?
+GIMME IMPORT_COLORS?
+GIMME IMPORT_BRIDGE?
+
+HAI ITZ ME NUMBR FUNC Main,
+        PURR Say_Hello.
+        PURR Sndphrase.
+        PURR Fstphrase.
+        GIVE 0.
+KBYE

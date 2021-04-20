@@ -41,6 +41,7 @@ exception InvalidArrayAssignment of string
 
 (* Other *)
 exception ImportNotFound of string
+exception DuplicateImport of string
 exception NotYetSupported of string
 exception InternalError of string
 
