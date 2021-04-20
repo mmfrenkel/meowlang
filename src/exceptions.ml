@@ -41,12 +41,13 @@ exception InvalidArrayAssignment of string
 
 (* Other *)
 exception ImportNotFound of string
+exception DuplicateImport of string
 exception NotYetSupported of string
 exception InternalError of string
 
 
 (* Message Templates for Exceptions *)
-let dup_func_msg                = "duplicate function name, or conflict with built-in:"
+let dup_func_msg                = "duplicate function/import name, or conflict with built-in:"
 let dup_class_msg               = "duplicate class name:"
 let dup_method_msg              = "duplicate class method name:"
 let dup_instance_var_msg        = "duplicate instance variable name identified in class declaration:"

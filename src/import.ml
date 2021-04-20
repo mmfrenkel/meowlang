@@ -8,6 +8,14 @@ open Exceptions
 
 let imported_asts:(string, Ast.program) Hashtbl.t = Hashtbl.create 10
 
+
+let unique_list import_list =
+  let unique = 
+    List.fold_left (fun acc item -> if List.mem item acc then acc else item :: acc ) [] import_list in
+    if (List.length import_list == List.length unique) then true
+    else  
+    raise (DuplicateImport("Duplicate import in .meow file"))
+
 (* Check that the import exists; note that this only checks for files in the cwd *)
 let check_import_exists import =
   if (Sys.file_exists import) then ()
@@ -37,24 +45,33 @@ let import_ast import_path =
 
 (* Pull in the import; this reads in the file, parses into AST
    and adds the file to the *)
+
 let rec do_import import =
   (* get the import as a path*)
   let real_import_path = mangle_import_name import in
 
   (* if we've already pulled in the import, stop recursion here *)
   if Hashtbl.mem imported_asts real_import_path then ()
-  else
+  else (
     (* if it exists, get the ast; then recursively get other ASTs *)
     check_import_exists real_import_path;
     let new_ast = import_ast real_import_path in
     match new_ast with
       ([], _, _) -> ()
-    | (import_list, _, _) -> List.iter do_import import_list
+    | (import_list, _, _) -> 
+    if unique_list import_list then
+    List.iter do_import import_list 
+    else  () )
 
 (* Add import contents to functions and classes *)
-let add_imports (imports, functions, classes) =
+let add_imports (imports, functions, classes) filename =
   (* populate hash table of asts that we need to import *)
-  List.iter do_import imports;
+  let base_path =
+    Printf.sprintf "%s/%s" (Sys.getcwd ()) filename
+  in Hashtbl.add imported_asts base_path ([], [], []);
+  
+  if unique_list imports then
+  (List.iter do_import imports;
 
   (* add all the new classes and functions to the list of existing ones *)
   let functions' =
@@ -66,4 +83,5 @@ let add_imports (imports, functions, classes) =
       List.fold_left (fun acc cls -> cls :: acc) acc cls_list
   ) imported_asts classes
   in
-  ([], functions', classes')
+  ([], functions', classes'))
+  else ([], [], [])

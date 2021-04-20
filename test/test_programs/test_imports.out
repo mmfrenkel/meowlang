@@ -7,8 +7,23 @@ Say_Hello()
 	username = Get_User_Name();
 	message = "hello, " + username;
 	printf("%X\n", message);
+	Fstphrase();
 	free(message);
 	free(username);
+}
+
+int Main()
+{
+	Say_Hello();
+	Sndphrase();
+	Fstphrase();
+	return 0;
+}
+
+Sndphrase()
+{
+	printf("%X\n", "My least favorite color is yellow");
+	Get_User_Name();
 }
 
 char * Get_User_Name()
@@ -19,9 +34,22 @@ char * Get_User_Name()
 	return username;
 }
 
+Colors()
+{
+	char * green = "green";
+	char * red = "red";
+}
+
+Fstphrase()
+{
+	printf("%X\n", "My favorite color is blue ");
+}
+
 int Main()
 {
 	Say_Hello();
+	Sndphrase();
+	Fstphrase();
 	return 0;
 }
 

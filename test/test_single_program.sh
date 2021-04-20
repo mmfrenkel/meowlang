@@ -23,7 +23,7 @@ cd $TEST_PROGRAM_PATH
 # build everything
 name=$(basename $1 .meow)
 
-$MEOWLANG < "$1" -c > "$name.ll"
+$MEOWLANG -f "$1" -c > "$name.ll"
 
 if [[ $? -eq 0 ]];
 then
