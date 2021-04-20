@@ -8,7 +8,6 @@ open Exceptions
 
 let imported_asts:(string, Ast.program) Hashtbl.t = Hashtbl.create 10
 
-
 let unique_list import_list =
   let unique = 
     List.fold_left (fun acc item -> if List.mem item acc then acc else item :: acc ) [] import_list in
@@ -24,7 +23,7 @@ let check_import_exists import =
 (* Check that import name is capitalized filename without the extension *)
 (* I.e. to import hello_world.meow: GIMME HELLO_WORLD? *)
 let valid_import_name import =
-  let accepted_regex = Str.regexp "['A-Z', '_']+" in
+  let accepted_regex = Str.regexp "['A-Z']['A-Z', '_', '0-9']*" in
   if Str.string_match accepted_regex import 0 then true else false
 
 (* Convert string representing module into the module path *)

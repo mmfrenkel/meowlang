@@ -8,7 +8,6 @@ HAI ITZ ME FUNC Say_Hello,
         username IZ PURR Get_User_Name.
         message IZ CAT "hello, " AN username.
         PURR Meow WIT message.
-                PURR Fstphrase.
 
         PSST CAT and SCAN allocate strings on heap
         BLEEP message.
