@@ -16,24 +16,32 @@ HAI ITZ ME FUNC Main,
     ITZ ME YARN combine.
 
     PSST these are the strings used in the story. You can initialize them here or create them elsewhere.
-    ITZ ME YARN select_place IZ "After eating cake you don’t feel so well. Maybe a change of scenery would do you some good.
+    ITZ ME YARN select_place IZ "
+After eating cake you don’t feel so well. Maybe a change of scenery would do you some good.
 Type 1 to live in the wild or Type anything else to stay in the apartment.".
-    ITZ ME YARN select_1 IZ "You’ve found a pack of fellow felines to keep you company. However they soon grow annoyed of your domestic tendencies and kick you out. You have no choice but to return to the apartment.".
-    ITZ ME YARN select_2 IZ "You curl up against the fireplace and have a nice long nap. You wake up find your owner wanting to pet you. 
+    ITZ ME YARN select_1 IZ "
+You’ve found a pack of fellow felines to keep you company. However they soon grow annoyed of your domestic tendencies and kick you out. You have no choice but to return to the apartment.".
+    ITZ ME YARN select_2 IZ "
+You curl up against the fireplace and have a nice long nap. You wake up to find your owner wanting to pet you. 
 How many pets does she give you?".
-    ITZ ME YARN pet_allow_question IZ "How many pets will you allow?".
-    ITZ ME YARN chocolate_msg IZ "Once you’ve been petted you leave your owner and go back to stealing food. You find that there is a box of chocolates on the counter containing 5 chocolates.
+    ITZ ME YARN pet_allow_question IZ "
+How many pets will you allow?".
+    ITZ ME YARN chocolate_msg IZ "
+Once you’ve been petted you leave your owner and go back to stealing food. You find that there is a box of chocolates on the counter containing 5 chocolates.
 Which chocolate do you want to eat? (Enter a number 0-4)".
-    ITZ ME YARN end IZ "You have decided that enough is enough for one day. You go back to sleep.
+    ITZ ME YARN end IZ "
+You have decided that enough is enough for one day. You go back to sleep.
 THE END".
 
     PSST the game's functionality begins here:
     PURR Meow WIT "You are a cat living in an apartment with an adoring owner. What is your name?".
     PURR Scan WIT cat_name.
 
-    PURR Meow WIT "What color is your fur?".
+    PURR Meow WIT "
+What color is your fur?".
     PURR Scan WIT color.
 
+    PURR Meow WIT "".
     combine IZ CAT CAT CAT CAT "Hello there, " AN cat_name AN ". " AN color AN " is such a pretty color. But unfortunately for your owner you like to steal food.". 
     PURR Meow WIT combine.
     PURR Meow WIT "How many cakes do you want to eat from the fridge today? (Please enter a digit for full enjoyment)".
@@ -41,6 +49,7 @@ THE END".
     PURR Scan WIT num_cakes.
     count IZ NUMBR num_cakes.
 
+    PURR Meow WIT "".
     PSST Calls a function outside of Main
     PURR eat_cake WIT count.
 
@@ -96,16 +105,19 @@ HAI ITZ ME FUNC pet_response WIT NUMBR pet_give_num AN NUMBR pet_allow_num,
     SMALLR pet_give_num THAN pet_allow_num
     O RLY?
     YA RLY HAI
-        PURR Meow WIT "You huff in annoyance as your human has failed to pay proper fealty to you.".
+        PURR Meow WIT "
+You huff in annoyance as your human has failed to pay proper fealty to you.".
     KBYE
     NO WAI HAI
         SAEM pet_give_num AN pet_allow_num
         O RLY?
         YA RLY HAI
-            PURR Meow WIT "You purr with satisfaction.".
+            PURR Meow WIT "
+You purr with satisfaction.".
         KBYE
         NO WAI HAI
-            PURR Meow WIT "You scramble away as fast as you can to avoid the extra pets.".
+            PURR Meow WIT "
+You scramble away as fast as you can to avoid the extra pets.".
         KBYE
     KBYE
 KBYE
