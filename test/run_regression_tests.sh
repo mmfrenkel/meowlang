@@ -147,7 +147,8 @@ do
                         let n_tests_completed++
                         ;;
                 *)
-                        "\nSkipping accessory file $file..." ;;
+                        echo ""
+                        echo "Skipping accessory file $file..." ;;
         esac
 done
 
