@@ -1,0 +1,22 @@
+PSST this is an if-else function that takes in more than one parameter
+PSST this function prints out the cat's response depending on pet_give_num and pet_allow_num
+HAI ITZ ME FUNC pet_response WIT NUMBR pet_give_num AN NUMBR pet_allow_num,
+    SMALLR pet_give_num THAN pet_allow_num
+    O RLY?
+    YA RLY HAI
+        PURR Meow WIT "
+You huff in annoyance as your human has failed to pay proper fealty to you.".
+    KBYE
+    NO WAI HAI
+        SAEM pet_give_num AN pet_allow_num
+        O RLY?
+        YA RLY HAI
+            PURR Meow WIT "
+You purr with satisfaction.".
+        KBYE
+        NO WAI HAI
+            PURR Meow WIT "
+You scramble away as fast as you can to avoid the extra pets.".
+        KBYE
+    KBYE
+KBYE
