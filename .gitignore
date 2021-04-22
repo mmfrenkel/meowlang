@@ -2,6 +2,8 @@
 *.cmi
 *.cmo
 *.o
+*.ll
+*.s
 parser.ml
 parser.mli
 parser.output

@@ -1,24 +1,25 @@
 (*
   Performs import-specific semantic checks on the AST,
-  Scans and parses each import file,
-  Produces AST which is the importing file's AST appended by
-  the ASTs of the import files appended
+  Scans and parses each import file, Produces AST which is the importing
+  file's AST appended by the ASTs of the import files appended
 *)
 open Exceptions
 
 let imported_asts:(string, Ast.program) Hashtbl.t = Hashtbl.create 10
 
 let unique_list import_list =
-  let unique = 
-    List.fold_left (fun acc item -> if List.mem item acc then acc else item :: acc ) [] import_list in
-    if (List.length import_list == List.length unique) then true
-    else  
-    raise (DuplicateImport("Duplicate import in .meow file"))
+  let unique =
+    List.fold_left (
+      fun acc item -> if List.mem item acc then acc else item :: acc
+    ) [] import_list
+  in
+  if (List.length import_list == List.length unique) then true
+  else raise (DuplicateImport("Duplicate import in .meow file"))
 
-(* Check that the import exists; note that this only checks for files in the cwd *)
+(* Check that the import exists; only files in the cwd are supported *)
 let check_import_exists import =
   if (Sys.file_exists import) then ()
-  else raise (ImportNotFound("Could not find import named: " ^ import))
+  else raise (ImportNotFound("Could not find import"))
 
 (* Check that import name is capitalized filename without the extension *)
 (* I.e. to import hello_world.meow: GIMME HELLO_WORLD? *)
@@ -57,10 +58,10 @@ let rec do_import import =
     let new_ast = import_ast real_import_path in
     match new_ast with
       ([], _, _) -> ()
-    | (import_list, _, _) -> 
-    if unique_list import_list then
-    List.iter do_import import_list 
-    else  () )
+    | (import_list, _, _) ->
+        if unique_list import_list then List.iter do_import import_list
+        else ()
+  )
 
 (* Add import contents to functions and classes *)
 let add_imports (imports, functions, classes) filename =
@@ -68,19 +69,19 @@ let add_imports (imports, functions, classes) filename =
   let base_path =
     Printf.sprintf "%s/%s" (Sys.getcwd ()) filename
   in Hashtbl.add imported_asts base_path ([], [], []);
-  
-  if unique_list imports then
-  (List.iter do_import imports;
 
-  (* add all the new classes and functions to the list of existing ones *)
-  let functions' =
-    Hashtbl.fold (fun _ (_, funcs, _) acc ->
-      List.fold_left (fun acc func -> func :: acc) acc funcs
-  ) imported_asts functions
-  and classes' =
-    Hashtbl.fold (fun _ (_, _, cls_list) acc ->
-      List.fold_left (fun acc cls -> cls :: acc) acc cls_list
-  ) imported_asts classes
-  in
-  ([], functions', classes'))
-  else ([], [], [])
+  if unique_list imports then (
+    List.iter do_import imports;
+    (* add all the new classes and functions to the list of existing ones *)
+    let functions' =
+      Hashtbl.fold (fun _ (_, funcs, _) acc ->
+          List.fold_left (fun acc func -> func :: acc) acc funcs
+      ) imported_asts functions
+    and classes' =
+      Hashtbl.fold (fun _ (_, _, cls_list) acc ->
+        List.fold_left (fun acc cls -> cls :: acc) acc cls_list
+      ) imported_asts classes
+    in
+    ([], functions', classes')
+  )
+  else ([], [], []) (* make compiler happy; an exception will be raised *)

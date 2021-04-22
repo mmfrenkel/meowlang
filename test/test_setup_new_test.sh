@@ -1,6 +1,7 @@
 # Use the script when you're prepared to save the output from a test run
 # of a test program. This will run the compiler against just the program,
 # with each of the available flags.
+COMPILER=../../src/meowlang.native
 
 if [[ $# -le 0 ]]
 then
@@ -12,8 +13,8 @@ fi
 basename=$(basename $1 .meow)
 cd ./test/test_programs
 
-../../src/meowlang.native -a -f $test_file &> ../test_output/ast/$basename.out
-../../src/meowlang.native -s -f $test_file &> ../test_output/semantic/$basename.out
+$COMPILER -a -f $test_file &> ../test_output/ast/$basename.out
+$COMPILER -s -f $test_file &> ../test_output/semantic/$basename.out
 
 case $test_file in
         *test*)
