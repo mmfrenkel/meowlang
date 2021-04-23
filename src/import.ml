@@ -1,8 +1,8 @@
-(*
-  Performs import-specific semantic checks on the AST,
-  Scans and parses each import file, Produces AST which is the importing
-  file's AST appended by the ASTs of the import files appended
-*)
+(*****************************************************************************)
+(* Performs import-specific semantic checks on the AST,                      *)
+(*  Scans and parses each import file, Produces AST which is the importing   *)
+(* file's AST appended by the ASTs of the import files appended              *)
+(*****************************************************************************)
 open Exceptions
 
 let imported_asts:(string, Ast.program) Hashtbl.t = Hashtbl.create 10
@@ -31,8 +31,8 @@ let valid_import_name import =
 let mangle_import_name import =
   if valid_import_name import then
     let cwd = Sys.getcwd ()
-    and adjusted_name = String.lowercase_ascii import in
-    Printf.sprintf "%s/%s.meow" cwd adjusted_name
+    and adjusted_name = String.lowercase_ascii import
+    in Printf.sprintf "%s/%s.meow" cwd adjusted_name
   else
     let msg = "illegal import name " ^ import
     in raise (ImportNotFound (msg))
@@ -59,11 +59,14 @@ let rec do_import import =
     match new_ast with
       ([], _, _) -> ()
     | (import_list, _, _) ->
-        if unique_list import_list then List.iter do_import import_list
+        if unique_list import_list then
+          List.iter do_import import_list
         else ()
   )
 
-(* Add import contents to functions and classes *)
+(************************************************)
+(* Add imports recursively to main file         *)
+(************************************************)
 let add_imports (imports, functions, classes) filename =
   (* populate hash table of asts that we need to import *)
   let base_path =
@@ -77,6 +80,7 @@ let add_imports (imports, functions, classes) filename =
       Hashtbl.fold (fun _ (_, funcs, _) acc ->
           List.fold_left (fun acc func -> func :: acc) acc funcs
       ) imported_asts functions
+
     and classes' =
       Hashtbl.fold (fun _ (_, _, cls_list) acc ->
         List.fold_left (fun acc cls -> cls :: acc) acc cls_list

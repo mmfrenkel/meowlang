@@ -65,10 +65,12 @@ let rec string_of_expr = function
   | MethodCall(ob, f, el) ->
     string_of_expr ob ^ "." ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | NewArray(i, typ, s, contents) ->
-      string_of_typ typ ^ " [" ^ string_of_array_size s ^ "] " ^ i ^ " = [ " ^ String.concat ", " (List.map string_of_expr contents) ^ " ]"
+      string_of_typ typ ^ " [" ^ string_of_array_size s ^ "] " ^ i ^ " = [ " ^
+      String.concat ", " (List.map string_of_expr contents) ^ " ]"
   | Noexpr -> ""
   | NewInstance(var, c, []) -> string_of_typ c ^ " " ^ var
-  | NewInstance(var, c, exprs) -> string_of_typ c ^ " " ^ var ^ "(" ^ String.concat "" (List.map (fun e -> string_of_expr e ^ ", ") exprs) ^ ")"
+  | NewInstance(var, c, exprs) -> string_of_typ c ^ " " ^ var ^ "(" ^
+      String.concat "" (List.map (fun e -> string_of_expr e ^ ", ") exprs) ^ ")"
   | ClassAccess(ob, el) -> string_of_expr ob ^ "." ^ el
   | ArrayAccess(var, e) -> var ^ "[" ^ string_of_expr e ^ "]"
 
@@ -81,7 +83,8 @@ let rec string_of_stmt = function
   | If(e, s1, s2) ->  "\tif (" ^ string_of_expr e ^ ")" ^
     string_of_stmt s1 ^ "\telse\t" ^ string_of_stmt s2
   | For(o, e1, e_opt, e2, s) ->
-      "\tfor (" ^string_of_expr e_opt ^ " " ^ string_of_expr e1 ^ string_of_op o ^ " " ^ string_of_expr e2 ^ ") {\n\t\t" ^ string_of_stmt s ^ "\t}\n"
+      "\tfor (" ^string_of_expr e_opt ^ " " ^ string_of_expr e1 ^ string_of_op o ^
+      " " ^ string_of_expr e2 ^ ") {\n\t\t" ^ string_of_stmt s ^ "\t}\n"
   | Dealloc(e) -> "\tfree(" ^ string_of_expr e ^ ");\n"
   | ClassAssign(e1, s2, e2) -> "\t" ^ string_of_expr e1 ^ "." ^ s2 ^ " = " ^ string_of_expr e2 ^ ";\n"
   | ArrayAssign(s, e1, e2) -> "\t" ^ s ^ "[" ^ string_of_expr e1 ^ "] = " ^ string_of_expr e2 ^";\n"
@@ -99,8 +102,8 @@ let format_params fdecl =
 let string_of_fdecl fdecl  =
   let return_string = (
     match fdecl.typ with
-        Void -> ""
-      | _ -> string_of_typ fdecl.typ ^ " ") in
+      Void -> ""
+    | _ -> string_of_typ fdecl.typ ^ " ") in
 
   return_string ^ fdecl.fname ^ format_params fdecl ^
   "{\n" ^

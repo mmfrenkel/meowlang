@@ -19,22 +19,29 @@ let global_functions:(string, (L.llvalue * sfunc_decl)) Hashtbl.t = Hashtbl.crea
 (* Finds a struct by its original class name *)
 let find_struct_by_cls cls_name =
   try Hashtbl.find struct_types cls_name
-  with | Not_found -> raise (UnknownStruct("struct for class " ^ cls_name ^ "unknown"))
+  with Not_found ->
+    let msg = Printf.sprintf "struct for class %s unknown" cls_name
+    in raise (UnknownStruct(msg))
 
 (* Return the value for a variable, else raise error *)
 let lookup_variable var_name env =
   try Hashtbl.find env var_name
-  with _ -> raise (VariableNotFound("codegen error: " ^ undeclared_msg ^ "variable: " ^ var_name))
+  with _ ->
+    let msg = Printf.sprintf "codegen error: %s variable: %s" undeclared_msg var_name
+    in raise (VariableNotFound(msg))
 
 (* Return the value for a function name or argument *)
 let lookup_function func_name =
   try Hashtbl.find global_functions func_name
-  with _ -> raise (FunctionNotFound("codegen error: " ^ undeclared_msg ^  "function: " ^ func_name))
+  with _ ->
+    let msg = Printf.sprintf "codegen error: %s function: %s" undeclared_msg func_name
+    in raise (FunctionNotFound(msg))
 
 let lookup_index cls_name field_name =
   try Hashtbl.find struct_field_idx (cls_name ^ "." ^ field_name)
-  with _ -> raise (InstanceVariableNotFound("codegen error: " ^ cls_name ^ "." ^ field_name))
-
+  with _ ->
+    let msg = Printf.sprintf "codegen error: %s.%s" cls_name field_name
+    in raise (InstanceVariableNotFound(msg))
 
 let create_built_in return_typ args n m =
   let func_t = L.function_type return_typ args in
@@ -103,7 +110,6 @@ let format (typ, _) =
 let build_function fdecl =
 
   (*  First create the prototypes for build in functions (I/O and casting) *)
-
   let printf_func = (* variatic, so needs its own distinct builder *)
     let printf_t = L.var_arg_function_type i32_t [| str_t |] in
     L.declare_function "printf" printf_t the_module
@@ -114,7 +120,8 @@ let build_function fdecl =
   and itoa_func = create_built_in str_t [| i32_t |] "custom_itoa" the_module
   and ftoa_func = create_built_in str_t [| float_t |] "custom_ftoa" the_module
   and strcmp_func = create_built_in i32_t [| str_t ; str_t |] "custom_strcmp" the_module
-  and strcat_func = create_built_in str_t [| str_t ; str_t |] "custom_strcat" the_module in
+  and strcat_func = create_built_in str_t [| str_t ; str_t |] "custom_strcat" the_module
+  in
 
   let (the_function, _) = Hashtbl.find global_functions fdecl.sfname in
   let builder = L.builder_at_end context (L.entry_block the_function) in
@@ -210,7 +217,7 @@ let build_function fdecl =
         in raise (NotYetSupported(msg))
       ) lhs rhs "binop_int_tmp" builder
 
-    (* String concatenation *)  
+    (* String concatenation *)
     | SBinop(((A.String, _) as e1), A.Concat, ((A.String, _) as e2)) ->
       let lhs = expr builder e1 env
       and rhs = expr builder e2 env in

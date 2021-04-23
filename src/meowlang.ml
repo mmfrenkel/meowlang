@@ -27,8 +27,8 @@ let _ =
 
     (* Perform action based on specification *)
     match !action with
-      Ast -> print_string (string_of_program ast_with_imports) 
-    | _   ->
+      Ast -> print_string (string_of_program ast_with_imports)
+    | _ ->
         let sast = Semant.check ast_with_imports in
         match !action with
           Ast     -> ()

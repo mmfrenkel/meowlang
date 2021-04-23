@@ -100,7 +100,10 @@ let check_duplicates functions classes =
   (* duplicates in class names*)
   find_duplicate (List.map (fun c -> c.cname) classes) dup_class_msg;
   (* duplicates in methods within a class*)
-  List.iter (fun cls -> find_duplicate (List.map (fun m -> m.fname) cls.cfuncs) dup_method_msg) classes;
+  List.iter (
+    fun cls ->
+      find_duplicate (List.map (fun m -> m.fname) cls.cfuncs) dup_method_msg
+  ) classes;
   ()
 
 (* Add built in functions to the list of functions *)

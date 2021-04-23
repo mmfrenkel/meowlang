@@ -2,6 +2,14 @@
 
 # meowlang
 
+Meowlang is an object-oriented esoteric programming language inspired by LOLCODE (Adam Lindsay, 2007).
+
+The syntax is inspired by internet lolspeak, characterized by intentionally misspelled
+and grammatically incorrect natural language.
+
+Nevertheless, Meowlang is a general purpose programming language, providing
+support for user-defined classes and functions, arrays, and imports.
+
 ## I. Compile:
 
 To compile the compiler, from `/` or `src/` directories:
