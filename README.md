@@ -10,14 +10,14 @@ and grammatically incorrect natural language.
 Nevertheless, Meowlang is a general purpose programming language, providing
 support for user-defined classes and functions, arrays, and imports.
 
-## I. Compile:
+## I. Compile Compiler
 
 To compile the compiler, from `/` or `src/` directories:
 ```
 $ make
 ```
 
-## II. Run
+## II. Compile & Run .meow Programs
 
 ### 0. Hello World
 
@@ -34,7 +34,7 @@ in `/bin` from any directory and provide the relative path of your file:
 $ ./bin/meowlang.sh </path/to/meow/file.meow>
 ```
 
-### III. Testing Components of Compiler
+## III. Testing Indivudal Components of Compiler
 ```
 $ ./bin/meowlang.sh <program_name.meow> [flags]
 ```
