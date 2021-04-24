@@ -1,0 +1,21 @@
+HAI ITZ ME FUNC Main,
+
+    ITZ ME YARN val IZ "string1. ".
+    ITZ ME YARN dup_val IZ "string2.".
+    ITZ ME YARN str_str_concat.
+
+    ITZ ME NUMBAR flt IZ 2.0.
+    ITZ ME YARN str IZ " <- float to string.".
+    ITZ ME YARN flt_str_concat.
+
+    str_str_concat IZ CAT val AN dup_val.
+    PURR Meow WIT str_str_concat.
+    
+    BLEEP str_str_concat.
+
+    flt_str_concat IZ CAT flt AN str.
+    PURR Meow WIT flt_str_concat.
+
+    BLEEP flt_str_concat.
+
+KBYE
