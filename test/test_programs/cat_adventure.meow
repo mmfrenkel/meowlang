@@ -18,20 +18,34 @@ HAI ITZ ME FUNC Main,
     ITZ ME YARN combine.
 
     PSST these are the strings used in the story. You can initialize them here or create them elsewhere.
+
     ITZ ME YARN select_place IZ "
 After eating cake you don’t feel so well. Maybe a change of scenery would do you some good.
 Type 1 to live in the wild or Type anything else to stay in the apartment.".
+
     ITZ ME YARN select_1 IZ "
-You’ve found a pack of fellow felines to keep you company. However they soon grow annoyed of your domestic tendencies and kick you out. 
+You’ve found a pack of fellow felines to keep you company. However they soon
+grow annoyed of your domestic tendencies and kick you out.
 You have no choice but to return to the apartment.".
+
     ITZ ME YARN select_2 IZ "
-You curl up against the fireplace and have a nice long nap. You wake up to find your owner wanting to pet you. 
+You curl up against the fireplace and have a nice long nap. You wake up to
+find your owner wanting to pet you.
 How many pets does she give you?".
+
     ITZ ME YARN pet_allow_question IZ "
 How many pets will you allow?".
+
     ITZ ME YARN chocolate_msg IZ "
-Once you’ve been petted you leave your owner and go back to stealing food. You find that there is a box of chocolates on the counter containing 5 chocolates.
+Once you’ve been petted you leave your owner and go back to stealing food.
+You find that there is a box of chocolates on the counter containing 5 chocolates.
 Which chocolate do you want to eat? (Enter a number 0-4)".
+
+    ITZ ME YARN cakes IZ "
+How many cakes do you want to eat from the fridge today? (Please enter a digit for full enjoyment)".
+
+    ITZ ME YARN steal_food IZ " is such a pretty color. But unfortunately for your owner you like to steal food.".
+
     ITZ ME YARN end IZ "
 You have decided that enough is enough for one day. You go back to sleep.
 THE END".
@@ -45,9 +59,9 @@ What color is your fur?".
     PURR Scan WIT color.
 
     PURR Meow WIT "".
-    combine IZ CAT CAT CAT CAT "Hello there, " AN cat_name AN ". " AN color AN " is such a pretty color. But unfortunately for your owner you like to steal food.". 
+    combine IZ CAT CAT CAT CAT "Hello there, " AN cat_name AN ". " AN color AN steal_food.
     PURR Meow WIT combine.
-    PURR Meow WIT "How many cakes do you want to eat from the fridge today? (Please enter a digit for full enjoyment)".
+    PURR Meow WIT cakes.
 
     PURR Scan WIT num_cakes.
     count IZ NUMBR num_cakes.
@@ -65,7 +79,7 @@ What color is your fur?".
     YA RLY HAI
         PURR Meow WIT select_1.
     KBYE
-    
+
     PURR Meow WIT select_2.
     PURR Scan WIT pet_give.
     pet_give_num IZ NUMBR pet_give.
@@ -104,12 +118,24 @@ KBYE
 
 PSST Function that returns a string associated with an array index
 HAI ITZ ME FUNC eat_chocolate WIT NUMBR chocolate_idx,
-    MAEK chocolate_box NEW BUCKET OF YARN HOLDS 5,
+
+    ITZ ME NUMBR max_chocolates IZ 5.
+
+    MAEK chocolate_box NEW BUCKET OF YARN HOLDS max_chocolates,
         WIT "This chocolate gives off a horrible odor."
         AN "You have found sea salt and caramel chocolate."
         AN "This chocolate is milky and sweet."
         AN "You have found white velvety chocolate."
         AN "??? This does not look like chocolate.".
-    PURR Meow WIT chocolate_box[chocolate_idx].
+
+    EITHER OF SMALLR chocolate_idx THAN 0 AN BIGGR chocolate_idx THAN max_chocolates
+    O RLY?
+    YA RLY HAI
+        PURR Meow WIT "No chocolates for you!".
+    KBYE
+    NO WAI HAI
+        PURR Meow WIT chocolate_box[chocolate_idx].
+    KBYE
+
     BLEEP chocolate_box.
 KBYE
