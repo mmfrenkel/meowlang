@@ -1,0 +1,13 @@
+
+HAI ITZ ME FUNC Main,
+
+        ITZ ME YARN favorite_color.
+
+        PSST Reading in content
+        PURR Meow WIT "Please tell me your favorite color: ".
+        PURR Scan WIT favorite_color.
+
+        PURR Meow WIT CAT "Your favorite color is: " AN favorite_color.
+
+        BLEEP favorite_color.
+KBYE
