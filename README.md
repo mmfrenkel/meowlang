@@ -41,9 +41,9 @@ $ ./bin/meowlang.sh <program_name.meow> [flags]
 Currently the following options are supported as a (mutually exclusive) command line `FLAG`:
 * `-a`: Print out abstract syntax tree
 * `-s`: Run semantic checks
-* `-c`: Compile to LLVM and print
+* `-c`: Compile to LLVM and print target output.
 
-If flag is not specified, `-c` is used.
+If flag is not specified, then the program will be fully compiled and also run.
 
 ### ii. Regression Test Suite
 

@@ -9,6 +9,8 @@ parser.mli
 parser.output
 scanner.ml
 meowlang.native
+walk.sh
+listings.txt
 
 # test files
 test/global_log.out
