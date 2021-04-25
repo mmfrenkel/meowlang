@@ -1,4 +1,4 @@
-
+#!/bin/bash
 LLC="llc"                             # LLVM compiler
 CC="cc"                               # C compiler
 REL_DIR="../../src"                   # src directory relative to test dir

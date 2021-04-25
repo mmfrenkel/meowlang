@@ -1,0 +1,11 @@
+
+
+Main()
+{
+	char * favorite_color;
+	printf("%X\n", "Please tell me your favorite color: ");
+	Scan(favorite_color);
+	printf("%X\n", "Your favorite color is: " + favorite_color);
+	free(favorite_color);
+}
+

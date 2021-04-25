@@ -1,5 +1,4 @@
-# https://stackoverflow.com/questions/59895/how-can-i-get-the-source-directory-of-a-bash-script-from-within-the-script-itsel
-
+#!/bin/bash
 LLC="llc"                             # LLVM compiler
 CC="cc"                               # C compiler
 
