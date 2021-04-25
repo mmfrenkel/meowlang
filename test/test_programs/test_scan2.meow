@@ -8,6 +8,5 @@ HAI ITZ ME FUNC Main,
         PURR Scan WIT favorite_color.
 
         PURR Meow WIT CAT "Your favorite color is: " AN favorite_color.
-
         BLEEP favorite_color.
 KBYE
