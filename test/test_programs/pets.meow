@@ -1,0 +1,22 @@
+HAI ITZ ME CLASS PET,
+    ITZ ME YARN name.
+    ITZ ME YARN species.
+    ITZ ME NUMBR age IZ 0.
+    ITZ ME NUMBR store_id.
+
+    HAI ITZ ME YARN FUNC Get_Name,
+        GIVE name.
+    KBYE
+
+    HAI ITZ ME YARN FUNC Get_Species,
+        GIVE species.
+    KBYE
+
+    HAI ITZ ME FUNC Rename WIT YARN new_name,
+        name IZ new_name.
+    KBYE
+
+    HAI ITZ ME FUNC Feed,
+        PURR Meow WIT "Nom nom".
+    KBYE
+KBYE

@@ -1,0 +1,50 @@
+GIMME PETS?
+
+ HAI ITZ ME NUMBR FUNC Main,
+
+    ITZ ME YARN user_value.
+    ITZ ME NUMBR user_selection.
+    ITZ ME YARN pet_name.
+    ITZ ME YARN pet_species.
+
+    PSST Make some pets
+    MAEK Silvester NEW PET,
+        WIT name IZ "Silvester"
+        AN species IZ "cat"
+        AN age IZ 4
+        AN store_id IZ 0.
+
+    MAEK Tank NEW PET,
+        WIT name IZ "Tank"
+        AN species IZ "dog"
+        AN age IZ 2
+        AN store_id IZ 1.
+
+    MAEK Hopper NEW PET.
+    name IN Hopper IZ "Hopper".
+    species IN Hopper IZ "Rabbit".
+    age IN Hopper IZ 10.
+    store_id IN Hopper IZ 2.
+
+    MAEK store_pets NEW BUCKET OF PET HOLDS 3,
+    	WIT Silvester
+    	AN Tank
+    	AN Hopper.
+
+    PSST Ask the user which pet they want
+    PURR Meow WIT "Please pick a pet by specifying a value between 0 and 2!".
+    PURR Scan WIT user_value.
+    user_selection IZ NUMBR user_value.
+
+    PSST Report back!
+    pet_name IZ PURR Get_Name IN store_pets[user_selection].
+    pet_species IZ PURR Get_Species IN store_pets[user_selection].
+    PURR Meow WIT CAT "You're bringing home a " AN CAT pet_species AN CAT " named " AN pet_name.
+
+    BLEEP Hopper.
+    BLEEP Silvester.
+    BLEEP Tank.
+    BLEEP store_pets.
+    GIVE 0.
+
+KBYE
