@@ -1,0 +1,18 @@
+
+
+int Main()
+{
+	int count;
+	float float_count = 2.34534534;
+	char * value;
+	int count2 = 203423;
+	printf("%X\n", float_count);
+	count = (int) float_count;
+	printf("%X\n", count);
+	printf("%X\n", count2);
+	value = (char *) count2;
+	printf("%X\n", value);
+	free(value);
+	return 0;
+}
+

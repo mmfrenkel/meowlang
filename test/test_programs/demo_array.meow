@@ -1,0 +1,16 @@
+HAI ITZ ME NUMBR FUNC Main,
+
+    PSST Create simple array with all elements initialized
+    MAEK animals NEW BUCKET OF YARN HOLDS 3,
+        WIT "Cats"
+        AN "Dogs".
+
+    animals[2] IZ "More dogs".
+
+    PURR Meow WIT animals[0].
+    PURR Meow WIT animals[1].
+    PURR Meow WIT animals[2].
+
+    BLEEP animals.
+    GIVE 0.
+KBYE

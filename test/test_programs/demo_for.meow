@@ -1,0 +1,26 @@
+HAI ITZ ME FUNC Main,
+
+        ITZ ME NUMBR count.
+        ITZ ME YARN count_str.
+        ITZ ME NUMBR index.
+        ITZ ME YARN condition.
+        count IZ 0.
+
+        PSST Decrementing with initialized index
+        count IZ 20.
+        IM IN YR LOOP count NERFIN AN BIGGR count THAN 10 HAI
+            condition IZ "count is still more than 10. ".
+            count_str IZ YARN count.
+            condition IZ CAT condition AN "count is: ".
+            condition IZ CAT condition AN count_str.
+            PURR Meow WIT condition.
+        KBYE
+
+        BLEEP condition.
+        
+        PSST Initialize index and then increment
+        IM IN YR LOOP index NERFIN index IZ 15 AN BIGGR index THAN 10 HAI
+            condition IZ "index is still more than 10".
+        KBYE
+
+KBYE

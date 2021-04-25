@@ -1,0 +1,18 @@
+
+
+Main()
+{
+	char * val = "string1. ";
+	char * dup_val = "string2.";
+	char * str_str_concat;
+	float flt = 2.0;
+	char * str = " <- float to string.";
+	char * flt_str_concat;
+	str_str_concat = val + dup_val;
+	printf("%X\n", str_str_concat);
+	free(str_str_concat);
+	flt_str_concat = flt + str;
+	printf("%X\n", flt_str_concat);
+	free(flt_str_concat);
+}
+
