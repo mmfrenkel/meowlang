@@ -34,9 +34,9 @@ $ ./bin/meowlang.sh </path/to/meow/file.meow>
 
 ## III. Testing Individual Components of Compiler
 ```
-$ ./bin/meowlang.sh <program_name.meow> [flags]
+$ ./bin/meowlang.sh <program_name.meow> [-a|-s|-c]
 ```
-Currently the following options are supported as a (mutually exclusive) command line `FLAG`:
+Currently the following options are supported using a mutually exclusive, optional command line flag:
 * `-a`: Print out abstract syntax tree
 * `-s`: Run semantic checks
 * `-c`: Compile to LLVM and print target output.
