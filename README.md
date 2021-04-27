@@ -5,10 +5,8 @@
 Meowlang is an object-oriented esoteric programming language inspired by LOLCODE (Adam Lindsay, 2007).
 
 The syntax is inspired by internet lolspeak, characterized by intentionally misspelled
-and grammatically incorrect natural language.
-
-Nevertheless, Meowlang is a general purpose programming language, providing
-support for user-defined classes and functions, arrays, and imports.
+and grammatically incorrect natural language. Nevertheless, Meowlang is a general purpose 
+programming language, providing support for user-defined classes and functions, arrays, and imports.
 
 ## I. Compile Compiler
 
@@ -34,7 +32,7 @@ in `/bin` from any directory and provide the relative path of your file:
 $ ./bin/meowlang.sh </path/to/meow/file.meow>
 ```
 
-## III. Testing Indivudal Components of Compiler
+## III. Testing Individual Components of Compiler
 ```
 $ ./bin/meowlang.sh <program_name.meow> [flags]
 ```
